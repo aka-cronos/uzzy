@@ -22,7 +22,8 @@ enum Codex: ProviderAdapter {
     /// provider may send the weekly window first. Windows of the same length
     /// and limit name are copies of one quota, wherever they appear in the
     /// response, and the reading decides whether they agree. Credits, spend
-    /// control, model usage and every identifier are ignored.
+    /// control, model usage and every identifier are ignored; the plan is
+    /// read apart.
     static func quotas(from body: Data, readAt moment: Date) -> Result<[QuotaReading], Failure> {
         guard let response = try? JSONDecoder().decode(Response.self, from: body) else { return .failure(.incompatibleResponse) }
         // A named limit may arrive in several entries, so its windows are
@@ -52,6 +53,18 @@ enum Codex: ProviderAdapter {
         else { return nil }
         return count
     }
+
+    /// `plan_type`, by ChatGPT's name. Read on its own, like the banked
+    /// resets, so a bad value hides the plan and never the quotas.
+    static func plan(of session: Session, response body: Data) -> String? {
+        (try? JSONDecoder().decode(Plan.self, from: body))?.plan_type.flatMap { planNames[$0] }
+    }
+
+    /// Every `plan_type` Uzzy knows. Any other value shows no plan.
+    private static let planNames = [
+        "free": "Free", "go": "Go", "plus": "Plus", "pro": "Pro",
+        "team": "Team", "business": "Business", "enterprise": "Enterprise", "edu": "Edu",
+    ]
 
     private static func windows(of rateLimit: RateLimit?) -> [Window] {
         [rateLimit?.primary_window, rateLimit?.secondary_window].compactMap { $0 }
@@ -102,6 +115,10 @@ enum Codex: ProviderAdapter {
                 .nestedContainer(keyedBy: CreditKeys.self, forKey: .rate_limit_reset_credits)
             availableCount = try? credits?.decodeIfPresent(Int.self, forKey: .available_count)
         }
+    }
+
+    private struct Plan: Decodable {
+        let plan_type: String?
     }
 
     private struct Response: Decodable {

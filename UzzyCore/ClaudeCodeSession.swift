@@ -1,11 +1,11 @@
 import Foundation
 
 /// Reads, read-only, the session Claude Code keeps on this Mac: the access
-/// token from the Keychain and the account identity from `~/.claude.json`.
-/// It keeps only the access token, never the refresh token, and never
-/// refreshes tokens or writes credentials. It never falls back on another
-/// source, such as a `.credentials.json` file, when the Keychain has no
-/// usable session.
+/// token and the plan from the Keychain, and the account identity from
+/// `~/.claude.json`. It keeps only the access token and the plan, never the
+/// refresh token, and never refreshes tokens or writes credentials. It never
+/// falls back on another source, such as a `.credentials.json` file, when
+/// the Keychain has no usable session.
 ///
 /// It reads the Keychain item through `/usr/bin/security`, which Claude Code
 /// uses to write it: the item trusts that tool, so the read shows no prompt.
@@ -39,12 +39,13 @@ public struct ClaudeCodeSessionReader: SessionReader {
         case .denied: return .accessDenied
         case .failed: return .storeUnavailable
         }
-        // Decodes only the access token; the rest of the item is discarded.
+        // Decodes only the access token and the plan; the rest of the item
+        // is discarded.
         guard let stored = try? JSONDecoder().decode(StoredCredentials.self, from: credentials) else {
             return .unknownFormat
         }
-        guard let token = stored.claudeAiOauth?.accessToken, !token.isEmpty else { return .noSession }
-        return .session(Session(accessToken: token, accountID: accountID()))
+        guard let oauth = stored.claudeAiOauth, let token = oauth.accessToken, !token.isEmpty else { return .noSession }
+        return .session(Session(accessToken: token, accountID: accountID(), plan: oauth.subscriptionType))
     }
 
     private enum KeychainItem {
@@ -101,6 +102,19 @@ public struct ClaudeCodeSessionReader: SessionReader {
 
         struct OAuth: Decodable {
             let accessToken: String?
+            /// The plan, e.g. `"max"`. Read leniently: a value that is not
+            /// text gives no plan, and never loses the session.
+            let subscriptionType: String?
+
+            private enum CodingKeys: String, CodingKey {
+                case accessToken, subscriptionType
+            }
+
+            init(from decoder: any Decoder) throws {
+                let values = try decoder.container(keyedBy: CodingKeys.self)
+                accessToken = try values.decodeIfPresent(String.self, forKey: .accessToken)
+                subscriptionType = (try? values.decodeIfPresent(String.self, forKey: .subscriptionType)).flatMap { $0 }
+            }
         }
     }
 

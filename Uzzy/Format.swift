@@ -56,6 +56,12 @@ enum Format {
         }
     }
 
+    /// A card's title as VoiceOver reads it, e.g. "Claude, plan Max", so the
+    /// separator the card shows is not read out.
+    static func cardTitle(_ provider: String, plan: String?) -> String {
+        plan.map { "\(provider), plan \($0)" } ?? provider
+    }
+
     /// The banked resets of an account, spelled out, e.g. "3 restablecimientos
     /// disponibles". «disponible» is allowed here only: it matches Codex's
     /// own "N available".

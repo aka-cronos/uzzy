@@ -119,16 +119,18 @@ public final class ManualClock: WallClock {
     }
 }
 
-/// Returns the sample session, or `reading` when set, and counts the reads.
-/// Reading a real session can show the Keychain prompt.
+/// Returns `session`, the sample one by default, or `reading` when set, and
+/// counts the reads. Reading a real session can show the Keychain prompt.
 public actor ControlledSessionReader: SessionReader {
     public private(set) var reads = 0
-    private var reading = SessionReading.session(Samples.session)
+    private var reading: SessionReading
     private var held = false
     private var heldReads: [CheckedContinuation<Void, Never>] = []
     private var readWaiters: [(count: Int, continuation: CheckedContinuation<Void, Never>)] = []
 
-    public init() {}
+    public init(session: Session = Samples.session) {
+        reading = .session(session)
+    }
 
     public func read() async -> SessionReading {
         reads += 1

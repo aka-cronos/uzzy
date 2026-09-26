@@ -7,10 +7,15 @@ public struct Session: Sendable, Equatable {
     public let accessToken: String
     /// Account identity; `nil` when it cannot be verified.
     public let accountID: String?
+    /// The account's plan as the official app stores it, e.g. `"max"`: the
+    /// provider's own identifier, not a name to show. `nil` when the session
+    /// holds none, or the provider reports it elsewhere.
+    public let plan: String?
 
-    public init(accessToken: String, accountID: String?) {
+    public init(accessToken: String, accountID: String?, plan: String? = nil) {
         self.accessToken = accessToken
         self.accountID = accountID
+        self.plan = plan
     }
 }
 
