@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/panel.png" width="420" alt="The Uzzy panel open from the menu bar, with one card each for Claude, Codex and Cursor. Every quota has its own bar, its used percentage and its reset time.">
+  <img src="docs/images/panel.png" width="420" alt="The Uzzy panel open from the menu bar, with one card each for Claude, Codex and Cursor and each account's plan next to its title. Every quota has its own bar, its used percentage and its reset time; the Claude card also shows the usage credits spent this month, and the Codex card a badge with its banked resets.">
 </p>
 
 > [!NOTE]
