@@ -49,6 +49,10 @@ _Avoid_: Login, account (the account is the identity behind a session), the 5-ho
 The provider identity behind a session, e.g. Claude Code's account UUID. Every last valid reading belongs to the account whose session produced it.
 _Avoid_: User, profile, session (the session is how Uzzy reaches the account).
 
+**Plan**:
+The subscription an account is on, by the provider's own name, e.g. Claude's «Max», ChatGPT's «Plus» or Cursor's «Pro+». It belongs to the account, not to a quota, and gives context to the quotas: Uzzy shows it next to the card's title with the last valid reading it came with. Uzzy shows only plans the provider reports and Uzzy knows by name; it never guesses a plan, infers it from the quotas or shows the provider's raw identifier. In Spanish copy it is «plan».
+_Avoid_: Tier, membership, subscription type (the providers' field names), account type.
+
 **Uncertain identity**:
 The state of a session whose account cannot be verified, e.g. because its identity is missing.
 _Avoid_: Unknown account (as if it were a distinct account), anonymous session.
