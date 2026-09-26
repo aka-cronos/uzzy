@@ -145,7 +145,7 @@ private struct CardView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .firstTextBaseline) {
-                Text(card.provider.name).fontWeight(.semibold)
+                CardTitle(provider: card.provider, plan: card.plan)
                 if let bankedResets = card.bankedResets {
                     BankedResetsButton(count: bankedResets)
                 }
@@ -177,6 +177,28 @@ private struct CardView: View {
         }
         .padding(.vertical, 14)
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+/// The provider's name and, when the provider reports it, the account's plan:
+/// «Claude · Max». A plan that does not fit is cut before the name is.
+private struct CardTitle: View {
+    let provider: Provider
+    let plan: String?
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 4) {
+            Text(provider.name)
+                .fontWeight(.semibold)
+                .layoutPriority(1)
+            if let plan {
+                Text("· \(plan)")
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .lineLimit(1)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Format.cardTitle(provider.name, plan: plan))
     }
 }
 
