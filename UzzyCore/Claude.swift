@@ -51,6 +51,15 @@ enum Claude: ProviderAdapter {
         return .success(quotas)
     }
 
+    /// The plan Claude Code keeps with the session (`subscriptionType`), by
+    /// Claude's name. The response names no plan.
+    static func plan(of session: Session, response body: Data) -> String? {
+        session.plan.flatMap { planNames[$0] }
+    }
+
+    /// Every `subscriptionType` Uzzy knows. Any other value shows no plan.
+    private static let planNames = ["pro": "Pro", "max": "Max", "team": "Team", "enterprise": "Enterprise"]
+
     private static func reading(_ period: QuotaPeriod, _ windows: [Window], at moment: Date) -> QuotaReading {
         QuotaReading(
             period: period,

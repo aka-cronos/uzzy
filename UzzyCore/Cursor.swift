@@ -47,6 +47,16 @@ enum Cursor: ProviderAdapter {
         ])
     }
 
+    /// The plan Cursor keeps with the session (`stripeMembershipType`), by
+    /// Cursor's name. The usage response names no plan.
+    static func plan(of session: Session, response body: Data) -> String? {
+        session.plan.flatMap { planNames[$0] }
+    }
+
+    /// Every `stripeMembershipType` Uzzy knows. Any other value, such as a
+    /// trial, shows no plan.
+    private static let planNames = ["free": "Hobby", "pro": "Pro", "pro_plus": "Pro+", "ultra": "Ultra"]
+
     /// `billingCycleEnd` is a string of epoch milliseconds.
     private static func date(fromMilliseconds text: String) -> Date? {
         guard let milliseconds = Int64(text), milliseconds > 0 else { return nil }

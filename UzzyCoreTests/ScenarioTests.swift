@@ -32,6 +32,12 @@ struct ScenarioTests {
         #expect(!core.state.isQuerying)
     }
 
+    @Test func quotasShowEachProvidersPlanNextToItsName() async {
+        let core = await Scenario.quotas.start()
+
+        #expect(core.state.cards.map(\.plan) == ["Max", "Plus", "Pro+"])
+    }
+
     @Test func usageCreditsShowsClaudeSpendingPastItsMonthlyLimit() async {
         let core = await Scenario.usageCredits.start()
 

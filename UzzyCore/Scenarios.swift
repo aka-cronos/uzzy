@@ -51,7 +51,8 @@ extension Scenario {
         networkFailures, refused, longContent, bankedResets,
     ]
 
-    /// Every card shows the sample quotas.
+    /// Every card shows the sample quotas, and its plan next to its name:
+    /// «Claude · Max», «Codex · Plus» and «Cursor · Pro+».
     public static let quotas = Scenario("quotas", "Cuotas al día") { stage in
         await stage.openPanel()
     }
@@ -317,8 +318,12 @@ extension Scenario {
 final class Stage {
     let clock = ManualClock(Samples.readingMoment)
     let transport = ControlledTransport()
+    /// Each official app's sample session, with its plan where the app keeps
+    /// one. Codex's plan comes in its sample response.
     let sessionReaders: [Provider: ControlledSessionReader] = [
-        .claude: ControlledSessionReader(), .codex: ControlledSessionReader(), .cursor: ControlledSessionReader(),
+        .claude: ControlledSessionReader(session: Samples.claudeSession),
+        .codex: ControlledSessionReader(),
+        .cursor: ControlledSessionReader(session: Samples.cursorSession),
     ]
     let core: UsageCore
 

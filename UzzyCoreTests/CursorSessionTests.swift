@@ -209,6 +209,16 @@ struct SampleCursorDatabase {
         }
     }
 
+    /// Stores the plan Cursor keeps next to the session, given as an SQL
+    /// literal (`'pro_plus'`, `X'FF'`…), or removes it when `nil`.
+    func store(membershipType literal: String?) throws {
+        if let literal {
+            try execute("INSERT INTO ItemTable VALUES ('cursorAuth/stripeMembershipType', \(literal))")
+        } else {
+            try execute("DELETE FROM ItemTable WHERE key = 'cursorAuth/stripeMembershipType'")
+        }
+    }
+
     func dropTable() throws {
         try execute("DROP TABLE ItemTable")
     }

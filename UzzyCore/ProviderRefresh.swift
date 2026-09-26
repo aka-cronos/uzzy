@@ -11,6 +11,10 @@ protocol ProviderAdapter {
     /// The banked resets in a response whose quotas were read, if it holds
     /// a positive count. Never fails the reading.
     static func bankedResets(from body: Data) -> Int?
+    /// The name of the account's plan, from the session a query used or the
+    /// response whose quotas were read. `nil` when they report no plan the
+    /// adapter knows. Never fails the reading.
+    static func plan(of session: Session, response body: Data) -> String?
 }
 
 extension ProviderAdapter {
@@ -82,6 +86,12 @@ final class ProviderRefresh {
     var bankedResets: Int? {
         guard case .quotas(let reading) = reading else { return nil }
         return reading.bankedResets
+    }
+
+    /// With any quotas the card shows, fresh or stale: the plan tells whose
+    /// they are. Without quotas the card has no account to name.
+    var plan: String? {
+        reading.lastValidReadingOfAnyAccount?.plan
     }
 
     func setEnabled(_ enabled: Bool) {
@@ -240,9 +250,9 @@ final class ProviderRefresh {
         let result = await transport.send(adapter.request(for: session))
         guard isCurrent(queryID) else { return nil }
         let failure: Failure
-        switch answer(to: result, at: clock.now()) {
-        case .quotas(let quotas, let bankedResets):
-            return .quotas(LastValidReading(quotas: quotas, accountID: session.accountID, bankedResets: bankedResets))
+        switch answer(to: result, of: session, at: clock.now()) {
+        case .quotas(let quotas, let bankedResets, let plan):
+            return .quotas(LastValidReading(quotas: quotas, accountID: session.accountID, bankedResets: bankedResets, plan: plan))
         case .failed(let why): failure = why
         }
         log.record(.queryFailed(provider, failure))
@@ -275,8 +285,9 @@ final class ProviderRefresh {
         }
     }
 
-    /// The quotas in the provider's answer, or why there are none.
-    private func answer(to result: HTTPResult, at moment: Date) -> Answer {
+    /// The quotas in the provider's answer to a query made with `session`,
+    /// or why there are none.
+    private func answer(to result: HTTPResult, of session: Session, at moment: Date) -> Answer {
         let response: HTTPResponse
         switch result {
         case .response(let received): response = received
@@ -287,7 +298,12 @@ final class ProviderRefresh {
         switch response.status {
         case 200:
             switch adapter.quotas(from: response.body, readAt: moment) {
-            case .success(let quotas): return .quotas(quotas, bankedResets: adapter.bankedResets(from: response.body))
+            case .success(let quotas):
+                return .quotas(
+                    quotas,
+                    bankedResets: adapter.bankedResets(from: response.body),
+                    plan: adapter.plan(of: session, response: response.body)
+                )
             case .failure(let failure): return .failed(failure)
             }
         case 401: return .failed(.sessionExpired)
@@ -368,7 +384,7 @@ private struct RetryWait {
 
 /// What a provider's answer to a query says.
 private enum Answer {
-    case quotas([QuotaReading], bankedResets: Int?)
+    case quotas([QuotaReading], bankedResets: Int?, plan: String?)
     case failed(Failure)
 }
 
@@ -476,12 +492,13 @@ private enum ProviderReading {
     }
 }
 
-/// The quotas and banked resets of a provider's last valid query, and the
-/// account they belong to; `nil` when it could not be verified.
+/// The quotas, banked resets and plan of a provider's last valid query, and
+/// the account they belong to; `nil` when it could not be verified.
 private struct LastValidReading {
     let quotas: [QuotaReading]
     let accountID: String?
     let bankedResets: Int?
+    let plan: String?
 }
 
 /// When a `Retry-After` header, in seconds or as an HTTP date, says to query

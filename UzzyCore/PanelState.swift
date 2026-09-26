@@ -33,11 +33,17 @@ public struct Card: Sendable, Equatable {
     /// card's fresh quotas. `nil` when there are none to show: the provider
     /// sent no positive count, or the card has no fresh quotas.
     public var bankedResets: Int?
+    /// The name of the account's plan, as the provider names it, e.g.
+    /// "Max". From the same query as the card's quotas, fresh or stale.
+    /// `nil` when the card shows no quotas, or the provider reported no plan
+    /// Uzzy knows: it is never guessed.
+    public var plan: String?
 
-    public init(provider: Provider, content: CardContent, bankedResets: Int? = nil) {
+    public init(provider: Provider, content: CardContent, bankedResets: Int? = nil, plan: String? = nil) {
         self.provider = provider
         self.content = content
         self.bankedResets = bankedResets
+        self.plan = plan
     }
 }
 

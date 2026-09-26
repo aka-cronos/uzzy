@@ -9,6 +9,12 @@ public enum Samples {
     /// A fictional session of the sample account.
     public static let session = Session(accessToken: "sample-token", accountID: "sample-account")
 
+    /// The sample session as Claude Code keeps it, on the Max plan.
+    public static let claudeSession = Session(accessToken: "sample-token", accountID: "sample-account", plan: "max")
+
+    /// The sample session as Cursor keeps it, on the Pro+ plan.
+    public static let cursorSession = Session(accessToken: "sample-token", accountID: "sample-account", plan: "pro_plus")
+
     /// Reading moment consistent with the sample responses: 2026-09-23T14:32:00Z.
     public static let readingMoment = Date(timeIntervalSince1970: 1_790_173_920)
 
@@ -32,9 +38,9 @@ public enum Samples {
     }
     """#.utf8)
 
-    /// Codex's `GET /backend-api/wham/usage` for a ChatGPT session. Includes
-    /// fields that are ignored (identifiers, plan, credits, `spend_control`
-    /// and `model_usage`).
+    /// Codex's `GET /backend-api/wham/usage` for a ChatGPT session, on the
+    /// Plus plan. Includes fields that are ignored (identifiers, credits,
+    /// `spend_control` and `model_usage`).
     public static let codexUsageResponse = Data(#"""
     {
       "user_id": "user-sample",
