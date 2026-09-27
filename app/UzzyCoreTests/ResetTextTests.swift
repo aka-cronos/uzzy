@@ -2,8 +2,8 @@ import Foundation
 import Testing
 import UzzyCore
 
-/// The reset text of a quota in each language, through the usage core and the app's formatter,
-/// which this target compiles from `Uzzy/Format.swift`.
+/// The reset text of a quota in each language, through the usage core and
+/// the app's formatter, which this target compiles from `Uzzy/Format.swift`.
 @MainActor
 @Suite(.timeLimit(.minutes(1)))
 struct ResetTextTests {

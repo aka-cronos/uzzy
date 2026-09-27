@@ -280,7 +280,7 @@ private struct QuotaView: View {
                         .font(.title3.weight(.semibold))
                         .monospacedDigit()
                         .foregroundStyle(quota.isStale ? .secondary : .primary)
-                    Text(magnitude.name).font(.caption).foregroundStyle(.secondary)
+                    Text(Format.current.name(of: magnitude)).font(.caption).foregroundStyle(.secondary)
                 }
                 Bar(fraction: percent / 100)
                     .opacity(quota.isStale ? 0.5 : 1)
@@ -316,7 +316,7 @@ private struct QuotaName: View {
     let quota: Quota
 
     var body: some View {
-        Text(quota.period.name)
+        Text(Format.current.name(of: quota.period))
         if quota.isStale {
             Text("Out of date").font(.caption.weight(.semibold)).foregroundStyle(.orange)
         }
@@ -330,7 +330,7 @@ private struct QuotaNotice: View {
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
-            Text(period.name)
+            Text(Format.current.name(of: period))
             Spacer()
             Text(notice).fontWeight(.semibold).foregroundStyle(.orange)
         }
@@ -444,29 +444,6 @@ private struct FailureMessage: View {
                 title: "Incompatible Cursor reset",
                 detail: "Cursor sent the reset date in a format \(Format.appName) doesn't recognize. Click Refresh; if it continues, the integration needs an update."
             )
-        }
-    }
-}
-
-private extension QuotaPeriod {
-    var name: String {
-        switch self {
-        case .fiveHours: String(localized: "5 hours")
-        case .weekly: String(localized: "Weekly")
-        case .lasting(let seconds): Format.current.duration(seconds: seconds)
-        case .billingCycle: String(localized: "Billing cycle")
-        case .usageCredits: String(localized: "Usage credits")
-        case .limit(let name, .billingCycle): name
-        case .limit(let name, let period): "\(period.name) · \(name)"
-        }
-    }
-}
-
-extension QuotaMagnitude {
-    var name: String {
-        switch self {
-        case .used: String(localized: "used")
-        case .remaining: String(localized: "left")
         }
     }
 }

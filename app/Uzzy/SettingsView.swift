@@ -24,8 +24,8 @@ struct SettingsView: View {
                     // The hidden title still names the control for VoiceOver.
                     Picker(title, selection: $selectedMagnitude) {
                         // The same words as the suffix after each card's figure.
-                        Text(QuotaMagnitude.used.name.localizedCapitalized).tag(QuotaMagnitude.used)
-                        Text(QuotaMagnitude.remaining.name.localizedCapitalized).tag(QuotaMagnitude.remaining)
+                        Text(Format.current.name(of: QuotaMagnitude.used).localizedCapitalized).tag(QuotaMagnitude.used)
+                        Text(Format.current.name(of: QuotaMagnitude.remaining).localizedCapitalized).tag(QuotaMagnitude.remaining)
                     }
                     .pickerStyle(.segmented)
                     .labelsHidden()

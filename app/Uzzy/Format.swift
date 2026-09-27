@@ -8,8 +8,9 @@ struct Format {
     /// times and money.
     let locale: Locale
 
-    /// `Locale.current` is the language the app runs in plus the system
-    /// region, e.g. "en_ES", and carries the person's 12/24-hour choice.
+    /// By default, the current locale: the language the app runs in plus the
+    /// system region, e.g. "en_ES", with the person's 12/24-hour choice. It
+    /// follows a change of region while the app runs.
     init(locale: Locale = .autoupdatingCurrent) {
         self.locale = locale
     }
@@ -77,6 +78,30 @@ struct Format {
             text("Reset pending confirmation")
         case .at(let date):
             text("Resets \(dayAndTime(date, now: now)) · in \(countdown(date.timeIntervalSince(now)))")
+        }
+    }
+
+    /// A quota's name, by its period: e.g. "Weekly", or "Weekly · Sonnet" for
+    /// a limit the provider names. A limit over the billing cycle, e.g.
+    /// "Cursor Models", goes by its name alone.
+    func name(of period: QuotaPeriod) -> String {
+        switch period {
+        case .fiveHours: text("5 hours")
+        case .weekly: text("Weekly")
+        case .lasting(let seconds): duration(seconds: seconds)
+        case .billingCycle: text("Billing cycle")
+        case .usageCredits: text("Usage credits")
+        case .limit(let name, .billingCycle): name
+        case .limit(let name, let period): "\(self.name(of: period)) · \(name)"
+        }
+    }
+
+    /// The word after a card's percentage, and the Settings choice between
+    /// them.
+    func name(of magnitude: QuotaMagnitude) -> String {
+        switch magnitude {
+        case .used: text("used")
+        case .remaining: text("left")
         }
     }
 

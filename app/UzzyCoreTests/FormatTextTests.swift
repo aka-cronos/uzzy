@@ -2,13 +2,6 @@ import Foundation
 import Testing
 import UzzyCore
 
-extension Format {
-    /// Spanish text and the Spanish region's 24-hour clock.
-    static let spanish = Format(locale: Locale(identifier: "es_ES"))
-    /// English text and the US region's 12-hour clock.
-    static let english = Format(locale: Locale(identifier: "en_US"))
-}
-
 /// The app's formatted copy in each language, from `Uzzy/Format.swift`, which
 /// this target compiles. Each test sets the language, so none depends on the
 /// language of the Mac that runs it.
@@ -16,11 +9,14 @@ struct FormatTextTests {
     /// A Thursday morning in the time zone the tests run in.
     let now = moment(day: 24, hour: 10, minute: 0)
 
+    /// A moment in September 2026, in the time zone the tests run in.
     static func moment(day: Int, hour: Int, minute: Int) -> Date {
         Calendar.current.date(from: DateComponents(year: 2026, month: 9, day: day, hour: hour, minute: minute))!
     }
 
+    /// Usage credits spent this month.
     let spent = Money(amount: Decimal(string: "53.06")!, currency: "USD")
+    /// The monthly spend limit of those usage credits.
     let limit = Money(amount: 40, currency: "USD")
 
     @Test func commandNames() {
@@ -121,5 +117,26 @@ struct FormatTextTests {
         #expect(Format.english.duration(seconds: 5 * 3_600) == "5 hours")
         #expect(Format.english.duration(seconds: 5_400) == "90 min")
         #expect(Format.english.duration(seconds: 45) == "45 s")
+    }
+
+    @Test func aQuotaIsNamedByItsPeriod() {
+        let periods: [QuotaPeriod] = [
+            .fiveHours, .weekly, .billingCycle, .usageCredits, .lasting(seconds: 86_400),
+            .limit("Sonnet", .weekly), .limit("Cursor Models", .billingCycle),
+        ]
+
+        #expect(periods.map(Format.spanish.name(of:)) == [
+            "5 horas", "Semanal", "Ciclo de facturación", "Créditos de uso", "1 día", "Semanal · Sonnet", "Cursor Models",
+        ])
+        #expect(periods.map(Format.english.name(of:)) == [
+            "5 hours", "Weekly", "Billing cycle", "Usage credits", "1 day", "Weekly · Sonnet", "Cursor Models",
+        ])
+    }
+
+    @Test func aPercentageNamesItsMagnitude() {
+        #expect(Format.spanish.name(of: QuotaMagnitude.used) == "usado")
+        #expect(Format.spanish.name(of: QuotaMagnitude.remaining) == "restante")
+        #expect(Format.english.name(of: QuotaMagnitude.used) == "used")
+        #expect(Format.english.name(of: QuotaMagnitude.remaining) == "left")
     }
 }
