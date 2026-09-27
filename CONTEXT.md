@@ -6,23 +6,23 @@ Uzzy shows the subscription quotas of AI services and when they reset.
 
 **Subscription quota**:
 A usage limit a provider applies to a subscription over a given period. Distinct from monetary spend and from billed API consumption.
-In Spanish copy it is a «límite de uso».
-_Avoid_: Balance, credits, consumption (without saying what is measured); in Spanish, «cuota» (reads as a fee).
+In Spanish copy it is a «límite de uso»; in English copy, a «usage limit».
+_Avoid_: Balance, credits, consumption (without saying what is measured); «quota» in English copy; in Spanish, «cuota» (reads as a fee).
 
 **Used quota**:
-The part of a subscription quota already consumed within its period. In Spanish copy it is «usado».
+The part of a subscription quota already consumed within its period. In Spanish copy it is «usado»; in English copy, «used».
 _Avoid_: Spend, cost; in Spanish, «consumido», «gastado».
 
 **Remaining quota**:
-The part of a subscription quota still available within its period. In Spanish copy it is «restante».
-_Avoid_: Available money, balance; in Spanish, «disponible» (already means the data is present; the one exception is «restablecimiento disponible», see **Banked reset**), «libre».
+The part of a subscription quota still available within its period. In Spanish copy it is «restante»; in English copy, «left», as Codex shows it.
+_Avoid_: Available money, balance; in English, «remaining»; in Spanish, «disponible» (already means the data is present; the one exception is «restablecimiento disponible», see **Banked reset**), «libre».
 
 **Reset**:
-The moment, given by the provider, when a subscription quota renews.
+The moment, given by the provider, when a subscription quota renews. In Spanish copy it is «reinicio»; in English copy, «resets», e.g. «Resets today, 14:42».
 _Avoid_: Top-up, session renewal.
 
 **Banked reset**:
-A reset the provider grants an account, which the person can redeem in the provider's app to refill quota windows. It belongs to the account, not to a quota. In Spanish copy it is a «restablecimiento disponible».
+A reset the provider grants an account, which the person can redeem in the provider's app to refill quota windows. It belongs to the account, not to a quota. In Spanish copy it is a «restablecimiento disponible»; in English copy, a «reset available», Codex's own wording.
 _Avoid_: Reset (the moment a quota renews), credits, spend; in Spanish, «reinicio», «crédito», «canjear».
 
 **Last valid reading**:
@@ -50,7 +50,7 @@ The provider identity behind a session, e.g. Claude Code's account UUID. Every l
 _Avoid_: User, profile, session (the session is how Uzzy reaches the account).
 
 **Plan**:
-The subscription an account is on, by the provider's own name, e.g. Claude's «Max», ChatGPT's «Plus» or Cursor's «Pro+». It belongs to the account, not to a quota, and gives context to the quotas: Uzzy shows it next to the card's title with the last valid reading it came with. Uzzy shows only plans the provider reports and Uzzy knows by name; it never guesses a plan, infers it from the quotas or shows the provider's raw identifier. In Spanish copy it is «plan».
+The subscription an account is on, by the provider's own name, e.g. Claude's «Max», ChatGPT's «Plus» or Cursor's «Pro+». It belongs to the account, not to a quota, and gives context to the quotas: Uzzy shows it next to the card's title with the last valid reading it came with. Uzzy shows only plans the provider reports and Uzzy knows by name; it never guesses a plan, infers it from the quotas or shows the provider's raw identifier. In Spanish and English copy it is «plan».
 _Avoid_: Tier, membership, subscription type (the providers' field names), account type.
 
 **Uncertain identity**:
@@ -58,7 +58,7 @@ The state of a session whose account cannot be verified, e.g. because its identi
 _Avoid_: Unknown account (as if it were a distinct account), anonymous session.
 
 **Usage credits**:
-Claude's pay-as-you-go consumption (formerly "extra usage"), billed at API rates after the subscription's included usage runs out, optionally capped by a **monthly spend limit** the person sets. Uzzy shows the amount spent this month and the limit, if any, in the provider's currency, as Claude does: «53,06 US$ de 40 US$ este mes», or «53,06 US$ este mes» without a limit. Spending can pass the limit and is shown as it is. It has no percentage, no used/remaining magnitude and no reset. The prepaid balance is not in the provider's response and is never shown or inferred. It is **not** a subscription quota; it sits among the quota rows as a deliberate exception. In Spanish copy it is «Créditos de uso».
+Claude's pay-as-you-go consumption (formerly "extra usage"), billed at API rates after the subscription's included usage runs out, optionally capped by a **monthly spend limit** the person sets. Uzzy shows the amount spent this month and the limit, if any, in the provider's currency, as Claude does: «53,06 US$ de 40 US$ este mes», or «53,06 US$ este mes» without a limit. Spending can pass the limit and is shown as it is. It has no percentage, no used/remaining magnitude and no reset. The prepaid balance is not in the provider's response and is never shown or inferred. It is **not** a subscription quota; it sits among the quota rows as a deliberate exception. In Spanish copy it is «Créditos de uso»; in English copy, «Usage credits», Claude's own wording.
 _Avoid_: Subscription quota, balance, a percentage of the limit, "extra usage" (as a label); in Spanish, «saldo», «cuota».
 
 **Disabled provider**:
