@@ -73,6 +73,7 @@ To keep Uzzy running day to day, build it in Release and copy it to `/Applicatio
 ```sh
 # Compile a Release build into the local `build/` folder
 xcodebuild build \
+  -project app/Uzzy.xcodeproj \
   -scheme Uzzy \
   -configuration Release \
   -destination 'platform=macOS,arch=arm64' \
@@ -92,8 +93,8 @@ To open it at login, add it under System Settings → General → Login Items.
 ### Build and test
 
 ```sh
-xcodebuild test -scheme Uzzy -destination 'platform=macOS,arch=arm64'
-xcodebuild build -scheme Uzzy -destination 'platform=macOS,arch=arm64' -derivedDataPath build
+xcodebuild test -project app/Uzzy.xcodeproj -scheme Uzzy -destination 'platform=macOS,arch=arm64'
+xcodebuild build -project app/Uzzy.xcodeproj -scheme Uzzy -destination 'platform=macOS,arch=arm64' -derivedDataPath build
 open build/Build/Products/Debug/Uzzy.app
 ```
 
@@ -101,7 +102,7 @@ Debug builds run as a separate app, «Uzzy Debug» (`com.akacronos.Uzzy.debug`),
 
 ### Debug scenarios
 
-Debug builds add a bar on top of the panel to pick a scenario: the real panel then shows one of its states («Desactualizado», «Sin sesión», «Respuesta incompatible»…) with fictional data, without touching the accounts. The scenarios drive the usage core through the same fakes as the tests. To open the panel straight on one, pass its id (see `UzzyCore/Scenarios.swift`):
+Debug builds add a bar on top of the panel to pick a scenario: the real panel then shows one of its states («Desactualizado», «Sin sesión», «Respuesta incompatible»…) with fictional data, without touching the accounts. The scenarios drive the usage core through the same fakes as the tests. To open the panel straight on one, pass its id (see `app/UzzyCore/Scenarios.swift`):
 
 ```sh
 build/Build/Products/Debug/Uzzy.app/Contents/MacOS/Uzzy -scenario stale
@@ -113,11 +114,12 @@ Release builds leave the scenarios, the fakes and the sample responses out.
 
 | Path | Contents |
 |---|---|
-| `Uzzy/` | App: menu bar icon, panel and SwiftUI presentation. |
-| `UzzyCore/` | Usage core: panel state, provider adapters and injectable dependencies. In Debug builds, also the fake dependencies, the sample responses and the debug scenarios. |
-| `UzzyCoreTests/` | Tests through the usage core, with the fake dependencies. |
+| `app/` | The macOS app and its Xcode project, `Uzzy.xcodeproj`. |
+| `app/Uzzy/` | App: menu bar icon, panel and SwiftUI presentation. |
+| `app/UzzyCore/` | Usage core: panel state, provider adapters and injectable dependencies. In Debug builds, also the fake dependencies, the sample responses and the debug scenarios. |
+| `app/UzzyCoreTests/` | Tests through the usage core, with the fake dependencies. |
+| `app/Config/` | Shared build settings (signing). |
 | `CONTEXT.md` | Domain vocabulary (used quota, reset, last valid reading…). |
-| `Config/` | Shared build settings (signing). |
 | `docs/agents/` | Agent conventions: issues, triage labels, domain docs. |
 | `docs/images/` | Screenshots used in this README. |
 | `.agents/skills/` | Agent skills used to work on the repo, copied from their upstream repos (see `skills-lock.json`). |

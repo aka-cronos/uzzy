@@ -17,25 +17,31 @@ Write everything in English: issues, pull requests, commits, code, comments, tes
 You need macOS 27 on Apple Silicon and Xcode 27.
 
 ```sh
-xcodebuild test -scheme Uzzy -destination 'platform=macOS,arch=arm64'
-xcodebuild build -scheme Uzzy -destination 'platform=macOS,arch=arm64' -derivedDataPath build
+xcodebuild test -project app/Uzzy.xcodeproj -scheme Uzzy -destination 'platform=macOS,arch=arm64'
+xcodebuild build -project app/Uzzy.xcodeproj -scheme Uzzy -destination 'platform=macOS,arch=arm64' -derivedDataPath build
 open build/Build/Products/Debug/Uzzy.app
 ```
 
-Tests go through the usage core with the fake dependencies in `UzzyCore/Fakes.swift`; they never touch real sessions or the network. To see a panel state without touching your accounts, use the debug scenarios described in the [README](README.md#debug-scenarios).
+Tests go through the usage core with the fake dependencies in `app/UzzyCore/Fakes.swift`; they never touch real sessions or the network. To see a panel state without touching your accounts, use the debug scenarios described in the [README](README.md#debug-scenarios).
 
 ### Signing
 
 By default the app is signed ad hoc ("Sign to Run Locally"), so it builds without an Apple Developer account. With ad hoc signing, macOS treats every rebuild as a different app, so the Keychain prompt to read Claude Code's session comes back after each build even if you chose «Always Allow».
 
-To sign with your own team, create `Config/Local.xcconfig` (ignored by git):
+To sign with your own team, create `app/Config/Local.xcconfig` (ignored by git):
 
 ```
 DEVELOPMENT_TEAM = YOUR_TEAM_ID
 CODE_SIGN_IDENTITY = Apple Development
 ```
 
-Do not commit a team ID to `Uzzy.xcodeproj`.
+Do not commit a team ID to `app/Uzzy.xcodeproj`.
+
+If you created `Config/Local.xcconfig` before the app moved into `app/`, move it by hand to `app/Config/Local.xcconfig`; git does not track it, so it did not move with the rest:
+
+```sh
+mv Config/Local.xcconfig app/Config/Local.xcconfig
+```
 
 ## Data and privacy
 

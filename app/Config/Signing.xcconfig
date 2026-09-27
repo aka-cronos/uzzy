@@ -1,6 +1,6 @@
 // Signs the app ad hoc ("Sign to Run Locally"), so anyone can build without
 // an Apple Developer team. To sign with your own team, create
-// Config/Local.xcconfig (ignored by git) with:
+// app/Config/Local.xcconfig (ignored by git) with:
 //
 //   DEVELOPMENT_TEAM = YOUR_TEAM_ID
 //   CODE_SIGN_IDENTITY = Apple Development

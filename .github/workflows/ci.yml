@@ -29,10 +29,11 @@ jobs:
           xcodebuild -version
 
       # Ad hoc signing with no team, so the build needs no Apple account,
-      # signing secret or Config/Local.xcconfig.
+      # signing secret or app/Config/Local.xcconfig.
       - name: Build and run tests
         run: |
           xcodebuild test \
+            -project app/Uzzy.xcodeproj \
             -scheme Uzzy \
             -destination 'platform=macOS,arch=arm64' \
             CODE_SIGN_IDENTITY=- \
