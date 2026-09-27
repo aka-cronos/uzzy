@@ -45,11 +45,11 @@ struct PanelView: View {
 
             if core.state.cards.isEmpty {
                 VStack(spacing: 10) {
-                    Text("No hay proveedores activos").font(.headline)
-                    Text("Activa un proveedor en Ajustes para ver sus cuotas.")
+                    Text("No active providers").font(.headline)
+                    Text("Turn on a provider in Settings to see its usage limits.")
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
-                    Button("Abrir ajustes", action: openSettings)
+                    Button("Open Settings", action: openSettings)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, 20)
@@ -79,17 +79,17 @@ struct PanelView: View {
                 Divider()
                 HStack {
                     // Quotas live only in memory, so quitting has nothing to save.
-                    Button("Salir") { NSApp.terminate(nil) }
-                        .accessibilityLabel(Format.quitApp)
-                        .accessibilityInputLabels(["Salir", Format.quitApp])
-                        .help("\(Format.quitApp) (⌘Q)")
+                    Button("Quit") { NSApp.terminate(nil) }
+                        .accessibilityLabel(Format.current.quitApp)
+                        .accessibilityInputLabels([String(localized: "Quit"), Format.current.quitApp])
+                        .help(Format.current.quitApp + " (⌘Q)")
                     Spacer()
                     Button(action: openSettings) {
                         Image(systemName: "gearshape")
                             .frame(width: 18, height: 18)
                     }
-                    .accessibilityLabel(Format.settings)
-                    .help("Abrir ajustes (⌘,)")
+                    .accessibilityLabel(Format.current.settings)
+                    .help("Open Settings (⌘,)")
                     if !core.state.cards.isEmpty {
                         Button(action: core.refresh) {
                             Group {
@@ -103,9 +103,9 @@ struct PanelView: View {
                             }
                             .frame(width: 18, height: 18)
                         }
-                        .accessibilityLabel("Actualizar")
-                        .accessibilityValue(core.state.isQuerying ? "Consulta en curso" : "")
-                        .help("Consultar las cuotas ahora")
+                        .accessibilityLabel("Refresh")
+                        .accessibilityValue(core.state.isQuerying ? Text("Query in progress") : Text(verbatim: ""))
+                        .help("Check usage limits now")
                     }
                 }
                 .padding(.horizontal, 12)
@@ -151,7 +151,7 @@ private struct CardView: View {
                 }
                 Spacer()
                 if let lastReadAt {
-                    Text("Última lectura: \(Format.dayAndTime(lastReadAt, now: now))")
+                    Text("Last reading: \(Format.current.dayAndTime(lastReadAt, now: now))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -159,11 +159,11 @@ private struct CardView: View {
 
             switch card.content {
             case .loading:
-                Message(title: "Consultando cuotas…", detail: "Todavía no hay un dato válido.")
+                Message(title: "Checking usage limits…", detail: "No valid data yet.")
             case .loadingNewAccount:
                 Message(
-                    title: "Consultando nueva cuenta…",
-                    detail: "La sesión de \(card.provider.officialApp) es de otra cuenta. Se borraron las cifras de la anterior."
+                    title: "Checking new account…",
+                    detail: "The \(card.provider.officialApp) session belongs to another account. The previous account's figures were cleared."
                 )
             case .failed(let failure):
                 FailureMessage(failure: failure, provider: card.provider, now: now)
@@ -192,13 +192,13 @@ private struct CardTitle: View {
                 .fontWeight(.semibold)
                 .layoutPriority(1)
             if let plan {
-                Text("· \(plan)")
+                Text(verbatim: "· \(plan)")
                     .foregroundStyle(.secondary)
             }
         }
         .lineLimit(1)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Format.cardTitle(provider.name, plan: plan))
+        .accessibilityLabel(Format.current.cardTitle(provider.name, plan: plan))
     }
 }
 
@@ -227,8 +227,8 @@ private struct BankedResetsButton: View {
             .contentShape(.capsule)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(Format.bankedResets(count))
-        .help(Format.bankedResets(count))
+        .accessibilityLabel(Format.current.bankedResets(count))
+        .help(Format.current.bankedResets(count))
         .popover(isPresented: $isShowingDetail, arrowEdge: .bottom) {
             HStack(alignment: .top, spacing: 10) {
                 Image(systemName: Self.symbol)
@@ -236,8 +236,8 @@ private struct BankedResetsButton: View {
                     .foregroundStyle(.tint)
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(Format.bankedResets(count)).font(.headline)
-                    Text(Format.bankedResetsNote(count))
+                    Text(Format.current.bankedResets(count)).font(.headline)
+                    Text(Format.current.bankedResetsNote(count))
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }
@@ -276,7 +276,7 @@ private struct QuotaView: View {
                 HStack(alignment: .firstTextBaseline) {
                     QuotaName(quota: quota)
                     Spacer()
-                    Text(Format.percent(percent))
+                    Text(Format.current.percent(percent))
                         .font(.title3.weight(.semibold))
                         .monospacedDigit()
                         .foregroundStyle(quota.isStale ? .secondary : .primary)
@@ -285,7 +285,7 @@ private struct QuotaView: View {
                 Bar(fraction: percent / 100)
                     .opacity(quota.isStale ? 0.5 : 1)
                 if let reset = quota.reset {
-                    Text(Format.reset(reset, now: now))
+                    Text(Format.current.reset(reset, now: now))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -294,16 +294,16 @@ private struct QuotaView: View {
                 HStack(alignment: .firstTextBaseline) {
                     QuotaName(quota: quota)
                     Spacer()
-                    Text(Format.usageCredits(spent, limit: limit))
+                    Text(Format.current.usageCredits(spent, limit: limit))
                         .fontWeight(.semibold)
                         .monospacedDigit()
                         .foregroundStyle(quota.isStale ? .secondary : .primary)
                 }
             // No valid reading of this quota, so no reset or reading time to vouch for.
             case .uninterpretable:
-                QuotaNotice(period: quota.period, notice: "Dato no interpretable")
+                QuotaNotice(period: quota.period, notice: "Unreadable data")
             case .unavailable:
-                QuotaNotice(period: quota.period, notice: "Cuota no disponible")
+                QuotaNotice(period: quota.period, notice: "Usage limit unavailable")
             }
         }
         .padding(.top, 14)
@@ -318,7 +318,7 @@ private struct QuotaName: View {
     var body: some View {
         Text(quota.period.name)
         if quota.isStale {
-            Text("Desactualizado").font(.caption.weight(.semibold)).foregroundStyle(.orange)
+            Text("Out of date").font(.caption.weight(.semibold)).foregroundStyle(.orange)
         }
     }
 }
@@ -326,7 +326,7 @@ private struct QuotaName: View {
 /// A quota without a percentage to show: no figure and no bar.
 private struct QuotaNotice: View {
     let period: QuotaPeriod
-    let notice: String
+    let notice: LocalizedStringKey
 
     var body: some View {
         HStack(alignment: .firstTextBaseline) {
@@ -353,8 +353,8 @@ private struct Bar: View {
 }
 
 private struct Message: View {
-    let title: String
-    let detail: String
+    let title: LocalizedStringKey
+    let detail: LocalizedStringKey
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -374,69 +374,75 @@ private struct FailureMessage: View {
     var body: some View {
         switch failure {
         case .noSession:
-            Message(title: "Sin sesión", detail: "Inicia sesión en \(provider.officialApp) y pulsa Actualizar.")
+            Message(title: "Not signed in", detail: "Sign in to \(provider.officialApp) and click Refresh.")
         case .sessionWithoutSubscriptionQuotas:
             Message(
-                title: "Esta sesión no ofrece cuotas de suscripción",
-                detail: "La sesión de \(provider.officialApp) no es de una suscripción (p. ej., usa una clave de API). Inicia sesión con tu suscripción en \(provider.officialApp) y pulsa Actualizar."
+                title: "This session has no subscription usage limits",
+                detail: "The \(provider.officialApp) session isn't from a subscription (e.g., it uses an API key). Sign in to \(provider.officialApp) with your subscription and click Refresh."
             )
         case .sessionAccessDenied:
             Message(
-                title: "Sin acceso a la sesión",
-                detail: "Se denegó el acceso a la sesión de \(provider.officialApp) en el llavero. Pulsa Actualizar para volver a pedirlo."
+                title: "No access to the session",
+                detail: "Access to the \(provider.officialApp) session in the keychain was denied. Click Refresh to ask again."
             )
         case .sessionStoreUnavailable:
             if provider == .claude {
                 Message(
-                    title: "Llavero no disponible",
-                    detail: "No se pudo leer la sesión de Claude Code en el llavero. Comprueba que esté desbloqueado y pulsa Actualizar."
+                    title: "Keychain unavailable",
+                    detail: "Couldn't read the Claude Code session in the keychain. Check that it's unlocked and click Refresh."
                 )
             } else {
                 Message(
-                    title: "No se pudo leer la sesión",
-                    detail: "No se pudo abrir la sesión de \(provider.officialApp). Comprueba que la app oficial funcione y pulsa Actualizar."
+                    title: "Couldn't read the session",
+                    detail: "Couldn't open the \(provider.officialApp) session. Check that the official app works and click Refresh."
                 )
             }
         case .sessionStoreBusy:
             Message(
-                title: "Sesión ocupada",
-                detail: "La base de datos de \(provider.officialApp) está ocupada. Espera un momento y pulsa Actualizar."
+                title: "Session busy",
+                detail: "The \(provider.officialApp) database is busy. Wait a moment and click Refresh."
             )
         case .incompatibleSession:
             Message(
-                title: "Sesión incompatible",
-                detail: "La sesión de \(provider.officialApp) tiene un formato que \(Format.appName) no reconoce."
+                title: "Incompatible session",
+                detail: "The \(provider.officialApp) session is in a format \(Format.appName) doesn't recognize."
             )
         case .sessionExpired:
-            Message(title: "Sesión vencida", detail: "Renueva la sesión en \(provider.officialApp) y pulsa Actualizar.")
+            Message(title: "Session expired", detail: "Renew the session in \(provider.officialApp) and click Refresh.")
         case .accessRefused:
             Message(
-                title: "Acceso rechazado",
-                detail: "\(provider.name) rechazó la consulta. Puede ser una restricción de la cuenta; revísala en \(provider.officialApp) y pulsa Actualizar."
+                title: "Access refused",
+                detail: "\(provider.name) refused the query. It may be an account restriction; check it in \(provider.officialApp) and click Refresh."
             )
         case .reusedSessionRejected:
             Message(
-                title: "Sin confirmar",
-                detail: "\(provider.name) no aceptó la sesión guardada. Pulsa Actualizar para volver a comprobarla."
+                title: "Unconfirmed",
+                detail: "\(provider.name) didn't accept the saved session. Click Refresh to check it again."
             )
         case .offline:
-            Message(title: "Sin conexión", detail: "No se pudo conectar con \(provider.name). Pulsa Actualizar para reintentar.")
+            Message(title: "Offline", detail: "Couldn't connect to \(provider.name). Click Refresh to try again.")
         case .timedOut:
-            Message(title: "Tiempo agotado", detail: "\(provider.name) no respondió a tiempo. Pulsa Actualizar para reintentar.")
+            Message(title: "Timed out", detail: "\(provider.name) didn't respond in time. Click Refresh to try again.")
         case .serverError(let status):
-            Message(title: "Error del servidor", detail: "\(provider.name) respondió con un error (\(status)). Pulsa Actualizar para reintentar.")
+            Message(title: "Server error", detail: "\(provider.name) responded with an error (\(status)). Click Refresh to try again.")
         case .rateLimited(let until):
-            let when = until.map { "a partir de: \(Format.dayAndTime($0, now: now))" } ?? "en breve"
-            Message(title: "Demasiadas consultas", detail: "\(provider.name) pidió esperar. Se volverá a consultar \(when).")
+            if let until {
+                Message(
+                    title: "Too many queries",
+                    detail: "\(provider.name) asked to wait. It will be checked again from \(Format.current.dayAndTime(until, now: now))."
+                )
+            } else {
+                Message(title: "Too many queries", detail: "\(provider.name) asked to wait. It will be checked again shortly.")
+            }
         case .incompatibleResponse, .responseTooLarge:
             Message(
-                title: "Respuesta incompatible",
-                detail: "\(provider.name) respondió en un formato que \(Format.appName) no reconoce. Puede que haya cambiado su servicio."
+                title: "Incompatible response",
+                detail: "\(provider.name) responded in a format \(Format.appName) doesn't recognize. Its service may have changed."
             )
         case .incompatibleResetFormat:
             Message(
-                title: "Reinicio de Cursor incompatible",
-                detail: "Cursor envió la fecha de reinicio en un formato que \(Format.appName) no reconoce. Pulsa Actualizar; si continúa, la integración necesita una actualización."
+                title: "Incompatible Cursor reset",
+                detail: "Cursor sent the reset date in a format \(Format.appName) doesn't recognize. Click Refresh; if it continues, the integration needs an update."
             )
         }
     }
@@ -445,11 +451,11 @@ private struct FailureMessage: View {
 private extension QuotaPeriod {
     var name: String {
         switch self {
-        case .fiveHours: "5 horas"
-        case .weekly: "Semanal"
-        case .lasting(let seconds): Format.duration(seconds: seconds)
-        case .billingCycle: "Ciclo de facturación"
-        case .usageCredits: "Créditos de uso"
+        case .fiveHours: String(localized: "5 hours")
+        case .weekly: String(localized: "Weekly")
+        case .lasting(let seconds): Format.current.duration(seconds: seconds)
+        case .billingCycle: String(localized: "Billing cycle")
+        case .usageCredits: String(localized: "Usage credits")
         case .limit(let name, .billingCycle): name
         case .limit(let name, let period): "\(period.name) · \(name)"
         }
@@ -459,8 +465,8 @@ private extension QuotaPeriod {
 extension QuotaMagnitude {
     var name: String {
         switch self {
-        case .used: "usado"
-        case .remaining: "restante"
+        case .used: String(localized: "used")
+        case .remaining: String(localized: "left")
         }
     }
 }

@@ -2,38 +2,55 @@ import Foundation
 import UzzyCore
 
 /// The app's user-facing text: panel figures in local time, window titles and
-/// command names. The UI copy is Spanish.
-enum Format {
-    private static let locale = Locale(identifier: "es_ES")
+/// command names, in English or Spanish from `Localizable.xcstrings`.
+struct Format {
+    /// Its language picks the copy's language, and its region formats dates,
+    /// times and money.
+    let locale: Locale
+
+    /// `Locale.current` is the language the app runs in plus the system
+    /// region, e.g. "en_ES", and carries the person's 12/24-hour choice.
+    init(locale: Locale = .autoupdatingCurrent) {
+        self.locale = locale
+    }
+
+    /// The text in the app's language and the system region.
+    static let current = Format()
+
+    /// The bundle that holds the catalog: the app's, or the tests' when they
+    /// compile this file.
+    private static let bundle = #bundle
 
     /// The product name, from the bundle's display name so a rename touches only the build settings.
     static let appName = Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String
         ?? ProcessInfo.processInfo.processName
     /// The quit command, in the panel and in the main menu (⌘Q).
-    static let quitApp = "Salir de \(appName)"
+    var quitApp: String { text("Quit \(Self.appName)") }
     /// The Settings window's title and the panel's settings button label.
-    static let settings = "Ajustes"
+    var settings: String { text("Settings") }
     /// The main menu command that opens Settings (⌘,).
-    static let openSettings = "\(settings)…"
+    var openSettings: String { "\(settings)…" }
+    /// The main menu's File menu.
+    var fileMenu: String { text("File") }
     /// The main menu command that closes the front window or the panel (⌘W).
-    static let closeWindow = "Cerrar ventana"
+    var closeWindow: String { text("Close Window") }
 
-    /// E.g. "20.5%": a decimal point and no space before the sign, unlike
-    /// the Spanish convention the rest of the copy follows.
-    static func percent(_ value: Double) -> String {
+    /// E.g. "20.5%" in every language: a decimal point and no space before
+    /// the sign, unlike the Spanish convention.
+    func percent(_ value: Double) -> String {
         "\(value.formatted(.number.precision(.fractionLength(0...1)).grouping(.never).locale(Locale(identifier: "en_US_POSIX"))))%"
     }
 
-    /// Usage credits spent this month, as Claude shows them: e.g. "53,06 US$
-    /// de 40 US$ este mes", or "53,06 US$ este mes" without a monthly limit.
-    static func usageCredits(_ spent: Money, limit: Money?) -> String {
-        let limitText = limit.map { " de \(money($0))" } ?? ""
-        return "\(money(spent))\(limitText) este mes"
+    /// Usage credits spent this month, as Claude shows them: e.g. "$53.06 of
+    /// $40 this month", or "$53.06 this month" without a monthly limit.
+    func usageCredits(_ spent: Money, limit: Money?) -> String {
+        guard let limit else { return text("\(money(spent)) this month") }
+        return text("\(money(spent)) of \(money(limit)) this month")
     }
 
-    /// In the currency's own format for Spanish; a whole amount drops its
-    /// decimals, e.g. "40 US$".
-    static func money(_ money: Money) -> String {
+    /// In the currency's own format for the region; a whole amount drops its
+    /// decimals, e.g. "$40".
+    func money(_ money: Money) -> String {
         let style = Decimal.FormatStyle.Currency(code: money.currency, locale: locale)
         var amount = money.amount
         var whole = Decimal()
@@ -41,62 +58,69 @@ enum Format {
         return money.amount.formatted(whole == money.amount ? style.precision(.fractionLength(0)) : style)
     }
 
-    static func time(_ date: Date) -> String {
-        date.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute(.twoDigits).locale(locale))
+    /// In the region's hour cycle: e.g. "2:42 PM" in the US; a 24-hour clock
+    /// pads the hour, e.g. "09:05".
+    func time(_ date: Date) -> String {
+        let hour: Date.FormatStyle.Symbol.Hour = switch locale.hourCycle {
+        case .zeroToEleven, .oneToTwelve: .defaultDigits(amPM: .abbreviated)
+        case .zeroToTwentyThree, .oneToTwentyFour: .twoDigits(amPM: .omitted)
+        @unknown default: .defaultDigits(amPM: .abbreviated)
+        }
+        return date.formatted(.dateTime.hour(hour).minute(.twoDigits).locale(locale))
     }
 
-    static func reset(_ reset: Reset, now: Date) -> String {
+    func reset(_ reset: Reset, now: Date) -> String {
         switch reset {
         case .unknown:
-            return "Reinicio desconocido"
+            text("Reset unknown")
         case .pendingConfirmation:
-            return "Reinicio pendiente de confirmar"
+            text("Reset pending confirmation")
         case .at(let date):
-            return "Reinicio: \(dayAndTime(date, now: now)) · en \(countdown(date.timeIntervalSince(now)))"
+            text("Resets \(dayAndTime(date, now: now)) · in \(countdown(date.timeIntervalSince(now)))")
         }
     }
 
-    /// A card's title as VoiceOver reads it, e.g. "Claude, plan Max", so the
+    /// A card's title as VoiceOver reads it, e.g. "Claude, Max plan", so the
     /// separator the card shows is not read out.
-    static func cardTitle(_ provider: String, plan: String?) -> String {
-        plan.map { "\(provider), plan \($0)" } ?? provider
+    func cardTitle(_ provider: String, plan: String?) -> String {
+        plan.map { text("\(provider), \($0) plan") } ?? provider
     }
 
-    /// The banked resets of an account, spelled out, e.g. "3 restablecimientos
-    /// disponibles". «disponible» is allowed here only: it matches Codex's
-    /// own "N available".
-    static func bankedResets(_ count: Int) -> String {
-        count == 1 ? "1 restablecimiento disponible" : "\(count) restablecimientos disponibles"
+    /// The banked resets of an account, spelled out, e.g. "3 resets
+    /// available". The Spanish «disponible» is allowed here only: it matches
+    /// Codex's own "N available".
+    func bankedResets(_ count: Int) -> String {
+        text("\(count) resets available")
     }
 
-    /// Where banked resets are used. Uzzy only shows them.
-    static func bankedResetsNote(_ count: Int) -> String {
-        count == 1 ? "Se usa desde Codex." : "Se usan desde Codex."
+    /// Where banked resets are used. Uzzy only shows them. Two strings, not a
+    /// plural variation: the catalog allows one only when the text shows the
+    /// number.
+    func bankedResetsNote(_ count: Int) -> String {
+        count == 1 ? text("Use it in Codex.") : text("Use them in Codex.")
     }
 
-    /// E.g. "Hoy, 14:42", so a moment on another day is not mistaken for today.
-    static func dayAndTime(_ date: Date, now: Date) -> String {
+    /// E.g. "today, 14:42", so a moment on another day is not mistaken for
+    /// today. It always follows other words, so English starts in lowercase.
+    func dayAndTime(_ date: Date, now: Date) -> String {
         "\(day(date, now: now)), \(time(date))"
     }
 
-    private static func day(_ date: Date, now: Date) -> String {
+    private func day(_ date: Date, now: Date) -> String {
         let calendar = Calendar.current
-        if calendar.isDate(date, inSameDayAs: now) { return "Hoy" }
+        if calendar.isDate(date, inSameDayAs: now) { return text("today") }
         if let tomorrow = calendar.date(byAdding: .day, value: 1, to: now),
-           calendar.isDate(date, inSameDayAs: tomorrow) { return "Mañana" }
+           calendar.isDate(date, inSameDayAs: tomorrow) { return text("tomorrow") }
         return date.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated).locale(locale))
     }
 
     /// The length of a quota period, in its largest whole unit: e.g.
-    /// "24 horas" is shown as "1 día", and 5400 s as "90 min".
-    static func duration(seconds: Int) -> String {
-        func plural(_ count: Int, _ one: String, _ many: String) -> String {
-            "\(count) \(count == 1 ? one : many)"
-        }
-        if seconds > 0, seconds % 86_400 == 0 { return plural(seconds / 86_400, "día", "días") }
-        if seconds > 0, seconds % 3_600 == 0 { return plural(seconds / 3_600, "hora", "horas") }
-        if seconds > 0, seconds % 60 == 0 { return "\(seconds / 60) min" }
-        return "\(seconds) s"
+    /// "24 hours" is shown as "1 day", and 5400 s as "90 min".
+    func duration(seconds: Int) -> String {
+        if seconds > 0, seconds % 86_400 == 0 { return text("\(seconds / 86_400) days") }
+        if seconds > 0, seconds % 3_600 == 0 { return text("\(seconds / 3_600) hours") }
+        if seconds > 0, seconds % 60 == 0 { return text("\(seconds / 60) min") }
+        return text("\(seconds) s")
     }
 
     /// The longest countdown shown, in minutes. Converting a longer interval
@@ -105,11 +129,17 @@ enum Format {
 
     /// An interval that is not ahead counts as zero, and a longer one is cut
     /// to `longestCountdownMinutes`, so invalid data never traps.
-    private static func countdown(_ seconds: TimeInterval) -> String {
-        let minutes = seconds > 0 ? Int(min(seconds / 60, longestCountdownMinutes)) : 0
+    private func countdown(_ seconds: TimeInterval) -> String {
+        let minutes = seconds > 0 ? Int(min(seconds / 60, Self.longestCountdownMinutes)) : 0
         let (days, hours, restMinutes) = (minutes / 1440, minutes / 60 % 24, minutes % 60)
-        if days > 0 { return "\(days) d \(hours) h" }
-        if hours > 0 { return "\(hours) h \(restMinutes) min" }
-        return "\(restMinutes) min"
+        if days > 0 { return text("\(days) d \(hours) h") }
+        if hours > 0 { return text("\(hours) h \(restMinutes) min") }
+        return text("\(restMinutes) min")
+    }
+
+    /// `value` from the catalog, in the language of `locale`. A language
+    /// the catalog lacks falls back to English.
+    private func text(_ value: String.LocalizationValue) -> String {
+        String(localized: LocalizedStringResource(value, locale: locale, bundle: .atURL(Self.bundle.bundleURL)))
     }
 }

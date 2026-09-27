@@ -17,9 +17,9 @@ struct SettingsView: View {
 
     var body: some View {
         Form {
-            Section("Cuotas") {
-                let title = "Porcentaje en las tarjetas"
-                let description = "Muestra cuánto has usado de cada límite o cuánto te queda hasta el reinicio."
+            Section("Usage limits") {
+                let title = String(localized: "Percentage on the cards")
+                let description = String(localized: "Shows how much of each limit you've used, or how much you have left until it resets.")
                 SettingsRow(title: title, description: description) {
                     // The hidden title still names the control for VoiceOver.
                     Picker(title, selection: $selectedMagnitude) {
@@ -45,9 +45,9 @@ struct SettingsView: View {
                     )
                 }
             } header: {
-                Text("Proveedores")
+                Text("Providers")
             } footer: {
-                Text("El orden de la lista es el de las tarjetas. Un proveedor desactivado no tiene tarjeta, y \(Format.appName) no lee su sesión ni consulta sus cuotas.")
+                Text("The cards follow the order of this list. A provider that's turned off has no card, and \(Format.appName) doesn't read its session or check its usage limits.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -96,11 +96,11 @@ private struct ProviderRow: View {
     let moveDown: (() -> Void)?
 
     var body: some View {
-        let description = "Usa la sesión de \(provider.officialApp) de este Mac."
+        let description = String(localized: "Uses the \(provider.officialApp) session on this Mac.")
         SettingsRow(title: provider.name, description: description) {
-            MoveButton(label: "Subir \(provider.name)", systemImage: "chevron.up", action: moveUp)
-            MoveButton(label: "Bajar \(provider.name)", systemImage: "chevron.down", action: moveDown)
-            Toggle("Mostrar \(provider.name)", isOn: $isOn)
+            MoveButton(label: String(localized: "Move \(provider.name) Up"), systemImage: "chevron.up", action: moveUp)
+            MoveButton(label: String(localized: "Move \(provider.name) Down"), systemImage: "chevron.down", action: moveDown)
+            Toggle("Show \(provider.name)", isOn: $isOn)
                 .toggleStyle(.switch)
                 .labelsHidden()
                 .accessibilityHint(description)

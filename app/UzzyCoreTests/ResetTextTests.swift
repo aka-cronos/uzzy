@@ -2,7 +2,7 @@ import Foundation
 import Testing
 import UzzyCore
 
-/// The reset text of a quota, through the usage core and the app's formatter,
+/// The reset text of a quota in each language, through the usage core and the app's formatter,
 /// which this target compiles from `Uzzy/Format.swift`.
 @MainActor
 @Suite(.timeLimit(.minutes(1)))
@@ -34,42 +34,48 @@ struct ResetTextTests {
     func anExtremeResetFromTheProviderReadsAsUnknown(resetAt: String) async throws {
         let reset = try #require(await codexReset(resetAt: resetAt))
 
-        #expect(Format.reset(reset, now: now) == "Reinicio desconocido")
+        #expect(Format.spanish.reset(reset, now: now) == "Reinicio desconocido")
+        #expect(Format.english.reset(reset, now: now) == "Reset unknown")
     }
 
     @Test func aMissingResetFromTheProviderReadsAsUnknown() async throws {
         let reset = try #require(await codexReset(resetAt: "null"))
 
-        #expect(Format.reset(reset, now: now) == "Reinicio desconocido")
+        #expect(Format.spanish.reset(reset, now: now) == "Reinicio desconocido")
+        #expect(Format.english.reset(reset, now: now) == "Reset unknown")
     }
 
     @Test func anOrdinaryResetReadsAsItsCountdown() async throws {
         let resetAt = now.addingTimeInterval(2 * 3_600 + 5 * 60).timeIntervalSince1970
         let reset = try #require(await codexReset(resetAt: "\(resetAt)"))
 
-        #expect(Format.reset(reset, now: now).hasSuffix(" · en 2 h 5 min"))
+        #expect(Format.spanish.reset(reset, now: now).hasSuffix(" · en 2 h 5 min"))
+        #expect(Format.english.reset(reset, now: now).hasSuffix(" · in 2 h 5 min"))
     }
 
     @Test func aPassedResetReadsAsPendingConfirmation() async throws {
         let resetAt = now.addingTimeInterval(-60).timeIntervalSince1970
         let reset = try #require(await codexReset(resetAt: "\(resetAt)"))
 
-        #expect(Format.reset(reset, now: now) == "Reinicio pendiente de confirmar")
+        #expect(Format.spanish.reset(reset, now: now) == "Reinicio pendiente de confirmar")
+        #expect(Format.english.reset(reset, now: now) == "Reset pending confirmation")
     }
 
     /// Invalid data that reaches the formatter must not stop the app.
     @Test(arguments: [1e30, 1.7976931348623157e308, .infinity])
     func anExtremeIntervalAheadDoesNotStopTheFormatter(seconds: Double) {
-        let text = Format.reset(.at(Date(timeIntervalSince1970: seconds)), now: now)
+        let reset = Reset.at(Date(timeIntervalSince1970: seconds))
 
-        #expect(text.hasPrefix("Reinicio: "))
+        #expect(Format.spanish.reset(reset, now: now).hasPrefix("Reinicio: "))
+        #expect(Format.english.reset(reset, now: now).hasPrefix("Resets "))
     }
 
     /// E.g. the panel is redrawn after the reset passed, before the next reading.
     @Test(arguments: [-60.0, -1e30, -1.7976931348623157e308, -.infinity, .nan])
     func anIntervalThatIsNotAheadCountsDownToZero(seconds: Double) {
-        let text = Format.reset(.at(now.addingTimeInterval(seconds)), now: now)
+        let reset = Reset.at(now.addingTimeInterval(seconds))
 
-        #expect(text.hasSuffix(" · en 0 min"))
+        #expect(Format.spanish.reset(reset, now: now).hasSuffix(" · en 0 min"))
+        #expect(Format.english.reset(reset, now: now).hasSuffix(" · in 0 min"))
     }
 }

@@ -17,17 +17,17 @@ import AppKit
 /// panel and in Settings without intercepting the keyboard.
 enum MainMenu {
     /// Builds the menu for `NSApp.mainMenu`: the app menu with Settings and
-    /// Quit, and a File menu with Close Window.
-    @MainActor static func make() -> NSMenu {
+    /// Quit, and a File menu with Close Window, named in `format`'s language.
+    @MainActor static func make(format: Format = .current) -> NSMenu {
         // Every action has a nil target, so the responder chain delivers and
         // validates it: the key window first, then the app and its delegate.
         let appMenu = NSMenu(title: Format.appName)
-        appMenu.addItem(withTitle: Format.openSettings, action: #selector(AppCommands.showSettings(_:)), keyEquivalent: ",")
+        appMenu.addItem(withTitle: format.openSettings, action: #selector(AppCommands.showSettings(_:)), keyEquivalent: ",")
         appMenu.addItem(.separator())
-        appMenu.addItem(withTitle: Format.quitApp, action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        appMenu.addItem(withTitle: format.quitApp, action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
 
-        let fileMenu = NSMenu(title: "Archivo")
-        fileMenu.addItem(withTitle: Format.closeWindow, action: #selector(AppCommands.closeWindow(_:)), keyEquivalent: "w")
+        let fileMenu = NSMenu(title: format.fileMenu)
+        fileMenu.addItem(withTitle: format.closeWindow, action: #selector(AppCommands.closeWindow(_:)), keyEquivalent: "w")
 
         let mainMenu = NSMenu()
         for submenu in [appMenu, fileMenu] {
