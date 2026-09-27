@@ -17,7 +17,7 @@
 </p>
 
 > [!NOTE]
-> Uzzy is in development. The MVP is specified in [#11](https://github.com/aka-cronos/uzzy/issues/11), and there are no prebuilt releases yet: you [build it yourself](#install). The app's interface is in Spanish.
+> Uzzy is in development. The MVP is specified in [#11](https://github.com/aka-cronos/uzzy/issues/11), and there are no prebuilt releases yet: you [build it yourself](#install). The app's interface follows the system language: English or Spanish.
 
 ## Why Uzzy
 

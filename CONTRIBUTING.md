@@ -10,7 +10,7 @@ If a provider changed its API and a card now shows «Respuesta incompatible» or
 
 ## Language
 
-Write everything in English: issues, pull requests, commits, code, comments, tests and docs. The one exception is the app's user-facing copy, which stays in Spanish. Some older issues are in Spanish; they stay as they are.
+Write everything in English: issues, pull requests, commits, code, comments, tests and docs. The one exception is the app's user-facing copy, which is in English and Spanish in `app/Uzzy/Localizable.xcstrings`. Some older issues are in Spanish; they stay as they are.
 
 ## Build and test
 
