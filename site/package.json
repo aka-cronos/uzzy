@@ -1,0 +1,14 @@
+{
+  "name": "uzzy-site-prototype",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "prototype": "astro dev --open /prototype/landing"
+  },
+  "dependencies": {
+    "astro": "^5",
+    "tailwindcss": "^4",
+    "@tailwindcss/vite": "^4"
+  }
+}

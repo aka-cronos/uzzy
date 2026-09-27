@@ -1,0 +1,28 @@
+---
+// PROTOTYPE — a crop of the cover's desktop (wallpaper, right end of the menu
+// bar, panel hanging from the Uzzy icon) as one rounded card. Decorative apart from the panel image.
+import GaugeIcon from "./GaugeIcon.astro";
+const { class: cls = "", style = "" } = Astro.props;
+---
+<div class={`relative h-[730px] w-[560px] overflow-hidden rounded-2xl bg-slate-950 shadow-[0_30px_60px_-20px_rgb(15_23_42/0.35)] ring-1 ring-slate-900/10 ${cls}`} style={style}>
+  <img src="/cover/bg.jpg" alt="" class="absolute inset-0 size-full object-cover" loading="eager" />
+  <!-- slate tint, shared with the CTA banner; the panel stays untinted above it -->
+  <div class="absolute inset-0 bg-slate-950/70"></div>
+  <!-- only the trailing end of the menu bar, as if cropped from a full desktop -->
+  <div class="relative flex items-center justify-end py-[5px] pr-4 pl-2.5 text-[13px] font-semibold text-slate-50">
+    <div class="flex items-center">
+      <span class="relative rounded-full bg-[#323234] px-[9px] py-1">
+        <GaugeIcon class="size-4" />
+        <img src="/cover/panel.png" width="432" height="681"
+          alt="The Uzzy panel: cards for Claude, Codex and Cursor, each quota with its bar, used percentage and reset time."
+          class="absolute top-[calc(100%-14px)] left-1/2 max-w-none -translate-x-1/2" />
+      </span>
+      <span aria-hidden="true" class="flex items-center">
+        <img src="/cover/wifi.svg" alt="" width="34.5" height="20" />
+        <svg class="mx-[9px] size-[15px]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6.5" cy="6.5" r="4.8" /><path d="m10 10 4.5 4.5" stroke-linecap="round" /></svg>
+        <img src="/cover/control-center.svg" alt="" width="31.15" height="21.41" />
+        <span class="flex gap-2 pl-[9px]"><span>Sat Sep 26</span><span>9:41 AM</span></span>
+      </span>
+    </div>
+  </div>
+</div>

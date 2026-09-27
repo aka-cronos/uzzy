@@ -1,0 +1,64 @@
+---
+// PROTOTYPE — Variant C "Spec sheet": one narrow typographic column, like a
+// well-set README. Sticky header carries the download; no hero image fight,
+// the screenshot sits beside the text on wide screens and stays in view.
+import * as c from "./content";
+import GaugeIcon from "./GaugeIcon.astro";
+---
+<div class="min-h-screen bg-[#faf9f6] font-serif text-[#1c1b19]">
+  <header class="sticky top-0 z-10 border-b border-black/10 bg-[#faf9f6]/90 backdrop-blur">
+    <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-3 font-sans text-sm">
+      <span class="flex items-center gap-2 font-semibold"><GaugeIcon class="size-4" /> Uzzy <span class="font-normal text-black/40">{c.VERSION}</span></span>
+      <span class="flex items-center gap-5">
+        <a href={c.REPO_URL} class="text-black/60 hover:text-black">Source</a>
+        <a href={c.DOWNLOAD_URL} class="rounded-md bg-[#1c1b19] px-3 py-1.5 text-white">Download .dmg</a>
+      </span>
+    </div>
+  </header>
+
+  <div class="mx-auto grid max-w-6xl gap-16 px-6 py-20 lg:grid-cols-[1fr_380px]">
+    <main class="max-w-[62ch] text-lg leading-relaxed">
+      <h1 class="text-5xl leading-tight">Uzzy</h1>
+      <p class="mt-2 font-sans text-xl text-black/60">{c.tagline}</p>
+      <p class="mt-10">{c.lede}</p>
+      <p class="mt-5">{c.why}</p>
+
+      <h2 class="mt-16 font-sans text-xs font-semibold tracking-[0.2em] text-black/50 uppercase">What it does</h2>
+      <dl class="mt-4">
+        {c.features.map((f) => (
+          <div class="border-t border-black/10 py-4">
+            <dt class="font-semibold">{f.title}.</dt>
+            <dd class="text-black/70">{f.body}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <h2 class="mt-16 font-sans text-xs font-semibold tracking-[0.2em] text-black/50 uppercase">Providers</h2>
+      <table class="mt-4 w-full font-sans text-sm">
+        <tbody>
+          {c.providers.map((p) => (
+            <tr class="border-t border-black/10 align-top">
+              <td class="py-3 pr-4 font-semibold">{p.name}</td>
+              <td class="py-3 pr-4 text-black/60">{p.session}</td>
+              <td class="py-3">{p.quotas}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <h2 class="mt-16 font-sans text-xs font-semibold tracking-[0.2em] text-black/50 uppercase">Privacy</h2>
+      <ol class="mt-4 list-decimal space-y-2 pl-5">{c.privacy.map((p) => <li>{p}</li>)}</ol>
+
+      <h2 class="mt-16 font-sans text-xs font-semibold tracking-[0.2em] text-black/50 uppercase">Install</h2>
+      <p class="mt-4">Requires {c.REQUIREMENTS}, and a signed-in Claude Code, Codex CLI or Cursor. <a href={c.DOWNLOAD_URL} class="underline decoration-1 underline-offset-4">Download Uzzy.dmg</a>, drag Uzzy to Applications and open it.</p>
+
+      <footer class="mt-20 border-t border-black/10 pt-6 font-sans text-xs text-black/45">
+        <p><a href={c.REPO_URL} class="underline">GitHub</a> · <a href={`${c.REPO_URL}/blob/main/LICENSE`} class="underline">MIT License</a></p>
+        <p class="mt-2">{c.disclaimer}</p>
+      </footer>
+    </main>
+    <aside class="hidden lg:block">
+      <img src="/panel.png" alt="The Uzzy panel" class="sticky top-24 w-full rounded-2xl shadow-xl" />
+    </aside>
+  </div>
+</div>

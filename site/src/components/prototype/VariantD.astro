@@ -1,0 +1,118 @@
+---
+// PROTOTYPE — Variant D "Cover hero + sticky panel": the hero reproduces the
+// GitHub cover from Figma (Uzzy file, node 5:5), the rest is A's content on
+// white, and the panel stays floating on the right as in C.
+import * as c from "./content";
+import GaugeIcon from "./GaugeIcon.astro";
+const logos = { Claude: "/cover/claude.svg", Codex: "/cover/codex.svg", Cursor: "/cover/cursor.svg" };
+---
+<div class="relative bg-white font-[system-ui] text-zinc-900">
+  <!-- hero backdrop: wallpaper + left-darkening gradient, one viewport tall -->
+  <div aria-hidden="true" class="absolute inset-x-0 top-0 h-screen min-h-[720px] overflow-hidden bg-black">
+    <img src="/cover/bg.jpg" alt="" class="size-full object-cover" />
+    <div class="absolute inset-0 bg-gradient-to-l from-black/0 to-black/80"></div>
+  </div>
+
+  <!-- fake macOS menu bar -->
+  <div class="relative z-20 mx-auto flex max-w-[1280px] items-center justify-between py-[5px] pr-5 pl-2.5 text-[13px] font-semibold text-white">
+    <div class="flex items-center">
+      <span class="px-2.5 text-[15px]"></span>
+      <span class="px-2.5 font-bold">Finder</span>
+      {["File", "Edit", "View", "Item", "Window", "Help"].map((m) => <span class="px-2.5 font-normal">{m}</span>)}
+    </div>
+    <div class="flex items-center">
+      <span class="rounded-full bg-[#323234] px-[9px] py-1"><GaugeIcon class="size-4" /></span>
+      <img src="/cover/wifi.svg" alt="" width="34.5" height="20" />
+      <span class="px-[9px] py-1">
+        <svg class="size-[15px]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6.5" cy="6.5" r="4.8" /><path d="m10 10 4.5 4.5" stroke-linecap="round" /></svg>
+      </span>
+      <img src="/cover/control-center.svg" alt="" width="31.15" height="21.41" />
+      <span class="flex gap-2 pl-[9px]"><span>Sat Sep 26</span><span>9:41 AM</span></span>
+    </div>
+  </div>
+
+  <div class="relative z-10 mx-auto grid max-w-[1280px] grid-cols-[1fr_432px] gap-20 pr-14 pl-20">
+    <main>
+      <!-- hero text stack, from the cover -->
+      <section class="flex h-[calc(100vh-30px)] min-h-[690px] flex-col justify-center gap-10 pb-10 text-white">
+        <p class="text-2xl font-black tracking-[2.4px] uppercase">Uzzy</p>
+        <div class="flex flex-col gap-2">
+          <h1 class="text-[32px] leading-[1.25] font-medium">Your AI subscription quotas,<br />in the macOS menu bar.</h1>
+          <p class="text-lg leading-[1.6] opacity-70">How much you have used, how much is left and when each quota resets.</p>
+        </div>
+        <div class="flex gap-4">
+          {c.providers.map((p) => (
+            <span class="flex items-center gap-2 rounded-full border border-white px-4 py-1 leading-[1.6]">
+              <img src={logos[p.name as keyof typeof logos]} alt="" width="16" height={p.name === "Cursor" ? 18 : 16} />{p.name}
+            </span>
+          ))}
+        </div>
+        <div>
+          <div class="flex items-center gap-6">
+            <a href={c.DOWNLOAD_URL} class="rounded-full bg-white px-6 py-2.5 font-medium text-black hover:bg-white/85"> Download for Mac</a>
+            <a href={c.REPO_URL} class="text-lg leading-[1.6] opacity-70 hover:opacity-100">github.com/aka-cronos/uzzy</a>
+          </div>
+          <p class="mt-3 text-sm opacity-50">Free · Version {c.VERSION} · {c.REQUIREMENTS}</p>
+        </div>
+      </section>
+
+      <!-- A's content, on white -->
+      <section class="py-24">
+        <p class="text-xl leading-relaxed text-zinc-600">{c.why}</p>
+        <div class="mt-12 grid gap-5 sm:grid-cols-2">
+          {c.features.map((f) => (
+            <div class="rounded-2xl border border-zinc-200 p-6">
+              <h3 class="font-semibold">{f.title}</h3>
+              <p class="mt-2 text-zinc-600">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="border-t border-zinc-200 py-24">
+        <h2 class="text-3xl font-semibold tracking-tight">Works with the tools you already use</h2>
+        <div class="mt-10 divide-y divide-zinc-200">
+          {c.providers.map((p) => (
+            <div class="flex gap-5 py-6">
+              <span class="grid size-11 shrink-0 place-items-center rounded-full bg-zinc-900">
+                <img src={logos[p.name as keyof typeof logos]} alt="" width="20" height={p.name === "Cursor" ? 22 : 20} />
+              </span>
+              <div>
+                <h3 class="text-lg font-semibold">{p.name}</h3>
+                <p class="text-sm text-zinc-500">Reuses your {p.session} session</p>
+                <p class="mt-2 text-zinc-700">{p.quotas}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="privacy" class="border-t border-zinc-200 py-24">
+        <h2 class="text-3xl font-semibold tracking-tight">Private by design</h2>
+        <ul class="mt-8 space-y-4">
+          {c.privacy.map((p) => <li class="flex gap-3 text-zinc-700"><span class="text-emerald-600">✓</span>{p}</li>)}
+        </ul>
+      </section>
+    </main>
+
+    <!-- the panel hangs from the menu bar icon, then floats while scrolling -->
+    <aside class="-mt-[20px]">
+      <img src="/cover/panel.png" width="432" height="681" alt="The Uzzy panel with cards for Claude, Codex and Cursor" class="sticky top-[10px]" />
+    </aside>
+  </div>
+
+  <section class="mx-auto max-w-[1280px] px-20 pb-24">
+    <div class="rounded-3xl bg-zinc-900 px-8 py-16 text-center text-white">
+      <h2 class="text-3xl font-semibold tracking-tight">Stop opening three dashboards.</h2>
+      <a href={c.DOWNLOAD_URL} class="mt-8 inline-block rounded-full bg-white px-6 py-3 font-medium text-zinc-900 hover:bg-zinc-200"> Download for Mac</a>
+      <p class="mt-3 text-sm text-zinc-400">{c.REQUIREMENTS} · Open source, MIT</p>
+    </div>
+  </section>
+
+  <footer class="border-t border-zinc-200">
+    <div class="mx-auto flex max-w-[1280px] justify-between gap-8 px-20 py-8 text-sm text-zinc-500">
+      <span>© 2026 Uzzy · <a href={c.REPO_URL} class="underline">GitHub</a> · <a href={`${c.REPO_URL}/blob/main/LICENSE`} class="underline">MIT License</a></span>
+      <span class="max-w-md text-xs">{c.disclaimer}</span>
+    </div>
+  </footer>
+</div>

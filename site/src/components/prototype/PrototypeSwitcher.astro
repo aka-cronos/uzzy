@@ -1,0 +1,42 @@
+---
+// PROTOTYPE — floating variant switcher; only rendered by `astro dev`.
+const { variants } = Astro.props as { variants: [string, string][] };
+---
+{import.meta.env.DEV && (
+  <div id="proto-switcher" data-variants={JSON.stringify(variants)}
+    class="fixed bottom-5 left-1/2 z-[100] flex -translate-x-1/2 items-center gap-3 rounded-full bg-fuchsia-600 px-3 py-2 font-mono text-sm text-white shadow-xl ring-2 ring-white">
+    <button data-step="-1" class="rounded-full px-2 hover:bg-white/20">←</button>
+    <span id="proto-label" class="min-w-56 text-center"></span>
+    <button data-step="1" class="rounded-full px-2 hover:bg-white/20">→</button>
+  </div>
+)}
+<script>
+  const bar = document.getElementById("proto-switcher");
+  const variants: [string, string][] = bar ? JSON.parse(bar.dataset.variants!) : [];
+  const keys = variants.map(([k]) => k);
+  function show(key: string) {
+    if (!keys.includes(key)) key = keys[0];
+    document.querySelectorAll<HTMLElement>("[data-variant]").forEach((el) => {
+      el.hidden = el.dataset.variant !== key;
+    });
+    const label = document.getElementById("proto-label");
+    if (label) label.textContent = `${key} (${variants.find(([k]) => k === key)![1]})`;
+    const url = new URL(location.href);
+    url.searchParams.set("variant", key);
+    history.replaceState(null, "", url);
+    window.scrollTo(0, 0);
+  }
+  function step(d: number) {
+    const cur = new URL(location.href).searchParams.get("variant") ?? keys[0];
+    show(keys[(keys.indexOf(cur) + d + keys.length) % keys.length]);
+  }
+  bar?.querySelectorAll<HTMLButtonElement>("[data-step]").forEach((b) =>
+    b.addEventListener("click", () => step(Number(b.dataset.step))));
+  document.addEventListener("keydown", (e) => {
+    const t = e.target as HTMLElement;
+    if (t.closest("input, textarea, [contenteditable]")) return;
+    if (e.key === "ArrowLeft") step(-1);
+    if (e.key === "ArrowRight") step(1);
+  });
+  show(new URL(location.href).searchParams.get("variant") ?? keys[0]);
+</script>

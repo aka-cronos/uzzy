@@ -1,0 +1,121 @@
+---
+// PROTOTYPE — Variant E "White page + desktop card": everything on white; the
+// cover's wallpaper, menu bar and panel live inside one rounded card that
+// floats on the right while scrolling, as in C. The hero is one viewport tall,
+// capped at a 14" MacBook Pro browser viewport (~860px) so it doesn't sprawl
+// on large screens.
+import * as c from "./content";
+import GaugeIcon from "./GaugeIcon.astro";
+const logos = { Claude: "/cover/claude.svg", Codex: "/cover/codex.svg", Cursor: "/cover/cursor.svg" };
+// white logos need inverting on white; Claude's is orange
+const onWhite = (name: string) => (name === "Claude" ? "" : "invert");
+const heroHeight = "clamp(690px, 100vh, 860px)";
+const cardHeight = 730;
+---
+<div class="bg-white font-[system-ui] text-zinc-900">
+  <div class="mx-auto grid max-w-[1280px] grid-cols-[1fr_560px] gap-16 px-20">
+    <main>
+      <section class="flex flex-col justify-center gap-10" style={`height:${heroHeight}`}>
+        <p class="text-2xl font-black tracking-[2.4px] uppercase">Uzzy</p>
+        <div class="flex flex-col gap-2">
+          <h1 class="text-[32px] leading-[1.25] font-medium">Your AI subscription quotas,<br />in the macOS menu bar.</h1>
+          <p class="text-lg leading-[1.6] text-zinc-600">How much you have used, how much is left and when each quota resets.</p>
+        </div>
+        <div class="flex gap-4">
+          {c.providers.map((p) => (
+            <span class="flex items-center gap-2 rounded-full border border-zinc-900 px-4 py-1 leading-[1.6]">
+              <img src={logos[p.name as keyof typeof logos]} alt="" width="16" height={p.name === "Cursor" ? 18 : 16} class={onWhite(p.name)} />{p.name}
+            </span>
+          ))}
+        </div>
+        <div>
+          <div class="flex items-center gap-6">
+            <a href={c.DOWNLOAD_URL} class="rounded-full bg-zinc-900 px-6 py-2.5 font-medium text-white hover:bg-zinc-700"> Download for Mac</a>
+            <a href={c.REPO_URL} class="text-lg leading-[1.6] text-zinc-600 hover:text-zinc-900">github.com/aka-cronos/uzzy</a>
+          </div>
+          <p class="mt-3 text-sm text-zinc-500">Free · Version {c.VERSION} · {c.REQUIREMENTS}</p>
+        </div>
+      </section>
+
+      <section class="border-t border-zinc-200 py-24">
+        <p class="text-xl leading-relaxed text-zinc-600">{c.why}</p>
+        <div class="mt-12 grid gap-5 sm:grid-cols-2">
+          {c.features.map((f) => (
+            <div class="rounded-2xl border border-zinc-200 p-6">
+              <h3 class="font-semibold">{f.title}</h3>
+              <p class="mt-2 text-zinc-600">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="border-t border-zinc-200 py-24">
+        <h2 class="text-3xl font-semibold tracking-tight">Works with the tools you already use</h2>
+        <div class="mt-10 divide-y divide-zinc-200">
+          {c.providers.map((p) => (
+            <div class="flex gap-5 py-6">
+              <span class="grid size-11 shrink-0 place-items-center rounded-full bg-zinc-900">
+                <img src={logos[p.name as keyof typeof logos]} alt="" width="20" height={p.name === "Cursor" ? 22 : 20} />
+              </span>
+              <div>
+                <h3 class="text-lg font-semibold">{p.name}</h3>
+                <p class="text-sm text-zinc-500">Reuses your {p.session} session</p>
+                <p class="mt-2 text-zinc-700">{p.quotas}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="border-t border-zinc-200 py-24">
+        <h2 class="text-3xl font-semibold tracking-tight">Private by design</h2>
+        <ul class="mt-8 space-y-4">
+          {c.privacy.map((p) => <li class="flex gap-3 text-zinc-700"><span class="text-emerald-600">✓</span>{p}</li>)}
+        </ul>
+      </section>
+    </main>
+
+    <!-- desktop card: vertically centred in the hero, then sticky -->
+    <aside style={`padding-top:calc((${heroHeight} - ${cardHeight}px) / 2)`}>
+      <div class="sticky top-8 overflow-hidden rounded-3xl bg-black shadow-2xl shadow-zinc-900/20" style={`height:${cardHeight}px`}>
+        <img src="/cover/bg.jpg" alt="" class="absolute inset-0 size-full object-cover" />
+        <div class="relative flex items-center justify-between py-[5px] pr-4 pl-2.5 text-[13px] font-semibold text-white">
+          <div class="flex items-center">
+            <span class="px-2.5 text-[15px]"></span>
+            <span class="px-2.5 font-bold">Finder</span>
+            {["File", "Edit"].map((m) => <span class="px-2.5 font-normal">{m}</span>)}
+          </div>
+          <div class="flex items-center">
+            <!-- the panel hangs from the icon -->
+            <span class="relative rounded-full bg-[#323234] px-[9px] py-1">
+              <GaugeIcon class="size-4" />
+              <img src="/cover/panel.png" width="432" height="681" alt="The Uzzy panel with cards for Claude, Codex and Cursor"
+                class="absolute top-[calc(100%-14px)] left-1/2 max-w-none -translate-x-1/2" />
+            </span>
+            <img src="/cover/wifi.svg" alt="" width="34.5" height="20" />
+            <span class="px-[9px] py-1">
+              <svg class="size-[15px]" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6.5" cy="6.5" r="4.8" /><path d="m10 10 4.5 4.5" stroke-linecap="round" /></svg>
+            </span>
+            <img src="/cover/control-center.svg" alt="" width="31.15" height="21.41" />
+            <span class="flex gap-2 pl-[9px]"><span>Sat Sep 26</span><span>9:41 AM</span></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <section class="mx-auto max-w-[1280px] px-20 pb-24">
+    <div class="rounded-3xl bg-zinc-900 px-8 py-16 text-center text-white">
+      <h2 class="text-3xl font-semibold tracking-tight">Stop opening three dashboards.</h2>
+      <a href={c.DOWNLOAD_URL} class="mt-8 inline-block rounded-full bg-white px-6 py-3 font-medium text-zinc-900 hover:bg-zinc-200"> Download for Mac</a>
+      <p class="mt-3 text-sm text-zinc-400">{c.REQUIREMENTS} · Open source, MIT</p>
+    </div>
+  </section>
+
+  <footer class="border-t border-zinc-200">
+    <div class="mx-auto flex max-w-[1280px] justify-between gap-8 px-20 py-8 text-sm text-zinc-500">
+      <span>© 2026 Uzzy · <a href={c.REPO_URL} class="underline">GitHub</a> · <a href={`${c.REPO_URL}/blob/main/LICENSE`} class="underline">MIT License</a></span>
+      <span class="max-w-md text-xs">{c.disclaimer}</span>
+    </div>
+  </footer>
+</div>

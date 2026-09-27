@@ -1,0 +1,29 @@
+---
+// PROTOTYPE — throwaway. Six landing page variants for "How should the
+// uzzy.app landing page look and read?" (aka-cronos/uzzy#105), switchable via
+// ?variant=A|B|C|D|E|F|B|C and the floating bar (or ←/→). Never merge this branch.
+import "../../styles/global.css";
+import VariantA from "../../components/prototype/VariantA.astro";
+import VariantB from "../../components/prototype/VariantB.astro";
+import VariantC from "../../components/prototype/VariantC.astro";
+import VariantD from "../../components/prototype/VariantD.astro";
+import VariantE from "../../components/prototype/VariantE.astro";
+import VariantF from "../../components/prototype/VariantF.astro";
+import PrototypeSwitcher from "../../components/prototype/PrototypeSwitcher.astro";
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Uzzy — your AI coding quotas in the menu bar</title>
+  </head>
+  <body class="antialiased">
+    <div data-variant="A"><VariantA /></div>
+    <div data-variant="B" hidden><VariantB /></div>
+    <div data-variant="C" hidden><VariantC /></div>
+    <div data-variant="D" hidden><VariantD /></div>
+    <div data-variant="E" hidden><VariantE /></div>
+    <div data-variant="F" hidden><VariantF /></div>
+    <PrototypeSwitcher variants={[["A", "Classic product page"], ["B", "Desktop scene, dark"], ["C", "Spec sheet"], ["D", "Cover hero + sticky panel"], ["E", "White page + desktop card"], ["F", "E refined, slate"]]} />
+  </body>
+</html>

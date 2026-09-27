@@ -1,0 +1,48 @@
+---
+// PROTOTYPE — the Uzzy panel rebuilt in HTML with English copy, since the
+// app's English UI doesn't exist yet. Numbers are fictional.
+const cards = [
+  { name: "Claude", plan: "Pro", quotas: [
+    { label: "5 hours", pct: 26, reset: "Today, 9:09 PM · in 4 h 22 min" },
+    { label: "Weekly", pct: 19, reset: "Thu, Oct 1, 11:59 PM · in 5 d 7 h" },
+  ], extra: ["Usage credits", "$53.06 this month"] },
+  { name: "Codex", plan: "Plus", badge: "1", quotas: [
+    { label: "5 hours", pct: 26, reset: "Today, 9:42 PM · in 4 h 54 min" },
+    { label: "Weekly", pct: 4, reset: "Sat, Oct 3, 4:42 PM · in 6 d 23 h" },
+  ] },
+  { name: "Cursor", plan: "Pro+", quotas: [
+    { label: "Cursor Models", pct: 5, reset: "Tue, Oct 20, 11:21 AM · in 23 d 18 h" },
+    { label: "Other Models", pct: 6, reset: "Tue, Oct 20, 11:21 AM · in 23 d 18 h" },
+  ] },
+];
+const { class: cls = "" } = Astro.props;
+---
+<div class={`w-[340px] rounded-2xl border border-white/10 bg-[#1e1e1e]/95 text-[13px] text-white shadow-2xl shadow-black/60 backdrop-blur ${cls}`}>
+  <div class="px-5 pt-4 pb-1 font-semibold">Uzzy</div>
+  {cards.map((c, i) => (
+    <div class={`px-5 py-3 ${i ? "border-t border-white/10" : ""}`}>
+      <div class="flex items-baseline justify-between">
+        <div class="flex items-center gap-1.5">
+          <span class="font-semibold">{c.name}</span><span class="text-white/55">· {c.plan}</span>
+          {c.badge && <span class="ml-1 rounded-full bg-white/10 px-1.5 text-[11px]">⟳ {c.badge}</span>}
+        </div>
+        <span class="text-[11px] text-white/50">Last read: Today, 4:47 PM</span>
+      </div>
+      {c.quotas.map((q) => (
+        <div class="mt-2.5">
+          <div class="flex items-baseline justify-between">
+            <span>{q.label}</span>
+            <span><span class="font-semibold tabular-nums">{q.pct}%</span> <span class="text-[11px] text-white/50">used</span></span>
+          </div>
+          <div class="mt-1 h-1 rounded-full bg-white/10"><div class="h-1 rounded-full bg-[#1f7aff]" style={`width:${Math.max(q.pct, 4)}%`}></div></div>
+          <div class="mt-1 text-[11px] text-white/50">Resets {q.reset}</div>
+        </div>
+      ))}
+      {c.extra && <div class="mt-2.5 flex justify-between"><span>{c.extra[0]}</span><span class="font-semibold">{c.extra[1]}</span></div>}
+    </div>
+  ))}
+  <div class="flex justify-between border-t border-white/10 px-3 py-2.5">
+    <span class="rounded-md bg-white/10 px-2.5 py-1">Quit</span>
+    <span class="flex gap-1.5"><span class="rounded-md bg-white/10 px-2.5 py-1">⚙</span><span class="rounded-md bg-white/10 px-2.5 py-1">↻</span></span>
+  </div>
+</div>
