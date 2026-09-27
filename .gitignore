@@ -3,4 +3,4 @@ DerivedData/
 xcuserdata/
 *.xcuserstate
 .DS_Store
-Config/Local.xcconfig
+app/Config/Local.xcconfig

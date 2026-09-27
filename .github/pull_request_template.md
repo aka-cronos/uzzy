@@ -8,6 +8,6 @@ Closes #
 
 ## How it was verified
 
-- [ ] `xcodebuild test -scheme Uzzy -destination 'platform=macOS,arch=arm64'` passes
+- [ ] `xcodebuild test -project app/Uzzy.xcodeproj -scheme Uzzy -destination 'platform=macOS,arch=arm64'` passes
 - [ ] Checked in the running app or a debug scenario, if the panel changed
 - [ ] No real tokens, emails, account IDs or provider responses in code, fixtures or this description
