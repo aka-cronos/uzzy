@@ -10,7 +10,8 @@ import Foundation
 public struct Scenario: Sendable, Identifiable, Hashable {
     /// Stable, for choosing a scenario from the command line.
     public let id: String
-    /// The state it shows, as the panel names it.
+    /// The state it shows, in plain English: debug builds only, so it is
+    /// not localized.
     public let name: String
     private let play: @MainActor @Sendable (Stage) async -> Void
 
@@ -53,20 +54,20 @@ extension Scenario {
 
     /// Every card shows the sample quotas, and its plan next to its name:
     /// «Claude · Max», «Codex · Plus» and «Cursor · Pro+».
-    public static let quotas = Scenario("quotas", "Cuotas al día") { stage in
+    public static let quotas = Scenario("quotas", "Usage limits up to date") { stage in
         await stage.openPanel()
     }
 
-    /// «Créditos de uso»: after its subscription quotas, Claude reports
+    /// «Usage credits»: after its subscription quotas, Claude reports
     /// 53.06 US dollars of usage credits spent against a 40-dollar monthly
     /// limit. Spending past the limit is shown as it is.
-    public static let usageCredits = Scenario("usageCredits", "Créditos de uso") { stage in
+    public static let usageCredits = Scenario("usageCredits", "Usage credits") { stage in
         await stage.transport.answer(with: .json(claudeWithUsageCredits(monthlyLimit: "4000")), for: .claude)
         await stage.openPanel()
     }
 
-    /// «Créditos de uso» without a monthly limit: only the spend is shown.
-    public static let uncappedUsageCredits = Scenario("uncappedUsageCredits", "Créditos de uso sin límite") { stage in
+    /// «Usage credits» without a monthly limit: only the spend is shown.
+    public static let uncappedUsageCredits = Scenario("uncappedUsageCredits", "Usage credits without a limit") { stage in
         await stage.transport.answer(with: .json(claudeWithUsageCredits(monthlyLimit: "null")), for: .claude)
         await stage.openPanel()
     }
@@ -82,16 +83,16 @@ extension Scenario {
         """#
     }
 
-    /// «Consultando cuotas»: the first query of every card is still running.
-    public static let loading = Scenario("loading", "Consultando cuotas") { stage in
+    /// «Checking usage limits…»: the first query of every card is still running.
+    public static let loading = Scenario("loading", "Checking usage limits") { stage in
         await stage.transport.hold()
         await stage.openPanel(waitingFor: [])
         await stage.transport.waitForRequests(stage.core.enabledProviders.count)
     }
 
-    /// «Consultando nueva cuenta»: every session changed to another account,
+    /// «Checking new account…»: every session changed to another account,
     /// whose first query is still running.
-    public static let newAccount = Scenario("newAccount", "Consultando nueva cuenta") { stage in
+    public static let newAccount = Scenario("newAccount", "Checking a new account") { stage in
         await stage.openPanel()
         await stage.answerEverySession(with: .session(Session(accessToken: "other-token", accountID: "other-account")))
         await stage.transport.hold()
@@ -99,9 +100,9 @@ extension Scenario {
         await stage.transport.waitForRequests(stage.core.enabledProviders.count * 2)
     }
 
-    /// «Desactualizado»: a later query of every card failed, so each keeps
+    /// «Out of date»: a later query of every card failed, so each keeps
     /// its last valid reading, 20 minutes old.
-    public static let stale = Scenario("stale", "Desactualizado") { stage in
+    public static let stale = Scenario("stale", "Out of date") { stage in
         await stage.openPanel()
         stage.core.panelClosed()
         stage.clock.advance(by: 20 * 60)
@@ -111,9 +112,9 @@ extension Scenario {
         await stage.openPanel()
     }
 
-    /// «Pendiente de confirmar»: Claude's 5-hour reset passed and the query
+    /// «Reset pending confirmation»: Claude's 5-hour reset passed and the query
     /// after it failed, so the figure is stale and the reset unconfirmed.
-    public static let pendingConfirmation = Scenario("pendingConfirmation", "Pendiente de confirmar") { stage in
+    public static let pendingConfirmation = Scenario("pendingConfirmation", "Pending confirmation") { stage in
         await stage.openPanel()
         stage.core.panelClosed()
         // 2026-09-23T17:30:00Z, half an hour after Claude's 5-hour reset.
@@ -122,8 +123,8 @@ extension Scenario {
         await stage.openPanel()
     }
 
-    /// «Reinicio desconocido»: Claude sends no date for the weekly reset.
-    public static let unknownReset = Scenario("unknownReset", "Reinicio desconocido") { stage in
+    /// «Reset unknown»: Claude sends no date for the weekly reset.
+    public static let unknownReset = Scenario("unknownReset", "Reset unknown") { stage in
         await stage.transport.answer(with: .json(#"""
         {
           "five_hour": {"utilization": 35.0, "resets_at": "2026-09-23T17:00:00.000000+00:00"},
@@ -133,28 +134,28 @@ extension Scenario {
         await stage.openPanel()
     }
 
-    /// «Cuota no disponible»: Claude leaves out the weekly quota.
-    public static let unavailable = Scenario("unavailable", "Cuota no disponible") { stage in
+    /// «Usage limit unavailable»: Claude leaves out the weekly quota.
+    public static let unavailable = Scenario("unavailable", "Usage limit unavailable") { stage in
         await stage.transport.answer(with: .json(#"""
         {"five_hour": {"utilization": 35.0, "resets_at": "2026-09-23T17:00:00.000000+00:00"}}
         """#), for: .claude)
         await stage.openPanel()
     }
 
-    /// «Esta sesión no ofrece cuotas de suscripción»: Codex CLI is signed in
+    /// «This session has no subscription usage limits»: Codex CLI is signed in
     /// with an API key, which has no subscription quotas. It stands in for
-    /// «Cuotas no disponibles para este plan»: no validated response shows
+    /// «No usage limits for this plan»: no validated response shows
     /// that a plan has no quotas yet, so the core has no such state.
     public static let withoutSubscriptionQuotas = Scenario(
-        "withoutSubscriptionQuotas", "Esta sesión no ofrece cuotas de suscripción"
+        "withoutSubscriptionQuotas", "Session without subscription usage limits"
     ) { stage in
         await stage.sessionReaders[.codex]?.answer(with: .withoutSubscriptionQuotas)
         await stage.openPanel()
     }
 
-    /// «Dato no interpretable»: Claude's 5-hour figure is over 100 and its
+    /// «Unreadable data»: Claude's 5-hour figure is over 100 and its
     /// weekly copies contradict each other; Cursor's Other Models is negative.
-    public static let uninterpretable = Scenario("uninterpretable", "Dato no interpretable") { stage in
+    public static let uninterpretable = Scenario("uninterpretable", "Unreadable data") { stage in
         await stage.transport.answer(with: .json(#"""
         {
           "five_hour": {"utilization": 140.0, "resets_at": "2026-09-23T17:00:00.000000+00:00"},
@@ -168,23 +169,23 @@ extension Scenario {
         await stage.openPanel()
     }
 
-    /// «Sin sesión»: no official app is signed in.
-    public static let noSession = Scenario("noSession", "Sin sesión") { stage in
+    /// «Not signed in»: no official app is signed in.
+    public static let noSession = Scenario("noSession", "Not signed in") { stage in
         await stage.answerEverySession(with: .noSession)
         await stage.openPanel()
     }
 
-    /// «Sesión vencida»: every provider rejects its session (401).
-    public static let sessionExpired = Scenario("sessionExpired", "Sesión vencida") { stage in
+    /// «Session expired»: every provider rejects its session (401).
+    public static let sessionExpired = Scenario("sessionExpired", "Session expired") { stage in
         await stage.transport.answer(with: .status(401))
         await stage.openPanel()
     }
 
-    /// «Sin confirmar»: five minutes after a successful reading, every
+    /// «Unconfirmed»: five minutes after a successful reading, every
     /// provider rejects the session the automatic query reused (401), so the
     /// figures go stale. The check made on opening the panel again is held,
     /// so reopening keeps showing the state.
-    public static let reusedSessionRejected = Scenario("reusedSessionRejected", "Sin confirmar") { stage in
+    public static let reusedSessionRejected = Scenario("reusedSessionRejected", "Unconfirmed") { stage in
         await stage.openPanel()
         await stage.transport.answer(with: .status(401))
         stage.clock.advance(by: UsageCore.refreshInterval)
@@ -195,29 +196,29 @@ extension Scenario {
         await stage.transport.waitForRequests(stage.core.enabledProviders.count * 3)
     }
 
-    /// «Sin acceso a la sesión»: the user denied the Keychain prompt for
+    /// «No access to the session»: the user denied the Keychain prompt for
     /// Claude Code's session.
-    public static let sessionAccessDenied = Scenario("sessionAccessDenied", "Sin acceso a la sesión") { stage in
+    public static let sessionAccessDenied = Scenario("sessionAccessDenied", "No access to the session") { stage in
         await stage.sessionReaders[.claude]?.answer(with: .accessDenied)
         await stage.openPanel()
     }
 
     /// The Keychain cannot be read, and Cursor's session database is busy.
-    public static let unavailableSessionStores = Scenario("unavailableSessionStores", "Sesiones no disponibles") { stage in
+    public static let unavailableSessionStores = Scenario("unavailableSessionStores", "Sessions unavailable") { stage in
         await stage.sessionReaders[.claude]?.answer(with: .storeUnavailable)
         await stage.sessionReaders[.cursor]?.answer(with: .storeBusy)
         await stage.openPanel()
     }
 
-    /// «Sesión incompatible»: every session is stored in an unknown format.
-    public static let incompatibleSession = Scenario("incompatibleSession", "Sesión incompatible") { stage in
+    /// «Incompatible session»: every session is stored in an unknown format.
+    public static let incompatibleSession = Scenario("incompatibleSession", "Incompatible session") { stage in
         await stage.answerEverySession(with: .unknownFormat)
         await stage.openPanel()
     }
 
-    /// «Respuesta incompatible»: every provider answers in a format the app
+    /// «Incompatible response»: every provider answers in a format the app
     /// does not understand.
-    public static let incompatibleResponse = Scenario("incompatibleResponse", "Respuesta incompatible") { stage in
+    public static let incompatibleResponse = Scenario("incompatibleResponse", "Incompatible response") { stage in
         await stage.transport.answer(with: .json("<html>Sample maintenance page</html>"), for: .claude)
         await stage.transport.answer(with: .codex(rateLimit: "null"), for: .codex)
         await stage.transport.answer(with: .json("{}"), for: .cursor)
@@ -225,7 +226,7 @@ extension Scenario {
     }
 
     /// Cursor sends its billing-cycle end as a number instead of a string.
-    public static let incompatibleCursorReset = Scenario("incompatibleCursorReset", "Reinicio de Cursor incompatible") { stage in
+    public static let incompatibleCursorReset = Scenario("incompatibleCursorReset", "Incompatible Cursor reset") { stage in
         await stage.transport.answer(with: .json("""
             {"billingCycleEnd": 1791590400000, "planUsage": {"autoPercentUsed": 18.5, "apiPercentUsed": 42.75}}
             """), for: .cursor)
@@ -234,7 +235,7 @@ extension Scenario {
 
     /// Network and server failures with no previous reading: no connection,
     /// no answer in time and a server error.
-    public static let networkFailures = Scenario("networkFailures", "Fallos de red o del servidor") { stage in
+    public static let networkFailures = Scenario("networkFailures", "Network or server failures") { stage in
         await stage.transport.answer(with: .networkError, for: .claude)
         await stage.transport.answer(with: .timeout, for: .codex)
         await stage.transport.answer(with: .status(503), for: .cursor)
@@ -243,7 +244,7 @@ extension Scenario {
 
     /// Claude refuses the query (403); Codex asks to wait 10 minutes and
     /// Cursor asks to wait without saying how long (429).
-    public static let refused = Scenario("refused", "Acceso rechazado y demasiadas consultas") { stage in
+    public static let refused = Scenario("refused", "Access refused and too many queries") { stage in
         await stage.transport.answer(with: .status(403), for: .claude)
         await stage.transport.answer(
             with: .response(HTTPResponse(status: 429, headers: ["Retry-After": "600"], body: Data())), for: .codex
@@ -263,7 +264,7 @@ extension Scenario {
     /// A panel taller than a short screen: Claude and Codex add per-model
     /// limits, some with long names, and Cursor's figures went stale after a
     /// timeout, so its card also explains the failure.
-    public static let longContent = Scenario("longContent", "Contenido largo") { stage in
+    public static let longContent = Scenario("longContent", "Long content") { stage in
         await stage.transport.answer(with: .json(#"""
         {
           "five_hour": {"utilization": 35.0, "resets_at": "2026-09-23T17:00:00.000000+00:00"},
@@ -297,9 +298,9 @@ extension Scenario {
 }
 
 extension Scenario {
-    /// «Restablecimientos disponibles»: the Codex account holds 3 banked
+    /// «3 resets available»: the Codex account holds 3 banked
     /// resets, so its card shows the count next to its name.
-    public static let bankedResets = Scenario("bankedResets", "Restablecimientos disponibles") { stage in
+    public static let bankedResets = Scenario("bankedResets", "Banked resets") { stage in
         await stage.transport.answer(with: .codex(
             rateLimit: #"""
             {
