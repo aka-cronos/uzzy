@@ -36,7 +36,8 @@ final class ScenarioSwitch {
     }
 }
 
-/// The panel with a bar on top to choose the scenario it shows.
+/// The panel with a bar on top to choose the scenario it shows. The bar is a
+/// developer tool, so its text is plain English, left out of the catalog.
 struct ScenarioPanel: View {
     let scenarios: ScenarioSwitch
     let bounds: PanelBounds
@@ -47,8 +48,8 @@ struct ScenarioPanel: View {
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 8) {
-                Picker("Escenario", selection: Binding(get: { scenarios.scenario }, set: choose)) {
-                    Text("Cuentas reales").tag(Scenario?.none)
+                Picker(String("Scenario"), selection: Binding(get: { scenarios.scenario }, set: choose)) {
+                    Text(verbatim: "Real accounts").tag(Scenario?.none)
                     Divider()
                     ForEach(Scenario.all) { scenario in
                         Text(scenario.name).tag(Optional(scenario))
@@ -58,7 +59,7 @@ struct ScenarioPanel: View {
                 .lineLimit(1)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 if scenarios.scenario != nil {
-                    Text("Datos ficticios")
+                    Text(verbatim: "Sample data")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.orange)
                         .lineLimit(1)

@@ -2,7 +2,7 @@ import Foundation
 import Testing
 import UzzyCore
 
-/// Claude's usage credits («Créditos de uso»): the money spent on them this
+/// Claude's usage credits («Usage credits»): the money spent on them this
 /// month and the monthly spend limit, read from `extra_usage`. They are not a
 /// subscription quota: no percentage, no magnitude and no reset.
 @MainActor

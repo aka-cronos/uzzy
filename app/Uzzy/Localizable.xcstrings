@@ -1,0 +1,1007 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ asked to wait. It will be checked again from %@." : {
+      "comment" : "The provider, then a moment, e.g. \"today, 14:42\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ pidió esperar. Se volverá a consultar a partir de: %2$@."
+          }
+        }
+      }
+    },
+    "%@ asked to wait. It will be checked again shortly." : {
+      "comment" : "%@ is the provider.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ pidió esperar. Se volverá a consultar en breve."
+          }
+        }
+      }
+    },
+    "%@ didn't accept the saved session. Click Refresh to check it again." : {
+      "comment" : "%@ is the provider.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ no aceptó la sesión guardada. Pulsa Actualizar para volver a comprobarla."
+          }
+        }
+      }
+    },
+    "%@ didn't respond in time. Click Refresh to try again." : {
+      "comment" : "%@ is the provider.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ no respondió a tiempo. Pulsa Actualizar para reintentar."
+          }
+        }
+      }
+    },
+    "%@ of %@ this month" : {
+      "comment" : "Usage credits spent this month and the monthly spend limit, e.g. \"$53.06 of $40 this month\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ de %2$@ este mes"
+          }
+        }
+      }
+    },
+    "%@ refused the query. It may be an account restriction; check it in %@ and click Refresh." : {
+      "comment" : "The provider, then the official app.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ rechazó la consulta. Puede ser una restricción de la cuenta; revísala en %2$@ y pulsa Actualizar."
+          }
+        }
+      }
+    },
+    "%@ responded in a format %@ doesn't recognize. Its service may have changed." : {
+      "comment" : "The provider, then the app name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ respondió en un formato que %2$@ no reconoce. Puede que haya cambiado su servicio."
+          }
+        }
+      }
+    },
+    "%@ responded with an error (%lld). Click Refresh to try again." : {
+      "comment" : "The provider, then the HTTP status code.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ respondió con un error (%2$lld). Pulsa Actualizar para reintentar."
+          }
+        }
+      }
+    },
+    "%@ this month" : {
+      "comment" : "Usage credits spent this month, without a monthly spend limit.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ este mes"
+          }
+        }
+      }
+    },
+    "%@, %@ plan" : {
+      "comment" : "A card title as VoiceOver reads it: the provider and its plan, e.g. \"Claude, Max plan\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@, plan %2$@"
+          }
+        }
+      }
+    },
+    "%lld d %lld h" : {
+      "comment" : "Time left until a reset, in days and hours.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld d %2$lld h"
+          }
+        }
+      }
+    },
+    "%lld days" : {
+      "comment" : "The length of a usage limit period.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld days"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld día"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld días"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld h %lld min" : {
+      "comment" : "Time left until a reset, in hours and minutes.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld h %2$lld min"
+          }
+        }
+      }
+    },
+    "%lld hours" : {
+      "comment" : "The length of a usage limit period.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld hour"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld hours"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld hora"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld horas"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld min" : {
+      "comment" : "Minutes: the time left until a reset, or the length of a usage limit period.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
+          }
+        }
+      }
+    },
+    "%lld resets available" : {
+      "comment" : "The banked resets of a Codex account.",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld reset available"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld resets available"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld restablecimiento disponible"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%lld restablecimientos disponibles"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld s" : {
+      "comment" : "Seconds: the length of a usage limit period.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld s"
+          }
+        }
+      }
+    },
+    "5 hours" : {
+      "comment" : "A usage limit period.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 horas"
+          }
+        }
+      }
+    },
+    "Access refused" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acceso rechazado"
+          }
+        }
+      }
+    },
+    "Access to the %@ session in the keychain was denied. Click Refresh to ask again." : {
+      "comment" : "%@ is the official app.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se denegó el acceso a la sesión de %@ en el llavero. Pulsa Actualizar para volver a pedirlo."
+          }
+        }
+      }
+    },
+    "Billing cycle" : {
+      "comment" : "A usage limit period.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ciclo de facturación"
+          }
+        }
+      }
+    },
+    "Check usage limits now" : {
+      "comment" : "Tooltip of the Refresh button.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consultar las cuotas ahora"
+          }
+        }
+      }
+    },
+    "Checking new account…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consultando nueva cuenta…"
+          }
+        }
+      }
+    },
+    "Checking usage limits…" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consultando cuotas…"
+          }
+        }
+      }
+    },
+    "Close Window" : {
+      "comment" : "The main menu command that closes the front window or the panel.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerrar ventana"
+          }
+        }
+      }
+    },
+    "Couldn't connect to %@. Click Refresh to try again." : {
+      "comment" : "%@ is the provider.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo conectar con %@. Pulsa Actualizar para reintentar."
+          }
+        }
+      }
+    },
+    "Couldn't open the %@ session. Check that the official app works and click Refresh." : {
+      "comment" : "%@ is the official app.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo abrir la sesión de %@. Comprueba que la app oficial funcione y pulsa Actualizar."
+          }
+        }
+      }
+    },
+    "Couldn't read the Claude Code session in the keychain. Check that it's unlocked and click Refresh." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo leer la sesión de Claude Code en el llavero. Comprueba que esté desbloqueado y pulsa Actualizar."
+          }
+        }
+      }
+    },
+    "Couldn't read the session" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo leer la sesión"
+          }
+        }
+      }
+    },
+    "Cursor sent the reset date in a format %@ doesn't recognize. Click Refresh; if it continues, the integration needs an update." : {
+      "comment" : "%@ is the app name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cursor envió la fecha de reinicio en un formato que %@ no reconoce. Pulsa Actualizar; si continúa, la integración necesita una actualización."
+          }
+        }
+      }
+    },
+    "File" : {
+      "comment" : "The main menu File menu.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Archivo"
+          }
+        }
+      }
+    },
+    "Incompatible Cursor reset" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinicio de Cursor incompatible"
+          }
+        }
+      }
+    },
+    "Incompatible response" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respuesta incompatible"
+          }
+        }
+      }
+    },
+    "Incompatible session" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesión incompatible"
+          }
+        }
+      }
+    },
+    "Keychain unavailable" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Llavero no disponible"
+          }
+        }
+      }
+    },
+    "Last reading: %@" : {
+      "comment" : "When the card figures were last read, e.g. \"Last reading: today, 14:42\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Última lectura: %@"
+          }
+        }
+      }
+    },
+    "Move %@ Down" : {
+      "comment" : "Moves a provider one place down in the card order. %@ is the provider.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bajar %@"
+          }
+        }
+      }
+    },
+    "Move %@ Up" : {
+      "comment" : "Moves a provider one place up in the card order. %@ is the provider.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subir %@"
+          }
+        }
+      }
+    },
+    "No access to the session" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin acceso a la sesión"
+          }
+        }
+      }
+    },
+    "No active providers" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No hay proveedores activos"
+          }
+        }
+      }
+    },
+    "No valid data yet." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Todavía no hay un dato válido."
+          }
+        }
+      }
+    },
+    "Not signed in" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin sesión"
+          }
+        }
+      }
+    },
+    "Offline" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin conexión"
+          }
+        }
+      }
+    },
+    "Open Settings" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ajustes"
+          }
+        }
+      }
+    },
+    "Open Settings (⌘,)" : {
+      "comment" : "Tooltip of the panel settings button.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ajustes (⌘,)"
+          }
+        }
+      }
+    },
+    "Out of date" : {
+      "comment" : "Marks a figure that could not be refreshed.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Desactualizado"
+          }
+        }
+      }
+    },
+    "Percentage on the cards" : {
+      "comment" : "Settings row title: whether cards show the used or the left percentage.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Porcentaje en las tarjetas"
+          }
+        }
+      }
+    },
+    "Providers" : {
+      "comment" : "Settings section title.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proveedores"
+          }
+        }
+      }
+    },
+    "Query in progress" : {
+      "comment" : "VoiceOver value of the Refresh button while it queries the providers.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consulta en curso"
+          }
+        }
+      }
+    },
+    "Quit" : {
+      "comment" : "The panel button that quits the app.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salir"
+          }
+        }
+      }
+    },
+    "Quit %@" : {
+      "comment" : "The quit command, in the panel and the main menu. %@ is the app name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Salir de %@"
+          }
+        }
+      }
+    },
+    "Refresh" : {
+      "comment" : "The panel button that queries the providers now.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizar"
+          }
+        }
+      }
+    },
+    "Renew the session in %@ and click Refresh." : {
+      "comment" : "%@ is the official app.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renueva la sesión en %@ y pulsa Actualizar."
+          }
+        }
+      }
+    },
+    "Reset pending confirmation" : {
+      "comment" : "The reset passed and no new reading confirms it yet.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinicio pendiente de confirmar"
+          }
+        }
+      }
+    },
+    "Reset unknown" : {
+      "comment" : "The provider sent no valid reset for the usage limit.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinicio desconocido"
+          }
+        }
+      }
+    },
+    "Resets %@ · in %@" : {
+      "comment" : "When a usage limit resets and the time left, e.g. \"Resets today, 14:42 · in 2 h 5 min\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinicio: %1$@ · en %2$@"
+          }
+        }
+      }
+    },
+    "Server error" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Error del servidor"
+          }
+        }
+      }
+    },
+    "Session busy" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesión ocupada"
+          }
+        }
+      }
+    },
+    "Session expired" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sesión vencida"
+          }
+        }
+      }
+    },
+    "Settings" : {
+      "comment" : "The Settings window title and the panel settings button label.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajustes"
+          }
+        }
+      }
+    },
+    "Show %@" : {
+      "comment" : "The switch that turns a provider on or off. %@ is the provider.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mostrar %@"
+          }
+        }
+      }
+    },
+    "Shows how much of each limit you've used, or how much you have left until it resets." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestra cuánto has usado de cada límite o cuánto te queda hasta el reinicio."
+          }
+        }
+      }
+    },
+    "Sign in to %@ and click Refresh." : {
+      "comment" : "%@ is the official app.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inicia sesión en %@ y pulsa Actualizar."
+          }
+        }
+      }
+    },
+    "The %@ database is busy. Wait a moment and click Refresh." : {
+      "comment" : "%@ is the official app.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La base de datos de %@ está ocupada. Espera un momento y pulsa Actualizar."
+          }
+        }
+      }
+    },
+    "The %@ session belongs to another account. The previous account's figures were cleared." : {
+      "comment" : "%@ is the official app.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sesión de %@ es de otra cuenta. Se borraron las cifras de la anterior."
+          }
+        }
+      }
+    },
+    "The %@ session is in a format %@ doesn't recognize." : {
+      "comment" : "The official app, then the app name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sesión de %1$@ tiene un formato que %2$@ no reconoce."
+          }
+        }
+      }
+    },
+    "The %@ session isn't from a subscription (e.g., it uses an API key). Sign in to %@ with your subscription and click Refresh." : {
+      "comment" : "Both %@ are the official app.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La sesión de %1$@ no es de una suscripción (p. ej., usa una clave de API). Inicia sesión con tu suscripción en %2$@ y pulsa Actualizar."
+          }
+        }
+      }
+    },
+    "The cards follow the order of this list. A provider that's turned off has no card, and %@ doesn't read its session or check its usage limits." : {
+      "comment" : "%@ is the app name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El orden de la lista es el de las tarjetas. Un proveedor desactivado no tiene tarjeta, y %@ no lee su sesión ni consulta sus cuotas."
+          }
+        }
+      }
+    },
+    "This session has no subscription usage limits" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esta sesión no ofrece cuotas de suscripción"
+          }
+        }
+      }
+    },
+    "Timed out" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo agotado"
+          }
+        }
+      }
+    },
+    "Too many queries" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demasiadas consultas"
+          }
+        }
+      }
+    },
+    "Turn on a provider in Settings to see its usage limits." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activa un proveedor en Ajustes para ver sus cuotas."
+          }
+        }
+      }
+    },
+    "Unconfirmed" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin confirmar"
+          }
+        }
+      }
+    },
+    "Unreadable data" : {
+      "comment" : "The provider sent a figure the app cannot interpret.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dato no interpretable"
+          }
+        }
+      }
+    },
+    "Usage credits" : {
+      "comment" : "Claude's pay-as-you-go usage credits.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créditos de uso"
+          }
+        }
+      }
+    },
+    "Usage limit unavailable" : {
+      "comment" : "The provider left out a usage limit.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuota no disponible"
+          }
+        }
+      }
+    },
+    "Usage limits" : {
+      "comment" : "Settings section title.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuotas"
+          }
+        }
+      }
+    },
+    "Use it in Codex." : {
+      "comment" : "Where one banked reset is used.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se usa desde Codex."
+          }
+        }
+      }
+    },
+    "Use them in Codex." : {
+      "comment" : "Where several banked resets are used.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se usan desde Codex."
+          }
+        }
+      }
+    },
+    "Uses the %@ session on this Mac." : {
+      "comment" : "%@ is the official app, e.g. \"Claude Code\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usa la sesión de %@ de este Mac."
+          }
+        }
+      }
+    },
+    "Weekly" : {
+      "comment" : "A usage limit period.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Semanal"
+          }
+        }
+      }
+    },
+    "left" : {
+      "comment" : "After a card percentage: how much of the usage limit is left.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "restante"
+          }
+        }
+      }
+    },
+    "today" : {
+      "comment" : "The day of a moment. It always follows other words, e.g. \"Resets today, 14:42\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy"
+          }
+        }
+      }
+    },
+    "tomorrow" : {
+      "comment" : "The day of a moment. It always follows other words, e.g. \"Resets tomorrow, 09:05\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mañana"
+          }
+        }
+      }
+    },
+    "used" : {
+      "comment" : "After a card percentage: how much of the usage limit is used.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "usado"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

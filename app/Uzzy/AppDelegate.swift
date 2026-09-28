@@ -228,7 +228,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
         if settingsWindow == nil {
             let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: SettingsView.width, height: 0),
                                   styleMask: [.titled, .closable], backing: .buffered, defer: false)
-            window.title = Format.settings
+            window.title = Format.current.settings
             let content = NSHostingController(rootView: SettingsView(
                 setProviderEnabled: { [weak self] provider, enabled in self?.setProviderEnabled(enabled, for: provider) },
                 setProviderOrder: { [weak self] order in self?.setProviderOrder(order) }
