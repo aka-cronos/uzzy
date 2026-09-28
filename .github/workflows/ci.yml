@@ -38,10 +38,10 @@ jobs:
 
   test:
     # The branch ruleset requires this check by name; keep it stable. A skipped
-    # job counts as passing, so a site-only PR can still merge.
+    # job counts as passing, so only skip when site-only detection succeeds.
     name: Build and test
     needs: changes
-    if: needs.changes.outputs.site-only != 'true'
+    if: ${{ !cancelled() && (needs.changes.result != 'success' || needs.changes.outputs.site-only != 'true') }}
     runs-on: xcode-27
     timeout-minutes: 30
     steps:
