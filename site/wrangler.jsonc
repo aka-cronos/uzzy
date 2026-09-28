@@ -3,6 +3,11 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "uzzy-site",
   "compatibility_date": "2026-09-27",
+  // Keep the workers.dev URL and per-branch preview URLs on across deploys.
+  "workers_dev": true,
+  "preview_urls": true,
+  // Workers Builds runs `wrangler preview` on pull requests; it needs this block.
+  "previews": {},
   "assets": {
     "directory": "./dist",
     "not_found_handling": "404-page",
