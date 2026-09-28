@@ -4,3 +4,4 @@ xcuserdata/
 *.xcuserstate
 .DS_Store
 app/Config/Local.xcconfig
+.pnpm-store/
