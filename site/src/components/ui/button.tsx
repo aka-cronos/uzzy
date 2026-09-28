@@ -1,10 +1,9 @@
-import * as React from "react";
+import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
-import { Slot } from "radix-ui";
 
 import { cn } from "@/lib/utils";
 
-// shadcn/ui's Button, restyled to the site's slate-only pills with 44px targets.
+// shadcn/ui's Button on Base UI, restyled to the site's slate-only pills with 44px targets.
 const buttonVariants = cva(
   "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full font-medium whitespace-nowrap transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-4 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
@@ -31,16 +30,13 @@ function Button({
   className,
   variant = "default",
   size = "default",
-  asChild = false,
   ...props
-}: React.ComponentProps<"button"> &
+}: Omit<ButtonPrimitive.Props, "className"> &
   VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
+    className?: string;
   }) {
-  const Comp = asChild ? Slot.Root : "button";
-
   return (
-    <Comp
+    <ButtonPrimitive
       data-slot="button"
       data-variant={variant}
       data-size={size}

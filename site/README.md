@@ -1,6 +1,6 @@
 # uzzy.app
 
-The landing page for Uzzy, served at <https://uzzy.app>. It is an [Astro](https://astro.build) site with static output, styled with Tailwind CSS and [shadcn/ui](https://ui.shadcn.com) components through `@astrojs/react`. The React components render to HTML at build time, so the page ships no client JavaScript.
+The landing page for Uzzy, served at <https://uzzy.app>. It is an [Astro](https://astro.build) site with static output, styled with Tailwind CSS and [shadcn/ui](https://ui.shadcn.com) components on [Base UI](https://base-ui.com) through `@astrojs/react`. The React components render to HTML at build time, so the page ships no client JavaScript.
 
 ## Develop
 
