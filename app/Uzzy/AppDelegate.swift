@@ -81,14 +81,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
         )
 
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        item.button?.image = NSImage(systemSymbolName: "gauge.with.dots.needle.33percent", accessibilityDescription: Format.appName)
+        // A template image from the asset catalog, so it follows the menu bar's
+        // appearance and highlight like the system's own items.
+        let icon = NSImage(resource: .menuBarIcon)
+        icon.accessibilityDescription = Format.appName
+        item.button?.image = icon
         #if DEBUG
         // Tells a Debug build apart from an installed Release copy in the menu bar.
-        // The menu bar ignores `contentTintColor`, so the symbol is drawn in color.
-        if let image = item.button?.image?.withSymbolConfiguration(.init(paletteColors: [.systemOrange])) {
-            image.isTemplate = false
-            item.button?.image = image
+        // The menu bar ignores `contentTintColor`, so the icon is drawn in color.
+        let debugIcon = NSImage(size: icon.size, flipped: false) { rect in
+            icon.draw(in: rect)
+            NSColor.systemOrange.set()
+            rect.fill(using: .sourceAtop)
+            return true
         }
+        debugIcon.isTemplate = false
+        debugIcon.accessibilityDescription = Format.appName
+        item.button?.image = debugIcon
         #endif
         item.button?.target = self
         item.button?.action = #selector(togglePanel)
