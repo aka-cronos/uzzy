@@ -1,0 +1,11 @@
+// A static-only Worker: no script, Cloudflare serves Astro's dist/ as assets.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "uzzy-site",
+  "compatibility_date": "2026-09-27",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}

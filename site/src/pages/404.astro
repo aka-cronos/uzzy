@@ -1,0 +1,17 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Lockup from "@/components/Lockup.astro";
+
+const focus = "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900";
+---
+<Layout title="Page not found · Uzzy">
+  <header class="mx-auto flex h-[72px] max-w-[1280px] items-center px-6 sm:px-10 lg:px-20">
+    <Lockup class={focus} />
+  </header>
+  <main class="mx-auto flex min-h-[calc(100vh-144px)] max-w-[1280px] flex-col items-start justify-center gap-6 px-6 sm:px-10 lg:px-20">
+    <p class="text-sm font-semibold tracking-wide text-slate-500 uppercase">404</p>
+    <h1 class="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">This page doesn't exist.</h1>
+    <p class="max-w-xl text-lg leading-relaxed text-slate-600">The link may be old or mistyped.</p>
+    <a href="/" class={`inline-flex min-h-11 items-center rounded-full bg-slate-900 px-6 font-medium text-slate-50 transition-colors duration-200 hover:bg-slate-700 ${focus}`}>Back to uzzy.app</a>
+  </main>
+</Layout>
