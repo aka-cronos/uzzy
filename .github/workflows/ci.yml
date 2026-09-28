@@ -5,15 +5,43 @@ on:
 
 permissions:
   contents: read
+  # the changes job reads the PR's file list
+  pull-requests: read
 
 concurrency:
   group: ci-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
+  changes:
+    name: Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      site-only: ${{ steps.files.outputs.site-only }}
+    steps:
+      # The site (site/) is built and previewed by Cloudflare Workers Builds,
+      # so a PR that only touches it doesn't need the macOS build.
+      - name: List changed files
+        id: files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          files=$(gh pr diff "$PR" --repo "$GITHUB_REPOSITORY" --name-only)
+          printf '%s\n' "$files"
+          if [ -n "$files" ] && ! printf '%s\n' "$files" | grep -qv '^site/'; then
+            echo "site-only=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "site-only=false" >> "$GITHUB_OUTPUT"
+          fi
+
   test:
-    # The branch ruleset requires this check by name; keep it stable.
+    # The branch ruleset requires this check by name; keep it stable. A skipped
+    # job counts as passing, so a site-only PR can still merge.
     name: Build and test
+    needs: changes
+    if: needs.changes.outputs.site-only != 'true'
     runs-on: xcode-27
     timeout-minutes: 30
     steps:
