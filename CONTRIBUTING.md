@@ -43,6 +43,40 @@ If you created `Config/Local.xcconfig` before the app moved into `app/`, move it
 mv Config/Local.xcconfig app/Config/Local.xcconfig
 ```
 
+## Releases
+
+Releases are built by [`.github/workflows/release.yml`](.github/workflows/release.yml) from a `v*` tag, never on a local Mac. It signs the app with Developer ID and Hardened Runtime, notarizes and staples both the app and `Uzzy.dmg`, and attaches `Uzzy.dmg` to a **draft** GitHub Release. Only the maintainer cuts releases.
+
+1. **Bump.** Open a pull request that sets `MARKETING_VERSION` (e.g. `0.1.0`) and adds 1 to `CURRENT_PROJECT_VERSION` in every target of `app/Uzzy.xcodeproj`, and merge it.
+2. **Tag.** Tag the merged commit on `main` and push the tag. The tag without its `v` and anything after a `-` must equal `MARKETING_VERSION`, or the workflow fails before it signs anything. Try the pipeline with a release candidate first; tags with a `-` become prereleases, which `releases/latest` ignores.
+
+   ```sh
+   git switch main && git pull
+   git tag v0.1.0-rc.1
+   git push origin v0.1.0-rc.1
+   ```
+
+3. **Try the draft.** When the workflow finishes, download `Uzzy.dmg` from the draft release in a browser, on a macOS account that never ran Uzzy. It must open with the one-click "downloaded from the Internet" prompt, and every provider must still read.
+4. **Publish.** Edit the notes if needed (they start from GitHub's generated notes) and publish the draft. The site's download button points at `releases/latest/download/Uzzy.dmg`, so it only moves when a non-prerelease is published.
+
+### Release secrets
+
+The workflow runs in a `release` environment. In **Settings → Environments → New environment**, create `release`, and under **Deployment branches and tags** choose **Selected branches and tags** and add the tag rule `v*`. Then add these environment secrets:
+
+| Secret | Value |
+|---|---|
+| `DEVELOPER_ID_P12_BASE64` | The Developer ID Application certificate with its private key, exported from Keychain Access as `.p12`, then `base64 -i DeveloperID.p12 \| pbcopy` |
+| `DEVELOPER_ID_P12_PASSWORD` | The password chosen when exporting the `.p12` |
+| `APP_STORE_CONNECT_API_KEY_P8` | The full contents of the `AuthKey_XXXXXXXXXX.p8` file, including the `BEGIN`/`END` lines |
+| `APP_STORE_CONNECT_KEY_ID` | The key's ID |
+| `APP_STORE_CONNECT_ISSUER_ID` | The issuer ID shown above the keys list |
+
+The certificate comes from [Certificates](https://developer.apple.com/account/resources/certificates/list) → **+** → **Developer ID Application**. The API key comes from [App Store Connect → Users and Access → Integrations → App Store Connect API](https://appstoreconnect.apple.com/access/integrations/api) → **Team Keys** → **+**, with the **Developer** role; Apple lets you download the `.p8` only once. The team ID is read from the certificate, so it is not a secret. If either leaks, revoke it in the same place and replace the secret.
+
+### Tag ruleset
+
+Only the maintainer may create `v*` tags. In **Settings → Rules → Rulesets → New ruleset → New tag ruleset**, name it `Release tags`, set **Enforcement status** to **Active**, add the target `v*` (**Include by pattern**), leave **Repository admin** in the bypass list, and turn on **Restrict creations**, **Restrict updates** and **Restrict deletions**.
+
 ## Data and privacy
 
 Test fixtures and sample responses must be sanitized: no real tokens, emails, account IDs or provider responses, in code, issues or pull requests. See [Privacy](README.md#privacy) for what the app may read and where it may connect; a change that widens that needs to be agreed in an issue first.
