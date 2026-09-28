@@ -115,10 +115,11 @@ Release builds leave the scenarios, the fakes and the sample responses out.
 | Path | Contents |
 |---|---|
 | `app/` | The macOS app and its Xcode project, `Uzzy.xcodeproj`. |
-| `app/Uzzy/` | App: menu bar icon, panel and SwiftUI presentation. |
+| `app/Uzzy/` | App: menu bar icon, panel and SwiftUI presentation, plus the app icon (`AppIcon.icon`, an Icon Composer document). |
 | `app/UzzyCore/` | Usage core: panel state, provider adapters and injectable dependencies. In Debug builds, also the fake dependencies, the sample responses and the debug scenarios. |
 | `app/UzzyCoreTests/` | Tests through the usage core, with the fake dependencies. |
 | `app/Config/` | Shared build settings (signing). |
+| `brand/` | Vector masters of the logo, the app icon glyph and the menu bar icon, on a 32-unit grid. |
 | `CONTEXT.md` | Domain vocabulary (used quota, reset, last valid reading…). |
 | `docs/agents/` | Agent conventions: issues, triage labels, domain docs. |
 | `docs/images/` | Screenshots used in this README. |
