@@ -133,9 +133,8 @@ const download = '<path d="M12 15V3M7 10l5 5 5-5"/><path d="M21 15v4a2 2 0 0 1-2
 
   <section class="mx-auto max-w-[1280px] px-6 pb-20 sm:px-10 lg:px-20 lg:pb-24">
     <div class="relative overflow-hidden rounded-2xl bg-slate-950 px-8 py-16 text-center text-slate-50">
-      <!-- same tinted wallpaper as the desktop card -->
-      <img src="/cover/bg.jpg" alt="" class="absolute inset-0 size-full object-cover" loading="lazy" />
-      <div class="absolute inset-0 bg-slate-950/70"></div>
+      <!-- same tinted wallpaper as the desktop card: the wallpaper at 40% over slate-950 -->
+      <img src="/cover/bg.jpg" alt="" class="absolute inset-0 size-full object-cover opacity-40" loading="lazy" />
       <div class="relative">
       {appIcon === "cta" && <img src="/brand/app-icon-512.png" alt="" width="104" height="104" class="mx-auto mb-5 size-[104px]" loading="lazy" />}
       <h2 class="text-3xl font-semibold tracking-tight text-balance">Stop opening three dashboards.</h2>
