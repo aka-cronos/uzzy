@@ -43,6 +43,7 @@ jobs:
       - name: Set paths
         run: |
           echo "DIST=$RUNNER_TEMP/dist" >> "$GITHUB_ENV"
+          echo "CERTIFICATE_PATH=$RUNNER_TEMP/developer-id.p12" >> "$GITHUB_ENV"
           echo "KEYCHAIN_PATH=$RUNNER_TEMP/release.keychain-db" >> "$GITHUB_ENV"
           echo "API_KEY_PATH=$RUNNER_TEMP/AuthKey.p8" >> "$GITHUB_ENV"
 
@@ -69,14 +70,14 @@ jobs:
           DEVELOPER_ID_P12_BASE64: ${{ secrets.DEVELOPER_ID_P12_BASE64 }}
           DEVELOPER_ID_P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
         run: |
+          umask 077
           keychain_password="$(uuidgen)"
-          certificate_path="$RUNNER_TEMP/developer-id.p12"
-          printf '%s' "$DEVELOPER_ID_P12_BASE64" | base64 --decode > "$certificate_path"
+          printf '%s' "$DEVELOPER_ID_P12_BASE64" | base64 --decode > "$CERTIFICATE_PATH"
 
           security create-keychain -p "$keychain_password" "$KEYCHAIN_PATH"
           security set-keychain-settings -lut 3600 "$KEYCHAIN_PATH"
           security unlock-keychain -p "$keychain_password" "$KEYCHAIN_PATH"
-          security import "$certificate_path" \
+          security import "$CERTIFICATE_PATH" \
             -k "$KEYCHAIN_PATH" \
             -P "$DEVELOPER_ID_P12_PASSWORD" \
             -f pkcs12 \
@@ -86,7 +87,7 @@ jobs:
             -k "$keychain_password" "$KEYCHAIN_PATH" > /dev/null
           security list-keychains -d user -s "$KEYCHAIN_PATH" \
             $(security list-keychains -d user | tr -d '"')
-          rm -f "$certificate_path"
+          rm -f "$CERTIFICATE_PATH"
 
           # "Developer ID Application: Name (TEAMID)"
           identity="$(security find-identity -v -p codesigning "$KEYCHAIN_PATH" \
@@ -96,13 +97,19 @@ jobs:
             exit 1
           fi
           team_id="$(printf '%s' "$identity" | sed -n 's/.*(\([A-Z0-9]*\))$/\1/p')"
+          if [ -z "$team_id" ]; then
+            echo "::error::No team ID in the identity name: $identity"
+            exit 1
+          fi
           echo "SIGNING_IDENTITY=$identity" >> "$GITHUB_ENV"
           echo "TEAM_ID=$team_id" >> "$GITHUB_ENV"
 
       - name: Write the App Store Connect API key
         env:
           APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
-        run: printf '%s' "$APP_STORE_CONNECT_API_KEY_P8" > "$API_KEY_PATH"
+        run: |
+          umask 077
+          printf '%s' "$APP_STORE_CONNECT_API_KEY_P8" > "$API_KEY_PATH"
 
       # Overrides app/Config/Signing.xcconfig's ad hoc default for this build
       # only. Hardened Runtime comes from the Release configuration.
@@ -200,4 +207,4 @@ jobs:
         if: always()
         run: |
           security delete-keychain "$KEYCHAIN_PATH" 2> /dev/null || true
-          rm -f "$API_KEY_PATH"
+          rm -f "$CERTIFICATE_PATH" "$API_KEY_PATH"

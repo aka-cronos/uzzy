@@ -9,6 +9,7 @@ set -eu
 
 file="$1"
 result="$(mktemp)"
+trap 'rm -f "$result"' EXIT
 
 xcrun notarytool submit "$file" \
   --key "$API_KEY_PATH" \
