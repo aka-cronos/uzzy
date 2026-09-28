@@ -2,7 +2,10 @@
 // PROTOTYPE — a crop of the cover's desktop (wallpaper, right end of the menu
 // bar, panel hanging from the Uzzy icon) as one rounded card. Decorative apart from the panel image.
 import GaugeIcon from "./GaugeIcon.astro";
-const { class: cls = "", style = "" } = Astro.props;
+import Mark from "./Mark.astro";
+import { MENU_BAR } from "./marks";
+// icon: "gauge" is the landing prototype's stand-in, "cards" the 06b menu bar icon, drawn on the status item's 18 pt canvas
+const { class: cls = "", style = "", icon = "gauge" } = Astro.props;
 ---
 <div class={`relative h-[730px] w-[560px] overflow-hidden rounded-2xl bg-slate-950 shadow-[0_30px_60px_-20px_rgb(15_23_42/0.35)] ring-1 ring-slate-900/10 ${cls}`} style={style}>
   <img src="/cover/bg.jpg" alt="" class="absolute inset-0 size-full object-cover" loading="eager" />
@@ -12,7 +15,7 @@ const { class: cls = "", style = "" } = Astro.props;
   <div class="relative flex items-center justify-end py-[5px] pr-4 pl-2.5 text-[13px] font-semibold text-slate-50">
     <div class="flex items-center">
       <span class="relative rounded-full bg-[#323234] px-[9px] py-1">
-        <GaugeIcon class="size-4" />
+        {icon === "cards" ? <Mark d={MENU_BAR} class="-my-0.5 size-[18px]" /> : <GaugeIcon class="size-4" />}
         <img src="/cover/panel.png" width="432" height="681"
           alt="The Uzzy panel: cards for Claude, Codex and Cursor, each quota with its bar, used percentage and reset time."
           class="absolute top-[calc(100%-14px)] left-1/2 max-w-none -translate-x-1/2" />

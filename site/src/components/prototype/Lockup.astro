@@ -1,0 +1,8 @@
+---
+// PROTOTYPE — the 07c logo next to the "Uzzy" wordmark: title case, system
+// font at ~650, tracking about -0.05em (issue #109).
+import Mark from "./Mark.astro";
+import { LOGO } from "./marks";
+const { class: cls = "" } = Astro.props;
+---
+<a href="#" class={`flex items-center gap-1.5 rounded text-xl font-[650] tracking-[-0.05em] ${cls}`}><Mark d={LOGO} class="size-[22px]" />Uzzy</a>

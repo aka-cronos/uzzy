@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "prototype": "astro dev --open /prototype/landing"
+    "prototype": "astro dev --open /prototype/landing",
+    "prototype:identity": "astro dev --open /prototype/landing-identity"
   },
   "dependencies": {
     "astro": "^5",

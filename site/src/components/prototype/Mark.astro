@@ -1,0 +1,5 @@
+---
+// PROTOTYPE — one of the brand masters as an inline SVG in currentColor.
+const { d, class: cls = "size-5" } = Astro.props as { d: string; class?: string };
+---
+<svg class={cls} viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d={d} /></svg>

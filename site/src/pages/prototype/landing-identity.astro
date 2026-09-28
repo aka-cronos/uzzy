@@ -1,0 +1,25 @@
+---
+// PROTOTYPE — throwaway. How does the uzzy.app landing take in the new logo and
+// icons? (aka-cronos/uzzy#116). F as decided in #105 against the same page with
+// the identity from #109, switchable via ?variant= and the floating bar (or ←/→).
+// Never merge this branch.
+import "../../styles/global.css";
+import VariantF from "../../components/prototype/VariantF.astro";
+import VariantIdentity from "../../components/prototype/VariantIdentity.astro";
+import PrototypeSwitcher from "../../components/prototype/PrototypeSwitcher.astro";
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Uzzy — your AI coding quotas in the menu bar</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body class="antialiased">
+    <div data-variant="F" hidden><VariantF /></div>
+    <div data-variant="G" hidden><VariantIdentity id="g" /></div>
+    <div data-variant="H" hidden><VariantIdentity id="h" appIcon="hero" /></div>
+    <div data-variant="I" hidden><VariantIdentity id="i" appIcon="cta" /></div>
+    <PrototypeSwitcher variants={[["G", "Logo + cards, no app icon"], ["H", "G + app icon in the hero"], ["I", "G + app icon in the CTA"], ["F", "Before: F with the gauge"]]} />
+  </body>
+</html>
