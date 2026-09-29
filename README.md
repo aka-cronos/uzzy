@@ -1,8 +1,8 @@
 <h1 align="center">Uzzy</h1>
 
 <p align="center">
-  <strong>Your AI subscription usage limits, in your menu bar.</strong><br>
-  How much you have used, how much is left and when each limit resets, for Claude, Codex and Cursor.
+  <strong>Your AI tools have limits. Checking them shouldn’t be a task.</strong><br>
+  See how much you’ve used, how much is left and when your usage limits reset—for Claude, Codex and Cursor, in one menu bar panel.
 </p>
 
 <p align="center">
@@ -17,19 +17,19 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/app.jpg" width="420" alt="The Uzzy panel open from the menu bar, with one card each for Claude, Codex and Cursor and each account's plan next to its title. Every usage limit has its own bar, its used percentage and its reset time; the Claude card also shows the usage credits spent this month, and the Codex card a badge with its banked resets.">
+  <img src="docs/images/app.jpg" width="420" alt="The Uzzy panel open from the menu bar, with one card each for Claude, Codex and Cursor and each account's plan next to its title. Each usage limit has its own bar, its used percentage and its reset time; the Claude card also shows the usage credits spent this month, and the Codex card a badge with its banked resets.">
 </p>
 
 ## Why Uzzy
 
-If you pay for more than one AI coding subscription, finding out how close you are to a limit means opening each provider's dashboard. Uzzy puts every usage limit in one panel, reusing the sessions Claude Code, Codex CLI and Cursor already keep on your Mac. There is nothing to sign in to and no API key to paste.
+Keep using Claude, Codex and Cursor. Uzzy brings their usage limits together so you can stop checking each one separately. It reuses the sessions Claude Code, Codex CLI and Cursor already keep on your Mac: no extra sign-in, no API key to paste.
 
 ## Features
 
-- **One card per provider.** A fixed menu bar icon opens a panel with a card for each enabled provider.
-- **Every usage limit on its own.** Each usage limit («5 horas», «Semanal», «Cursor Models»…) gets its own bar, its reset in local time with a countdown, and the time of its last reading. Usage limits are never combined into a single percentage, and usage credits and banked resets are shown next to them.
-- **Queries only while you look.** Uzzy reads the usage limits when you open the panel (unless the last reading is under five minutes old), every five minutes while it stays open, and on demand with the refresh button. With the panel closed it makes no requests.
-- **Honest failures.** If a provider fails, its card explains why (no session, expired session, offline, incompatible response…) and the others keep working. When a refresh fails, the card keeps the last valid reading and marks it as stale. Missing data is never shown as zero.
+- **Three tools. One quick check.** Open Uzzy from your menu bar to see Claude, Codex and Cursor together, with a separate card for each enabled provider and its plan.
+- **Different limits stay different.** Check each usage limit («5 horas», «Semanal», «Cursor Models»…) on its own, with its reset in local time, a countdown and the time of its last reading. Five-hour and weekly limits are never blended into one number, and usage credits and banked resets are shown next to them.
+- **Checks while you look.** Uzzy refreshes readings as you open the panel (unless the last reading is under five minutes old), then every five minutes while it stays open, and on demand with the refresh button. Close it and the requests stop.
+- **Missing doesn’t mean zero.** If a session expires or a provider can’t be reached, Uzzy tells you what happened (no session, expired session, offline, incompatible response…) and the other providers keep working. When a refresh fails, the card keeps the last valid reading and marks it as out of date.
 - **Native settings.** Choose whether the cards show how much is used or left, and turn each provider on or off or change the order of the cards.
 - **Your language.** The interface follows the system language: English or Spanish.
 
