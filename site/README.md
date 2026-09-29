@@ -8,8 +8,9 @@ From `site/`, with Node 22.12 or later and pnpm:
 
 ```sh
 pnpm install --frozen-lockfile
-pnpm dev      # http://localhost:4321
-pnpm build    # static site in dist/
+pnpm dev       # http://localhost:4321
+pnpm typecheck # check Astro and TypeScript files
+pnpm build     # typecheck, then static site in dist/
 ```
 
 The copy lives in `src/content.ts` and the page in `src/pages/index.astro`. Every image the site uses lives in `public/`, including copies of the brand marks, so this directory builds on its own.
