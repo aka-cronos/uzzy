@@ -103,8 +103,9 @@ Releases are built by [`.github/workflows/release.yml`](.github/workflows/releas
    git push origin v0.1.0-rc.1
    ```
 
-3. **Try the draft.** When the workflow finishes, download `Uzzy.dmg` from the draft release in a browser, on a macOS account that never ran Uzzy. It must open with the one-click "downloaded from the Internet" prompt, and every provider must still read.
-4. **Publish.** Edit the notes if needed (they start from GitHub's generated notes) and publish the draft. The site's download button points at `releases/latest/download/Uzzy.dmg`, so it only moves when a non-prerelease is published.
+3. **Try the draft.** When the workflow finishes, quit Uzzy, delete `/Applications/Uzzy.app`, then download `Uzzy.dmg` from the draft release in a browser and install it. It must open with the one-click "downloaded from the Internet" prompt, Finder's **Get Info** must show the new version and build, and every provider must still read. Your own account is enough: the browser quarantines every download, so Gatekeeper checks it again, and it tests the update path most users take. Use a macOS account that never ran Uzzy only when a release changes the first launch or the permissions it asks for.
+4. **Publish.** Edit the notes if needed (they start from GitHub's generated notes, which also list site-only pull requests) and publish the draft. The site's download button points at `releases/latest/download/Uzzy.dmg`, so it only moves when a non-prerelease is published.
+5. **Update the site.** Open a pull request that sets `VERSION` in `site/src/content.ts` to the published version, and merge it. It feeds the version line under the download button and the JSON-LD `softwareVersion`. Merge it only after publishing: every push to `main` that touches `site/` deploys uzzy.app, so an earlier merge would show a version `releases/latest` doesn't serve yet.
 
 ### Release secrets
 
