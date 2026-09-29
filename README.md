@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/panel.png" width="420" alt="The Uzzy panel open from the menu bar, with one card each for Claude, Codex and Cursor and each account's plan next to its title. Every quota has its own bar, its used percentage and its reset time; the Claude card also shows the usage credits spent this month, and the Codex card a badge with its banked resets.">
+  <img src="docs/images/app.png" width="420" alt="The Uzzy panel open from the menu bar, with one card each for Claude, Codex and Cursor and each account's plan next to its title. Every quota has its own bar, its used percentage and its reset time; the Claude card also shows the usage credits spent this month, and the Codex card a badge with its banked resets.">
 </p>
 
 > [!NOTE]
@@ -32,7 +32,7 @@ If you pay for more than one AI coding subscription, finding out how close you a
 - **Native settings.** Choose used or remaining quota, and turn each provider on or off or change the order of the cards.
 
 <p align="center">
-  <img src="docs/images/settings.png" width="520" alt="The Uzzy Settings window: a Used / Remaining switch for the percentage on the cards, and the Claude, Codex and Cursor providers with buttons to reorder them and a switch to turn each one on or off.">
+  <img src="docs/images/settings.png" width="520" alt="The Uzzy Settings window: a Used / Left switch for the percentage on the cards, and the Claude, Codex and Cursor providers with buttons to reorder them and a switch to turn each one on or off.">
 </p>
 
 Open Settings with ⌘, from the panel; ⌘W closes it and ⌘Q quits. Your choices are remembered across launches, and a disabled provider has no card: Uzzy does not read its session or query its quotas.
