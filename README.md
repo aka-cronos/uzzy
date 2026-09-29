@@ -1,8 +1,8 @@
 <h1 align="center">Uzzy</h1>
 
 <p align="center">
-  <strong>Your Claude, Codex and Cursor subscription quotas, one click away in the macOS menu bar.</strong><br>
-  How much you have used, how much is left and when each quota resets.
+  <strong>Your AI subscription usage limits, in your menu bar.</strong><br>
+  How much you have used, how much is left and when each limit resets, for Claude, Codex and Cursor.
 </p>
 
 <p align="center">
@@ -17,37 +17,37 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/app.jpg" width="420" alt="The Uzzy panel open from the menu bar, with one card each for Claude, Codex and Cursor and each account's plan next to its title. Every quota has its own bar, its used percentage and its reset time; the Claude card also shows the usage credits spent this month, and the Codex card a badge with its banked resets.">
+  <img src="docs/images/app.jpg" width="420" alt="The Uzzy panel open from the menu bar, with one card each for Claude, Codex and Cursor and each account's plan next to its title. Every usage limit has its own bar, its used percentage and its reset time; the Claude card also shows the usage credits spent this month, and the Codex card a badge with its banked resets.">
 </p>
 
 ## Why Uzzy
 
-If you pay for more than one AI coding subscription, finding out how close you are to a limit means opening each provider's dashboard. Uzzy puts every quota in one panel, reusing the sessions Claude Code, Codex CLI and Cursor already keep on your Mac. There is nothing to sign in to and no API key to paste.
+If you pay for more than one AI coding subscription, finding out how close you are to a limit means opening each provider's dashboard. Uzzy puts every usage limit in one panel, reusing the sessions Claude Code, Codex CLI and Cursor already keep on your Mac. There is nothing to sign in to and no API key to paste.
 
 ## Features
 
 - **One card per provider.** A fixed menu bar icon opens a panel with a card for each enabled provider.
-- **Every quota on its own.** Each quota («5 horas», «Semanal», «Cursor Models»…) gets its own bar, its reset in local time with a countdown, and the time of its last reading. Quotas are never combined into a single percentage.
-- **Queries only while you look.** Uzzy reads the quotas when you open the panel (unless the last reading is under five minutes old), every five minutes while it stays open, and on demand with the refresh button. With the panel closed it makes no requests.
+- **Every usage limit on its own.** Each usage limit («5 horas», «Semanal», «Cursor Models»…) gets its own bar, its reset in local time with a countdown, and the time of its last reading. Usage limits are never combined into a single percentage, and usage credits and banked resets are shown next to them.
+- **Queries only while you look.** Uzzy reads the usage limits when you open the panel (unless the last reading is under five minutes old), every five minutes while it stays open, and on demand with the refresh button. With the panel closed it makes no requests.
 - **Honest failures.** If a provider fails, its card explains why (no session, expired session, offline, incompatible response…) and the others keep working. When a refresh fails, the card keeps the last valid reading and marks it as stale. Missing data is never shown as zero.
-- **Native settings.** Choose used or remaining quota, and turn each provider on or off or change the order of the cards.
+- **Native settings.** Choose whether the cards show how much is used or left, and turn each provider on or off or change the order of the cards.
 - **Your language.** The interface follows the system language: English or Spanish.
 
 <p align="center">
   <img src="docs/images/settings.jpg" width="520" alt="The Uzzy Settings window: a Used / Left switch for the percentage on the cards, and the Claude, Codex and Cursor providers with buttons to reorder them and a switch to turn each one on or off.">
 </p>
 
-Open Settings with ⌘, from the panel; ⌘W closes it and ⌘Q quits. Your choices are remembered across launches, and a disabled provider has no card: Uzzy does not read its session or query its quotas.
+Open Settings with ⌘, from the panel; ⌘W closes it and ⌘Q quits. Your choices are remembered across launches, and a disabled provider has no card: Uzzy does not read its session or query its usage limits.
 
 ## Supported providers
 
-| Provider | Session it reuses | Quotas |
+| Provider | Session it reuses | What it shows |
 |---|---|---|
 | **Claude** | Claude Code (the Keychain and `~/.claude.json`) | 5 hours, weekly, and weekly per model when the plan has them; also the usage credits spent this month and their monthly limit («Créditos de uso»), when usage credits are on |
 | **Codex** | Codex CLI signed in with ChatGPT (`~/.codex/auth.json` or `$CODEX_HOME`) | 5 hours, weekly, any extra limit the plan has, and the account's banked resets |
 | **Cursor** | Cursor (its local `state.vscdb`) | «Cursor Models» and «Other Models» for the billing cycle |
 
-Each card also shows the account's plan next to its title, e.g. «Claude · Max», when the provider reports a plan Uzzy knows: Claude Code keeps it in its Keychain item, Codex sends it with the quotas and Cursor keeps it in `state.vscdb`.
+Each card also shows the account's plan next to its title, e.g. «Claude · Max», when the provider reports a plan Uzzy knows: Claude Code keeps it in its Keychain item, Codex sends it with the usage limits and Cursor keeps it in `state.vscdb`.
 
 Uzzy reads Claude Code's Keychain item through `/usr/bin/security`, the tool Claude Code writes it with. The item already trusts that tool, so macOS shows no Keychain prompt, even after Claude Code refreshes its token.
 
@@ -55,8 +55,8 @@ Uzzy reads Claude Code's Keychain item through `/usr/bin/security`, the tool Cla
 
 - Reuses, **read-only**, the sessions that already exist in Claude Code, Codex CLI and Cursor. It never asks for passwords, signs in, refreshes tokens or writes credentials.
 - Only connects to `api.anthropic.com`, `chatgpt.com` and `api2.cursor.sh`. No telemetry and no server of its own.
-- Quotas live only in memory; nothing is written to disk.
-- Display magnitude, provider visibility and provider order preferences are stored in local `UserDefaults`; they contain no quota, token, email or account identifier.
+- Usage data lives only in memory; nothing is written to disk.
+- Display magnitude, provider visibility and provider order preferences are stored in local `UserDefaults`; they contain no usage data, token, email or account identifier.
 
 ## Install
 
@@ -77,7 +77,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). To report a vulnerability, see [SECURITY
 
 ## Disclaimer
 
-The endpoints the app uses to read quotas are **internal and undocumented** by the providers. They may change or stop working without notice, and each person is responsible for using them within their provider's terms.
+The endpoints the app uses to read usage data are **internal and undocumented** by the providers. They may change or stop working without notice, and each person is responsible for using them within their provider's terms.
 
 Uzzy is an independent project, not affiliated with, endorsed by or sponsored by the makers of Claude, Codex, ChatGPT or Cursor. All product names and trademarks belong to their respective owners.
 
