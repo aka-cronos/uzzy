@@ -1,6 +1,6 @@
 # Third-party notices
 
-Uzzy's own code is under the [MIT license](LICENSE). The agent skills under `.agents/skills/` are copied from the repositories below, under their licenses; `skills-lock.json` records the exact source of each one. `commit-workflow` and `create-pull-request` come from [aka-cronos/skills](https://github.com/aka-cronos/skills), by the same author as Uzzy.
+Uzzy's own code is under the [MIT license](LICENSE). The agent skills under `.agents/skills/` are copied from the repositories below, under their licenses; `skills-lock.json` records the exact source of each one. `commit-workflow` and `create-pull-request` come from [aka-cronos/skills](https://github.com/aka-cronos/skills), by the same author as Uzzy. The background photo is credited at the end.
 
 ## mattpocock/skills
 
@@ -61,3 +61,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Background photo
+
+Source: <https://unsplash.com/photos/dark-curved-lines-create-a-mesmerizing-pattern-HuvxHRcOY6E>
+
+Photo by [Norbert Kowalczyk](https://unsplash.com/@norbertkowalczyk) on Unsplash, under the [Unsplash License](https://unsplash.com/license). It is the wallpaper behind the uzzy.app site (`site/public/cover/bg.jpg`) and, tinted in `docs/images/main-bg.jpg`, behind the `Uzzy.dmg` window.
