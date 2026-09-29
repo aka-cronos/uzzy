@@ -66,4 +66,4 @@ SOFTWARE.
 
 Source: <https://unsplash.com/photos/dark-curved-lines-create-a-mesmerizing-pattern-HuvxHRcOY6E>
 
-Photo by [Norbert Kowalczyk](https://unsplash.com/@norbertkowalczyk) on Unsplash, under the [Unsplash License](https://unsplash.com/license). It is the wallpaper behind the uzzy.app site (`site/public/cover/bg.jpg`) and, tinted in `docs/images/main-bg.jpg`, behind the `Uzzy.dmg` window.
+Photo by [Norbert Kowalczyk](https://unsplash.com/@norbertkowalczyk) on Unsplash, under the [Unsplash License](https://unsplash.com/license). Tinted in `docs/images/main-bg.jpg`, it is the wallpaper behind the uzzy.app site (`site/public/cover/bg.jpg`, a copy), its `og:image` and the `Uzzy.dmg` window.

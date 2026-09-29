@@ -6,7 +6,7 @@ interface Props {
   title?: string;
 }
 const { title = "Uzzy — your AI coding quotas in the menu bar" } = Astro.props;
-const ogImage = new URL("/og.png", Astro.site).href;
+const ogImage = new URL("/og.jpg", Astro.site).href;
 ---
 <html lang="en" class="bg-slate-50">
   <head>
@@ -16,7 +16,7 @@ const ogImage = new URL("/og.png", Astro.site).href;
     <meta name="description" content={hero.subtitle} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <!-- og.png is exported from Figma (file Uzzy, frame "og:image — uzzy.app (1200×630)") -->
+    <!-- og.jpg is exported from Figma (file Uzzy, frame "og:image - site (JPEG)") -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.site} />
     <meta property="og:title" content="Uzzy — your AI subscription quotas, in your menu bar" />
