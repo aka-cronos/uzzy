@@ -4,9 +4,13 @@ Uzzy shows the subscription quotas of AI services and when they reset.
 
 ## Language
 
+**Copy**:
+Any text a person reads about Uzzy: the app, the uzzy.app site, the README and the social images. The Spanish and English terms below apply to all of it.
+_Avoid_: Treating marketing text as exempt from the glossary.
+
 **Subscription quota**:
 A usage limit a provider applies to a subscription over a given period. Distinct from monetary spend and from billed API consumption.
-In Spanish copy it is a «límite de uso»; in English copy, a «usage limit».
+In Spanish copy it is a «límite de uso»; in English copy, a «usage limit», shortened to «limit» once the text has said «usage limit» and it cannot be read as the monthly spend limit (see **Usage credits**).
 _Avoid_: Balance, credits, consumption (without saying what is measured); «quota» in English copy; in Spanish, «cuota» (reads as a fee).
 
 **Used quota**:
