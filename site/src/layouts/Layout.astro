@@ -4,9 +4,16 @@ import { hero } from "@/content";
 
 interface Props {
   title?: string;
+  // Pages that shouldn't be indexed (the 404): adds robots noindex and drops
+  // the canonical and og:url, which only make sense for the home page.
+  noindex?: boolean;
 }
-const { title = "Uzzy — your AI subscription usage limits, in your menu bar" } = Astro.props;
+// <title> and og:title share this string, so they can't drift apart.
+const { title = "Uzzy — your AI subscription usage limits, in your menu bar", noindex = false } = Astro.props;
+const canonical = new URL("/", Astro.site).href;
 const ogImage = new URL("/og.jpg", Astro.site).href;
+// slate-50, the page background
+const themeColor = "#f8fafc";
 ---
 <html lang="en" class="bg-slate-50">
   <head>
@@ -14,18 +21,27 @@ const ogImage = new URL("/og.jpg", Astro.site).href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={hero.subtitle} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <meta name="theme-color" content={themeColor} />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <!-- og.jpg is exported from Figma (file Uzzy, frame "og:image - site (JPEG)") -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={Astro.site} />
-    <meta property="og:title" content="Uzzy — your AI subscription usage limits, in your menu bar" />
+    <meta property="og:site_name" content="Uzzy" />
+    <meta property="og:locale" content="en_US" />
+    {!noindex && <meta property="og:url" content={canonical} />}
+    <meta property="og:title" content={title} />
     <meta property="og:description" content={hero.subtitle} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Uzzy: the panel hanging from the menu bar, with the usage limits for Claude, Codex and Cursor." />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@akacronos" />
+    <slot name="head" />
   </head>
   <body class="bg-slate-50 font-[system-ui,Inter,sans-serif] text-slate-900 antialiased">
     <slot />

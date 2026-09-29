@@ -14,6 +14,22 @@ pnpm build    # static site in dist/
 
 The copy lives in `src/content.ts` and the page in `src/pages/index.astro`. Every image the site uses lives in `public/`, including copies of the brand marks, so this directory builds on its own.
 
+### Icons
+
+`public/favicon.ico` (32×32), `public/icon-192.png` and `public/icon-512.png` (listed in `public/site.webmanifest`) come from `public/brand/app-icon-1024.png`. That PNG is a macOS app icon, with the opaque rounded square at 824×824 in the middle of a transparent margin that only holds its drop shadow; the commands crop that margin away so the icon fills the favicon and home-screen sizes. From `site/public/`, with only macOS's `sips`:
+
+```sh
+tmp=$(mktemp -d)
+sips --cropToHeightWidth 824 824 brand/app-icon-1024.png --out "$tmp/icon.png"
+sips -z 512 512 "$tmp/icon.png" --out icon-512.png
+sips -z 192 192 "$tmp/icon.png" --out icon-192.png
+sips -z 32 32 "$tmp/icon.png" --out "$tmp/icon-32.png"
+sips -s format ico "$tmp/icon-32.png" --out favicon.ico
+rm -r "$tmp"
+```
+
+Run them again whenever the app icon changes.
+
 ## Hosting
 
 Cloudflare serves the site from a static-only Worker named `uzzy-site`, configured in `wrangler.jsonc`: no script, just `dist/` as static assets, with Astro's `404.html` for unknown paths and automatic trailing-slash handling. `pnpm exec wrangler dev` serves the built `dist/` the way production does.
