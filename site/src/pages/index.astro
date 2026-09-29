@@ -24,8 +24,29 @@ const icons = [
   '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>',
 ];
 const check = '<path d="M20 6 9 17l-5-5"/>';
+
+// schema.org SoftwareApplication for search results, built from the copy
+const absolute = (path: string) => new URL(path, Astro.site).href;
+const softwareApplication = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "Uzzy",
+  description: c.hero.subtitle,
+  url: absolute("/"),
+  operatingSystem: c.REQUIREMENTS.split(" · ")[0],
+  applicationCategory: "UtilitiesApplication",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+  downloadUrl: c.DOWNLOAD_URL,
+  softwareVersion: c.VERSION,
+  image: absolute("/icon-512.png"),
+  screenshot: absolute("/cover/panel.png"),
+  author: { "@type": "Person", name: "aka-cronos", url: c.REPO_URL },
+};
+// JSON.stringify leaves "<" as is; escape it so no string can close the <script>
+const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
 ---
 <Layout>
+  <script is:inline type="application/ld+json" slot="head" set:html={jsonLd} />
   <header class="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-6 sm:px-10 lg:px-20">
     <Lockup class={focus} />
     <nav class="flex items-center gap-1 text-sm font-medium text-slate-600" aria-label="Main">
