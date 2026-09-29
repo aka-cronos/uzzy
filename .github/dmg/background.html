@@ -1,0 +1,32 @@
+<!doctype html>
+<!-- The Uzzy.dmg window's background (issue #115, variant C3). render-background.sh
+     screenshots it at 1x and 2x into background.png and background@2x.png. Positions
+     follow settings.py: icons centred at (170, 205) and (470, 205), labels below. -->
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  :root { --slate-50: #f8fafc; --slate-200: #e2e8f0; --slate-300: #cbd5e1; }
+  * { margin: 0; box-sizing: border-box; }
+  html, body { width: 640px; height: 400px; overflow: hidden; font-family: system-ui, -apple-system, sans-serif; }
+  /* main-bg.jpg is the wallpaper already tinted: 40% over slate-950 */
+  body { position: relative; background: url(../../docs/images/main-bg.jpg) center / cover; color: var(--slate-50); }
+  .lockup { position: absolute; top: 26px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 650; letter-spacing: -0.05em; }
+  .lockup svg { width: 22px; height: 22px; }
+  h1 { position: absolute; top: 68px; width: 100%; text-align: center; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+  .arrow { position: absolute; left: 262px; top: 196px; width: 116px; color: rgb(248 250 252 / .55); }
+  /* Finder draws icon labels dark over any window background, so each label gets a light chip */
+  .chip { position: absolute; top: 277px; height: 22px; border-radius: 11px; background: rgb(226 232 240 / .9); transform: translateX(-50%); }
+  /* 40pt up: Finder's path bar, when on, covers the bottom 28pt */
+  .foot { position: absolute; bottom: 40px; width: 100%; text-align: center; font-size: 11px; color: var(--slate-300); }
+</style>
+</head>
+<body>
+  <div class="lockup"><svg viewBox="0 0 32 32" fill="currentColor"><path d="LOGO"/></svg>Uzzy</div>
+  <h1>Drag Uzzy to Applications</h1>
+  <svg class="arrow" viewBox="0 0 116 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h104M96 3l12 9-12 9"/></svg>
+  <div class="chip" style="left: 170px; width: 60px"></div>
+  <div class="chip" style="left: 470px; width: 100px"></div>
+  <p class="foot">Requires macOS 27.0 or later</p>
+</body>
+</html>

@@ -151,17 +151,19 @@ jobs:
           .github/scripts/notarize.sh "$RUNNER_TEMP/Uzzy.zip"
           xcrun stapler staple "$DIST/Uzzy.app"
 
+      # dmgbuild lays out the window from .github/dmg/settings.py: the
+      # background, the icon positions and Uzzy.app next to an Applications
+      # link. It installs from hash-pinned requirements into a virtual
+      # environment, so pip leaves the runner's Python alone.
       - name: Build and sign Uzzy.dmg
         run: |
-          staging="$RUNNER_TEMP/dmg"
-          mkdir -p "$staging"
-          ditto "$DIST/Uzzy.app" "$staging/Uzzy.app"
-          ln -s /Applications "$staging/Applications"
-          hdiutil create \
-            -volname Uzzy \
-            -srcfolder "$staging" \
-            -format UDZO \
-            -ov \
+          python3 -m venv "$RUNNER_TEMP/dmgbuild"
+          "$RUNNER_TEMP/dmgbuild/bin/pip" install --quiet --require-hashes \
+            --only-binary :all: -r .github/dmg/requirements.txt
+          "$RUNNER_TEMP/dmgbuild/bin/dmgbuild" \
+            -s .github/dmg/settings.py \
+            -D app="$DIST/Uzzy.app" \
+            Uzzy \
             "$DIST/Uzzy.dmg"
           codesign --sign "$SIGNING_IDENTITY" \
             --keychain "$KEYCHAIN_PATH" \
