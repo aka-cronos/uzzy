@@ -14,16 +14,25 @@ const logo = (name: string) => logos[name as keyof typeof logos];
 const onLight = (name: string) => (name === "Claude" ? "" : "invert");
 // hero + header fill one viewport, capped at a 14" MacBook Pro viewport
 const heroHeight = "clamp(620px, calc(100vh - 72px), 788px)";
+// gap between the fixed header and the desktop card: centred in the hero, never under 24px; shared by the aside's padding and the card's sticky offset so the card doesn't shift on scroll
+const cardGap = `max(24px, calc((${heroHeight} - 730px) / 2))`;
 const focus = "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900";
 const nav = [["Features", "#features"], ["Providers", "#providers"], ["Privacy", "#privacy"]];
-// Lucide paths
-const icons = [
-  '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/>',
-  '<path d="M3 3v18h18"/><path d="M7 16h3M7 12h7M7 8h11"/>',
-  '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
-  '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>',
+// Lucide-style line icons, one per row
+const featureIcons = [
+  '<circle cx="4" cy="5" r="1.5"/><circle cx="4" cy="12" r="1.5"/><circle cx="4" cy="19" r="1.5"/><path d="M6 5h4l5 7M6 12h9M6 19h4l5-7"/><circle cx="18" cy="12" r="3"/>',
+  '<path d="M3 7h18M3 17h18"/><circle cx="9" cy="7" r="2" fill="currentColor" stroke="none"/><circle cx="16" cy="17" r="2" fill="currentColor" stroke="none"/>',
+  '<path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.8 9a7 7 0 0 1 12.1-2L20 12M4 12l2.1 5a7 7 0 0 0 12.1-2"/>',
+  '<circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.3 1.8c-.9.9-1.9 1.2-1.9 2.7M12 17h.01"/>',
 ];
-const check = '<path d="M20 6 9 17l-5-5"/>';
+const privacyIcons = [
+  '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
+  '<circle cx="4" cy="12" r="2"/><circle cx="20" cy="5" r="2"/><circle cx="20" cy="19" r="2"/><path d="m6 11 12-5M6 13l12 5"/>',
+  '<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 9h6v6H9zM9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>',
+];
+const rowIcon = "grid size-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700 ring-1 ring-slate-200";
+const rowList = "mt-10 divide-y divide-slate-200";
+const row = "flex gap-5 py-6";
 
 // schema.org SoftwareApplication for search results, built from the copy
 const absolute = (path: string) => new URL(path, Astro.site).href;
@@ -47,22 +56,24 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
 ---
 <Layout>
   <script is:inline type="application/ld+json" slot="head" set:html={jsonLd} />
-  <header class="mx-auto flex h-[72px] max-w-[1280px] items-center justify-between px-6 sm:px-10 lg:px-20">
-    <Lockup class={focus} />
-    <nav class="flex items-center gap-1 text-sm font-medium text-slate-600" aria-label="Main">
-      {nav.map(([label, href]) => (
-        <a href={href} class={`hidden min-h-11 items-center rounded-md px-3 transition-colors duration-200 hover:text-slate-900 sm:inline-flex ${focus}`}>{label}</a>
-      ))}
-      <DownloadButton label="Download" icon={false} size="sm" className="ml-3" />
-    </nav>
+  <header class="fixed inset-x-0 top-0 z-50 bg-slate-50/60 backdrop-blur-md">
+    <div class="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-6 sm:px-10 lg:px-12">
+      <Lockup class={focus} />
+      <nav class="flex items-center gap-1 text-sm font-medium text-slate-600" aria-label="Main">
+        {nav.map(([label, href]) => (
+          <a href={href} class={`hidden min-h-11 items-center rounded-md px-3 transition-colors duration-200 hover:text-slate-900 sm:inline-flex ${focus}`}>{label}</a>
+        ))}
+        <DownloadButton label="Download" icon={false} size="sm" className="ml-3" />
+      </nav>
+    </div>
   </header>
 
-  <div class="mx-auto grid max-w-[1280px] gap-16 px-6 sm:px-10 lg:grid-cols-[1fr_560px] lg:px-20 lg:pb-16">
+  <div class="mx-auto grid max-w-[1440px] gap-16 pt-[72px] px-6 sm:px-10 xl:grid-cols-[minmax(0,1fr)_560px] lg:px-12 xl:pb-16">
     <main class="min-w-0">
-      <section class="flex flex-col justify-center gap-9 py-16 lg:h-(--hero) lg:py-0" style={`--hero:${heroHeight}`}>
+      <section class="flex max-w-[60ch] flex-col justify-center gap-9 py-16 xl:h-(--hero) xl:py-0" style={`--hero:${heroHeight}`}>
         <div class="flex flex-col gap-4">
-          <h1 class="text-4xl leading-[1.1] font-semibold tracking-tight text-balance sm:text-5xl">{c.hero.title}</h1>
-          <p class="max-w-xl text-lg leading-relaxed text-pretty text-slate-600">{c.hero.subtitle}</p>
+          <h1 class="text-4xl leading-[1.1] font-semibold tracking-tight text-pretty sm:text-5xl">{c.hero.title}</h1>
+          <p class="text-lg leading-relaxed text-pretty text-slate-600">{c.hero.subtitle}</p>
         </div>
         <ul class="flex flex-wrap gap-3" aria-label="Supported providers">
           {c.providers.map((p) => (
@@ -76,96 +87,115 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
             <DownloadButton />
             <a href={c.REPO_URL} class={`inline-flex min-h-11 items-center rounded font-medium text-slate-600 underline-offset-4 transition-colors duration-200 hover:text-slate-900 hover:underline ${focus}`}>View on GitHub</a>
           </div>
-          <p class="text-sm text-slate-600">Free and open source · Version {c.VERSION} · {c.REQUIREMENTS}</p>
+          <p class="text-sm text-slate-600 text-pretty">Free and open source · Version {c.VERSION} · {c.REQUIREMENTS}</p>
         </div>
       </section>
 
       <!-- small screens: the desktop card sits under the hero, scaled to fit -->
-      <div class="flex justify-center pb-16 lg:hidden">
-        <DesktopCard class="[zoom:0.6] sm:[zoom:0.85]" />
+      <div class="flex justify-center pb-16 xl:hidden">
+        <DesktopCard class="[zoom:0.55] sm:[zoom:0.85]" />
       </div>
 
-      <section id="features" class="scroll-mt-6 border-t border-slate-200 py-20 lg:py-24">
-        <p class="text-sm font-semibold tracking-wide text-slate-500 uppercase">Why Uzzy</p>
-        <h2 class="mt-3 text-3xl font-semibold tracking-tight text-balance">One panel instead of three dashboards.</h2>
-        <p class="mt-5 max-w-2xl text-lg leading-relaxed text-pretty text-slate-600">{c.why}</p>
-        <div class="mt-12 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-1">
+      <section id="features" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
+        <h2 class="text-3xl font-semibold tracking-tight text-balance">Different tools. One place to check.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-pretty text-slate-600">{c.why}</p>
+        <div class={rowList}>
           {c.features.map((f, i) => (
-            <div class="flex gap-5">
-              <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700 ring-1 ring-slate-200">
-                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={icons[i]} />
+            <div class={row}>
+              <span class={rowIcon}>
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={featureIcons[i]} />
               </span>
-              <div>
-                <h3 class="text-lg font-semibold">{f.title}</h3>
-                <p class="mt-1.5 leading-relaxed text-slate-600">{f.body}</p>
+              <div class="min-w-0">
+                <h3 class="text-lg font-semibold text-balance">{f.title}</h3>
+                <p class="mt-1.5 leading-relaxed text-slate-600 text-pretty">{f.body}</p>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      <section id="providers" class="scroll-mt-6 border-t border-slate-200 py-20 lg:py-24">
-        <p class="text-sm font-semibold tracking-wide text-slate-500 uppercase">Providers</p>
-        <h2 class="mt-3 text-3xl font-semibold tracking-tight text-balance">Nothing to sign in to.</h2>
-        <p class="mt-5 max-w-2xl text-lg leading-relaxed text-slate-600">Uzzy reuses the sessions your tools already keep on your Mac.</p>
-        <ul class="mt-10 divide-y divide-slate-200 rounded-2xl bg-slate-100 ring-1 ring-slate-200">
+      <section id="providers" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
+        <h2 class="text-3xl font-semibold tracking-tight text-balance">Your tools already know you.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate-600 text-pretty">Uzzy reuses the sessions Claude Code, Codex CLI and Cursor already keep on your Mac. No extra sign-in. No API key to paste.</p>
+        <ul class={rowList}>
           {c.providers.map((p) => (
-            <li class="flex gap-5 p-6">
-              <span class="grid size-11 shrink-0 place-items-center rounded-full bg-slate-900">
-                <img src={logo(p.name)} alt="" width="20" height={p.name === "Cursor" ? 22 : 20} />
+            <li class={row}>
+              <span class={rowIcon}>
+                <img src={logo(p.name)} alt="" width="20" height={p.name === "Cursor" ? 22 : 20} class={onLight(p.name)} />
               </span>
-              <div>
-                <h3 class="text-lg font-semibold">{p.name}</h3>
-                <p class="text-sm text-slate-600">Reuses your {p.session} session</p>
-                <p class="mt-2 text-slate-700">{p.shows}</p>
+              <div class="min-w-0">
+                <h3 class="text-lg font-semibold text-balance">{p.name}</h3>
+                <p class="mt-1.5 leading-relaxed text-slate-600 text-pretty">Reuses your {p.session} session. {p.shows}.</p>
               </div>
             </li>
           ))}
         </ul>
       </section>
 
-      <section id="privacy" class="scroll-mt-6 border-t border-slate-200 py-20 lg:py-24">
-        <p class="text-sm font-semibold tracking-wide text-slate-500 uppercase">Privacy</p>
-        <h2 class="mt-3 text-3xl font-semibold tracking-tight text-balance">Your credentials stay where they are.</h2>
-        <ul class="mt-10 space-y-5">
-          {c.privacy.map((p) => (
-            <li class="flex gap-4 text-lg leading-relaxed text-slate-700">
-              <span class="mt-1 grid size-6 shrink-0 place-items-center rounded-full bg-slate-200 text-slate-700">
-                <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={check} />
+      <section id="privacy" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
+        <h2 class="text-3xl font-semibold tracking-tight text-balance">Your credentials stay where they are.</h2>
+        <ul class={rowList}>
+          {c.privacy.map((p, i) => (
+            <li class={row}>
+              <span class={rowIcon}>
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={privacyIcons[i]} />
               </span>
-              {p}
+              <div class="min-w-0">
+                <h3 class="text-lg font-semibold text-balance">{p.title}</h3>
+                <p class="mt-1.5 leading-relaxed text-slate-600 text-pretty">{p.body}</p>
+                {i === 1 && (
+                  <div class="mt-3 flex flex-wrap gap-2" aria-label="The only hosts Uzzy connects to">
+                    {c.hosts.map((h) => <code class="rounded-md bg-slate-100 px-2.5 py-1 font-mono text-sm text-slate-700 ring-1 ring-slate-200">{h}</code>)}
+                  </div>
+                )}
+              </div>
             </li>
           ))}
         </ul>
-        <div class="mt-8 flex flex-wrap gap-2" aria-label="The only hosts Uzzy connects to">
-          {c.hosts.map((h) => <code class="rounded-md bg-slate-100 px-2.5 py-1 font-mono text-sm text-slate-700 ring-1 ring-slate-200">{h}</code>)}
+      </section>
+
+      <section id="faq" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
+        <h2 class="text-3xl font-semibold tracking-tight text-balance">The practical details.</h2>
+        <div class="mt-10 divide-y divide-slate-200 border-y border-slate-200">
+          <details class="group py-2" open>
+            <summary class={`flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded text-lg font-semibold text-balance ${focus}`}>Do I need another account?<span aria-hidden="true" class="text-2xl font-normal text-slate-500 group-open:rotate-45">+</span></summary>
+            <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">No. Uzzy reuses the sessions Claude Code, Codex CLI and Cursor keep on your Mac. You’ll need to be signed in to the tools you want to check.</p>
+          </details>
+          <details class="group py-2">
+            <summary class={`flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded text-lg font-semibold text-balance ${focus}`}>Where does my data go?<span aria-hidden="true" class="text-2xl font-normal text-slate-500 group-open:rotate-45">+</span></summary>
+            <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">Uzzy queries your providers directly using your existing sessions. It has no server of its own and sends no telemetry.</p>
+          </details>
+          <details class="group py-2">
+            <summary class={`flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded text-lg font-semibold text-balance ${focus}`}>What if a reading is unavailable?<span aria-hidden="true" class="text-2xl font-normal text-slate-500 group-open:rotate-45">+</span></summary>
+            <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">Uzzy explains what went wrong. If it has an earlier reading for the same account, it shows it as out of date. Missing data is never shown as zero.</p>
+          </details>
         </div>
       </section>
     </main>
 
-    <!-- large screens: vertically centred in the hero, then sticky while scrolling; the grid's bottom padding stops it 64px before the CTA banner -->
-    <aside class="hidden lg:block" style={`padding-top:max(0px, calc((${heroHeight} - 730px) / 2))`}>
-      <DesktopCard class="sticky top-6" />
+    <!-- large screens: vertically centred in the hero, then sticky while scrolling at the same offset (72px header + cardGap), so it never shifts; the grid's bottom padding stops it 64px before the CTA banner -->
+    <aside class="hidden pt-(--card-gap) xl:block" style={`--card-gap:${cardGap}`}>
+      <DesktopCard class="sticky top-[calc(72px+var(--card-gap))]" />
     </aside>
   </div>
 
-  <section class="mx-auto max-w-[1280px] px-6 pb-20 sm:px-10 lg:px-20 lg:pb-24">
+  <section class="mx-auto max-w-[1440px] px-6 pb-20 sm:px-10 lg:px-12 lg:pb-24">
     <div class="relative overflow-hidden rounded-2xl bg-slate-950 px-8 py-16 text-center text-slate-50">
       <!-- same tinted wallpaper as the desktop card -->
       <img src="/cover/bg.jpg" alt="" class="absolute inset-0 size-full object-cover" loading="lazy" />
       <div class="relative">
         <!-- the macOS rendering of AppIcon.icon; the PNG keeps macOS's transparent margin -->
         <img src="/brand/app-icon-512.png" alt="" width="104" height="104" class="mx-auto mb-5 size-[104px]" loading="lazy" />
-        <h2 class="text-3xl font-semibold tracking-tight text-balance">Stop opening three dashboards.</h2>
-        <p class="mt-3 text-slate-300">Every usage limit, one click away in your menu bar.</p>
+        <h2 class="text-3xl font-semibold tracking-tight text-balance">That’s one less thing to check in three places.</h2>
+        <p class="mt-3 text-slate-300 text-pretty">Your AI usage limits and reset times, one click away.</p>
         <DownloadButton variant="inverse" className="mt-8" />
-        <p class="mt-4 text-sm text-slate-300">{c.REQUIREMENTS} · Open source, MIT</p>
+        <p class="mt-4 text-sm text-slate-300 text-pretty">{c.REQUIREMENTS} · Open source, MIT</p>
       </div>
     </div>
   </section>
 
-  <footer class="border-t border-slate-200">
-    <div class="mx-auto max-w-[1280px] px-6 sm:px-10 lg:px-20">
+  <footer>
+    <div class="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-12">
       <!-- brand and links on one line; the legal small print gets its own full-width band -->
       <div class="flex flex-col gap-4 py-8 sm:flex-row sm:items-center sm:justify-between">
         <Lockup class={`self-start sm:self-auto ${focus}`} />
@@ -175,10 +205,11 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
           <a href={`${c.REPO_URL}/blob/main/LICENSE`} class={`inline-flex min-h-11 items-center rounded transition-colors duration-200 hover:text-slate-900 ${focus}`}>MIT License</a>
         </nav>
       </div>
-      <div class="space-y-2 border-t border-slate-200 py-6 text-xs leading-relaxed text-slate-600">
-        <p>{c.disclaimer}</p>
+      <div class="space-y-2 border-t border-slate-200 py-6 text-center text-xs leading-relaxed text-slate-600">
+        <p class="text-pretty">{c.disclaimer}</p>
+        <p class="text-pretty">This website uses Cloudflare Web Analytics without cookies or personal data. The app sends no telemetry.</p>
         <!-- Unsplash License: credit not required, but appreciated -->
-        <p>© 2026 Uzzy · Background photo by <a href="https://unsplash.com/@norbertkowalczyk?utm_source=uzzy&utm_medium=referral" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Norbert Kowalczyk</a> on <a href="https://unsplash.com/photos/dark-curved-lines-create-a-mesmerizing-pattern-HuvxHRcOY6E?utm_source=uzzy&utm_medium=referral" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Unsplash</a>.</p>
+        <p class="text-pretty">© 2026 Uzzy · Background photo by <a href="https://unsplash.com/@norbertkowalczyk?utm_source=uzzy&utm_medium=referral" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Norbert Kowalczyk</a> on <a href="https://unsplash.com/photos/dark-curved-lines-create-a-mesmerizing-pattern-HuvxHRcOY6E?utm_source=uzzy&utm_medium=referral" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Unsplash</a>.</p>
       </div>
     </div>
   </footer>

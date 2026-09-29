@@ -1,4 +1,4 @@
-// The landing copy, from the README and issue #105.
+// The landing copy, approved in issue #144.
 export const DOWNLOAD_URL =
   "https://github.com/aka-cronos/uzzy/releases/latest/download/Uzzy.dmg";
 export const REPO_URL = "https://github.com/aka-cronos/uzzy";
@@ -6,31 +6,17 @@ export const VERSION = "0.1.0";
 export const REQUIREMENTS = "macOS 27 · Apple Silicon";
 
 export const hero = {
-  title: "Your AI subscription usage limits, in your menu bar.",
-  subtitle:
-    "How much you have used, how much is left and when each limit resets, for Claude, Codex and Cursor.",
+  title: "Your AI tools have limits. Checking them shouldn’t be a task.",
+  subtitle: "See how much you’ve used, how much is left and when your usage limits reset—for Claude, Codex and Cursor, in one menu bar panel.",
 };
 
-export const why =
-  "If you pay for more than one AI coding subscription, finding out how close you are to a limit means opening each provider's dashboard. Uzzy puts every usage limit in one panel, reusing the sessions Claude Code, Codex CLI and Cursor already keep on your Mac. Nothing to sign in to, no API key to paste.";
+export const why = "Keep using Claude, Codex and Cursor. Uzzy brings their usage limits together so you can stop checking each one separately.";
 
 export const features = [
-  {
-    title: "One panel, every provider",
-    body: "A menu bar icon opens a panel with a card for each subscription, and each card shows the account's plan next to its name.",
-  },
-  {
-    title: "Every usage limit on its own",
-    body: "5 hours, weekly, per model: each usage limit gets its own bar, its reset in local time with a countdown, and when it was last read, never blended into one number. Usage credits and banked resets are shown next to them.",
-  },
-  {
-    title: "Only asks while you look",
-    body: "Uzzy reads your usage limits when you open the panel and every five minutes while it stays open. Closed, it makes no requests at all.",
-  },
-  {
-    title: "Honest when things fail",
-    body: "No session, expired session, offline: the card says why and the others keep working. Missing data is never shown as zero.",
-  },
+  { title: "Three tools. One quick check.", body: "Open Uzzy from your menu bar to see Claude, Codex and Cursor together, with a separate card for each provider and its plan." },
+  { title: "Different limits stay different.", body: "Check each usage limit on its own, with its reset time, countdown and last reading. Five-hour and weekly limits are never blended into one number." },
+  { title: "Checks while you look.", body: "Uzzy refreshes readings when needed as you open the panel, then every five minutes while it stays open. Close it and the requests stop." },
+  { title: "Missing doesn’t mean zero.", body: "If a session expires or a provider can’t be reached, Uzzy tells you what happened. The other providers keep working." },
 ];
 
 export const providers = [
@@ -52,12 +38,11 @@ export const providers = [
 ];
 
 export const privacy = [
-  "Reuses your existing sessions read-only. Never asks for a password, never signs in, never writes credentials.",
-  "Talks only to api.anthropic.com, chatgpt.com and api2.cursor.sh. No telemetry, no server of its own.",
-  "Usage data lives in memory only. Nothing is written to disk.",
-  "This site counts visits with Cloudflare Web Analytics: no cookies, no personal data. The app itself sends nothing.",
+  { title: "Read-only access.", body: "Uzzy reuses your existing sessions. It never asks for a password, signs in for you or writes credentials." },
+  { title: "Straight to your providers.", body: "Usage requests go directly to Claude, Codex and Cursor. No telemetry. No server of its own." },
+  { title: "Readings stay in memory.", body: "Uzzy doesn’t save usage readings to disk." },
 ];
+
 export const hosts = ["api.anthropic.com", "chatgpt.com", "api2.cursor.sh"];
 
-export const disclaimer =
-  "Uzzy is an independent project, not affiliated with, endorsed or sponsored by Anthropic, OpenAI or Anysphere. It reads usage data through undocumented endpoints that may change without notice.";
+export const disclaimer = "Uzzy is an independent project, not affiliated with, endorsed or sponsored by Anthropic, OpenAI or Anysphere. It reads usage limits through undocumented endpoints that may change without notice.";

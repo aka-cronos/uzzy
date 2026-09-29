@@ -6,7 +6,8 @@ Uzzy shows the subscription quotas of AI services and when they reset.
 
 **Copy**:
 Any text a person reads about Uzzy: the app, the uzzy.app site, the README and the social images. The Spanish and English terms below apply to all of it.
-_Avoid_: Treating marketing text as exempt from the glossary.
+Marketing copy (the site, the README, the social images and the repo description) says «AI usage limits», without «subscription». While the list of providers is closed, no copy says «every» or «all» about providers or usage limits; it names Claude, Codex and Cursor instead.
+_Avoid_: Treating marketing text as exempt from the glossary; «subscription» in marketing copy; «every provider», «every usage limit», «all your limits».
 
 **Subscription quota**:
 A usage limit a provider applies to a subscription over a given period. Distinct from monetary spend and from billed API consumption.
