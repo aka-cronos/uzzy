@@ -139,4 +139,16 @@ struct FormatTextTests {
         #expect(Format.english.name(of: QuotaMagnitude.used) == "used")
         #expect(Format.english.name(of: QuotaMagnitude.remaining) == "left")
     }
+
+    /// «Cuota» reads as a fee in Spanish, so the Spanish copy says «límite de
+    /// uso» instead, as the glossary in `CONTEXT.md` records.
+    @Test func theSpanishCopyCallsUsageLimitsLimitesDeUso() throws {
+        let path = try #require(#bundle.path(forResource: "Localizable", ofType: "strings", inDirectory: nil, forLocalization: "es"))
+        let catalog = try #require(NSDictionary(contentsOfFile: path) as? [String: String])
+
+        #expect(!catalog.isEmpty)
+        #expect(catalog.filter { $0.value.localizedCaseInsensitiveContains("cuota") }.isEmpty)
+        #expect(catalog["Usage limits"] == "Límites de uso")
+        #expect(catalog["Usage limit unavailable"] == "Límite no disponible")
+    }
 }
