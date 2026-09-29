@@ -55,6 +55,7 @@ export const privacy = [
   "Reuses your existing sessions read-only. Never asks for a password, never signs in, never writes credentials.",
   "Talks only to api.anthropic.com, chatgpt.com and api2.cursor.sh. No telemetry, no server of its own.",
   "Quotas live in memory only. Nothing is written to disk.",
+  "This site counts visits with Cloudflare Web Analytics: no cookies, no personal data. The app itself sends nothing.",
 ];
 export const hosts = ["api.anthropic.com", "chatgpt.com", "api2.cursor.sh"];
 

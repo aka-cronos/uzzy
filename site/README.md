@@ -1,6 +1,6 @@
 # uzzy.app
 
-The landing page for Uzzy, served at <https://uzzy.app>. It is an [Astro](https://astro.build) site with static output, styled with Tailwind CSS and [shadcn/ui](https://ui.shadcn.com) components on [Base UI](https://base-ui.com) through `@astrojs/react`. The React components render to HTML at build time, so the page ships no client JavaScript.
+The landing page for Uzzy, served at <https://uzzy.app>. It is an [Astro](https://astro.build) site with static output, styled with Tailwind CSS and [shadcn/ui](https://ui.shadcn.com) components on [Base UI](https://base-ui.com) through `@astrojs/react`. The React components render to HTML at build time, so the page's own code ships no client JavaScript. On `uzzy.app`, Cloudflare injects its Web Analytics beacon into the served HTML; the repo contains no analytics script (see step 5 of the Cloudflare setup below).
 
 ## Develop
 
@@ -32,5 +32,6 @@ Done once by hand in the Cloudflare dashboard; nothing in the repo does it.
    - **Branch control**: production branch `main`, with **builds for non-production branches** enabled so pull requests get preview URLs.
 3. **Settings → Domains & Routes → Add → Custom domain**: `uzzy.app`. The `uzzy.app` zone must be on the same Cloudflare account.
 4. Redirect `www.uzzy.app` to the apex: add a proxied DNS record for `www` (for example `AAAA` to `100::`), then a **Rules → Redirect Rules** rule from `www.uzzy.app/*` to `https://uzzy.app/${1}` with status 301, keeping the query string.
+5. **Web Analytics → Add a site**: `uzzy.app`, with automatic setup, so Cloudflare injects the beacon on the proxied hostname. Don't copy the JS snippet into the site. `*.workers.dev` and preview URLs aren't proxied, so they aren't counted. Keep **Bot Fight Mode** and challenges off on the `uzzy.app` zone: they set cookies (`__cf_bm`, `cf_clearance`), and the Privacy copy in `src/content.ts` promises none. Switching them on means updating that copy.
 
-**Launch order**: the download buttons point at `releases/latest/download/Uzzy.dmg`, which 404s until the first release exists. Merging the site and deploying to `*.workers.dev` is fine, but don't attach the `uzzy.app` custom domain (steps 3 and 4) until the `0.1.0` release is published.
+**Launch order**: the download buttons point at `releases/latest/download/Uzzy.dmg`, which 404s until the first release exists. Merging the site and deploying to `*.workers.dev` is fine, but don't attach the `uzzy.app` custom domain or switch on Web Analytics (steps 3 to 5) until the `0.1.0` release is published.
