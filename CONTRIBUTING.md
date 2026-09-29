@@ -22,11 +22,43 @@ xcodebuild build -project app/Uzzy.xcodeproj -scheme Uzzy -destination 'platform
 open build/Build/Products/Debug/Uzzy.app
 ```
 
-Tests go through the usage core with the fake dependencies in `app/UzzyCore/Fakes.swift`; they never touch real sessions or the network. To see a panel state without touching your accounts, use the debug scenarios described in the [README](README.md#debug-scenarios).
+Debug builds run as a separate app, «Uzzy Debug» (`com.akacronos.Uzzy.debug`), with an orange menu bar icon. They keep their own settings, so they can run next to the installed copy without touching it.
+
+Tests go through the usage core with the fake dependencies in `app/UzzyCore/Fakes.swift`; they never touch real sessions or the network. To see a panel state without touching your accounts, use the [debug scenarios](#debug-scenarios).
+
+### Debug scenarios
+
+Debug builds add a bar on top of the panel to pick a scenario: the real panel then shows one of its states («Desactualizado», «Sin sesión», «Respuesta incompatible»…) with fictional data, without touching the accounts. The scenarios drive the usage core through the same fakes as the tests. To open the panel straight on one, pass its id (see `app/UzzyCore/Scenarios.swift`):
+
+```sh
+build/Build/Products/Debug/Uzzy.app/Contents/MacOS/Uzzy -scenario stale
+```
+
+Release builds leave the scenarios, the fakes and the sample responses out.
+
+### Install your own build
+
+To keep your own build running day to day, build it in Release and copy it to `/Applications`. From the repo root you can paste the whole block; Terminal runs the three commands in order.
+
+```sh
+# Compile a Release build into the local `build/` folder
+xcodebuild build \
+  -project app/Uzzy.xcodeproj \
+  -scheme Uzzy \
+  -configuration Release \
+  -destination 'platform=macOS,arch=arm64' \
+  -derivedDataPath build
+
+# Install the app next to the rest of your applications
+cp -R build/Build/Products/Release/Uzzy.app /Applications/
+
+# Launch the installed copy
+open /Applications/Uzzy.app
+```
 
 ### Signing
 
-By default the app is signed ad hoc ("Sign to Run Locally"), so it builds without an Apple Developer account. With ad hoc signing, macOS treats every rebuild as a different app, so the Keychain prompt to read Claude Code's session comes back after each build even if you chose «Always Allow».
+No Apple Developer account is needed: by default the app is signed ad hoc ("Sign to Run Locally"). With ad hoc signing, macOS treats every rebuild as a different app, so the Keychain prompt to read Claude Code's session comes back after each build even if you chose «Always Allow».
 
 To sign with your own team, create `app/Config/Local.xcconfig` (ignored by git):
 
@@ -42,6 +74,21 @@ If you created `Config/Local.xcconfig` before the app moved into `app/`, move it
 ```sh
 mv Config/Local.xcconfig app/Config/Local.xcconfig
 ```
+
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| `app/` | The macOS app and its Xcode project, `Uzzy.xcodeproj`. |
+| `app/Uzzy/` | App: menu bar icon, panel and SwiftUI presentation, plus the app icon (`AppIcon.icon`, an Icon Composer document). |
+| `app/UzzyCore/` | Usage core: panel state, provider adapters and injectable dependencies. In Debug builds, also the fake dependencies, the sample responses and the debug scenarios. |
+| `app/UzzyCoreTests/` | Tests through the usage core, with the fake dependencies. |
+| `app/Config/` | Shared build settings (signing). |
+| `brand/` | Vector masters of the logo, the app icon glyph and the menu bar icon, on a 32-unit grid. |
+| `CONTEXT.md` | Domain vocabulary (used quota, reset, last valid reading…). |
+| `docs/agents/` | Agent conventions: issues, triage labels, domain docs. |
+| `docs/images/` | Screenshots used in the README, and `main-bg.jpg`, the background image. |
+| `.agents/skills/` | Agent skills used to work on the repo, copied from their upstream repos (see `skills-lock.json`). |
 
 ## Releases
 
