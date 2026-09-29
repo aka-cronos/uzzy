@@ -327,7 +327,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Consultar las cuotas ahora"
+            "value" : "Consultar los límites de uso ahora"
           }
         }
       }
@@ -347,7 +347,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Consultando cuotas…"
+            "value" : "Consultando límites de uso…"
           }
         }
       }
@@ -815,7 +815,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "El orden de la lista es el de las tarjetas. Un proveedor desactivado no tiene tarjeta, y %@ no lee su sesión ni consulta sus cuotas."
+            "value" : "El orden de la lista es el de las tarjetas. Un proveedor desactivado no tiene tarjeta, y %@ no lee su sesión ni consulta sus límites de uso."
           }
         }
       }
@@ -825,7 +825,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Esta sesión no ofrece cuotas de suscripción"
+            "value" : "Esta sesión no tiene límites de uso de suscripción"
           }
         }
       }
@@ -855,7 +855,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activa un proveedor en Ajustes para ver sus cuotas."
+            "value" : "Activa un proveedor en Ajustes para ver sus límites de uso."
           }
         }
       }
@@ -898,7 +898,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cuota no disponible"
+            "value" : "Límite no disponible"
           }
         }
       }
@@ -909,7 +909,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cuotas"
+            "value" : "Límites de uso"
           }
         }
       }
