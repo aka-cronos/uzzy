@@ -7,8 +7,8 @@ import { MENU_BAR } from "@/lib/marks";
 const { class: cls = "" } = Astro.props;
 ---
 <div class={`relative h-[730px] w-[560px] overflow-hidden rounded-2xl bg-slate-950 shadow-[0_30px_60px_-20px_rgb(15_23_42/0.35)] ring-1 ring-slate-900/10 ${cls}`}>
-  <!-- the wallpaper at 40% over the card's slate-950, shared with the CTA banner; the panel stays untinted above it -->
-  <img src="/cover/bg.jpg" alt="" class="absolute inset-0 size-full object-cover opacity-40" loading="eager" />
+  <!-- the tinted wallpaper (docs/images/main-bg.jpg), shared with the CTA banner; the panel sits untinted above it -->
+  <img src="/cover/bg.jpg" alt="" class="absolute inset-0 size-full object-cover" loading="eager" />
   <!-- only the trailing end of the menu bar, as if cropped from a full desktop -->
   <div class="relative flex items-center justify-end py-[5px] pr-4 pl-2.5 text-[13px] font-semibold text-slate-50">
     <div class="flex items-center">
