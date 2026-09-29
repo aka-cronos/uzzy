@@ -6,6 +6,10 @@
 </p>
 
 <p align="center">
+  <a href="https://uzzy.app">uzzy.app</a> · <a href="https://github.com/aka-cronos/uzzy/releases/latest">Download</a>
+</p>
+
+<p align="center">
   <img alt="macOS 27" src="https://img.shields.io/badge/macOS-27-black?logo=apple">
   <img alt="Apple Silicon" src="https://img.shields.io/badge/Apple%20Silicon-arm64-black">
   <img alt="Swift" src="https://img.shields.io/badge/Swift-6-F05138?logo=swift&logoColor=white">
@@ -15,9 +19,6 @@
 <p align="center">
   <img src="docs/images/app.jpg" width="420" alt="The Uzzy panel open from the menu bar, with one card each for Claude, Codex and Cursor and each account's plan next to its title. Every quota has its own bar, its used percentage and its reset time; the Claude card also shows the usage credits spent this month, and the Codex card a badge with its banked resets.">
 </p>
-
-> [!NOTE]
-> Uzzy is in development. The MVP is specified in [#11](https://github.com/aka-cronos/uzzy/issues/11), and there are no prebuilt releases yet: you [build it yourself](#install). The app's interface follows the system language: English or Spanish.
 
 ## Why Uzzy
 
@@ -30,6 +31,7 @@ If you pay for more than one AI coding subscription, finding out how close you a
 - **Queries only while you look.** Uzzy reads the quotas when you open the panel (unless the last reading is under five minutes old), every five minutes while it stays open, and on demand with the refresh button. With the panel closed it makes no requests.
 - **Honest failures.** If a provider fails, its card explains why (no session, expired session, offline, incompatible response…) and the others keep working. When a refresh fails, the card keeps the last valid reading and marks it as stale. Missing data is never shown as zero.
 - **Native settings.** Choose used or remaining quota, and turn each provider on or off or change the order of the cards.
+- **Your language.** The interface follows the system language: English or Spanish.
 
 <p align="center">
   <img src="docs/images/settings.jpg" width="520" alt="The Uzzy Settings window: a Used / Left switch for the percentage on the cards, and the Claude, Codex and Cursor providers with buttons to reorder them and a switch to turn each one on or off.">
@@ -58,74 +60,16 @@ Uzzy reads Claude Code's Keychain item through `/usr/bin/security`, the tool Cla
 
 ## Install
 
-### Requirements
+Download `Uzzy.dmg` from [uzzy.app](https://uzzy.app) or [GitHub Releases](https://github.com/aka-cronos/uzzy/releases/latest), open it and drag Uzzy to Applications. It is signed with Developer ID and notarized by Apple, so it opens like any other app.
 
-- macOS 27 on Apple Silicon.
-- Xcode 27 to build.
-- A signed-in session in Claude Code, Codex CLI (ChatGPT mode) and/or Cursor.
-
-No Apple Developer account is needed: by default the app is signed ad hoc ("Sign to Run Locally"). To sign with your own team, see [Signing](CONTRIBUTING.md#signing).
-
-### Build and install
-
-To keep Uzzy running day to day, build it in Release and copy it to `/Applications`. From the repo root you can paste the whole block; Terminal runs the three commands in order.
-
-```sh
-# Compile a Release build into the local `build/` folder
-xcodebuild build \
-  -project app/Uzzy.xcodeproj \
-  -scheme Uzzy \
-  -configuration Release \
-  -destination 'platform=macOS,arch=arm64' \
-  -derivedDataPath build
-
-# Install the app next to the rest of your applications
-cp -R build/Build/Products/Release/Uzzy.app /Applications/
-
-# Launch the installed copy
-open /Applications/Uzzy.app
-```
+- Requires macOS 27.0 or later on Apple Silicon.
+- Requires a signed-in session in Claude Code, Codex CLI (ChatGPT mode) and/or Cursor.
 
 To open it at login, add it under System Settings → General → Login Items.
 
-## Development
+There are no automatic updates yet: to update, download the new `Uzzy.dmg`.
 
-### Build and test
-
-```sh
-xcodebuild test -project app/Uzzy.xcodeproj -scheme Uzzy -destination 'platform=macOS,arch=arm64'
-xcodebuild build -project app/Uzzy.xcodeproj -scheme Uzzy -destination 'platform=macOS,arch=arm64' -derivedDataPath build
-open build/Build/Products/Debug/Uzzy.app
-```
-
-Debug builds run as a separate app, «Uzzy Debug» (`com.akacronos.Uzzy.debug`), with an orange menu bar icon. They keep their own settings, so they can run next to the installed copy without touching it.
-
-### Debug scenarios
-
-Debug builds add a bar on top of the panel to pick a scenario: the real panel then shows one of its states («Desactualizado», «Sin sesión», «Respuesta incompatible»…) with fictional data, without touching the accounts. The scenarios drive the usage core through the same fakes as the tests. To open the panel straight on one, pass its id (see `app/UzzyCore/Scenarios.swift`):
-
-```sh
-build/Build/Products/Debug/Uzzy.app/Contents/MacOS/Uzzy -scenario stale
-```
-
-Release builds leave the scenarios, the fakes and the sample responses out.
-
-### Repository layout
-
-| Path | Contents |
-|---|---|
-| `app/` | The macOS app and its Xcode project, `Uzzy.xcodeproj`. |
-| `app/Uzzy/` | App: menu bar icon, panel and SwiftUI presentation, plus the app icon (`AppIcon.icon`, an Icon Composer document). |
-| `app/UzzyCore/` | Usage core: panel state, provider adapters and injectable dependencies. In Debug builds, also the fake dependencies, the sample responses and the debug scenarios. |
-| `app/UzzyCoreTests/` | Tests through the usage core, with the fake dependencies. |
-| `app/Config/` | Shared build settings (signing). |
-| `brand/` | Vector masters of the logo, the app icon glyph and the menu bar icon, on a 32-unit grid. |
-| `CONTEXT.md` | Domain vocabulary (used quota, reset, last valid reading…). |
-| `docs/agents/` | Agent conventions: issues, triage labels, domain docs. |
-| `docs/images/` | Screenshots used in this README. |
-| `.agents/skills/` | Agent skills used to work on the repo, copied from their upstream repos (see `skills-lock.json`). |
-
-Design decisions live in the [issues](https://github.com/aka-cronos/uzzy/issues?q=is%3Aissue) of map [#1](https://github.com/aka-cronos/uzzy/issues/1).
+To build it yourself, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Contributing
 
@@ -143,4 +87,4 @@ Endpoint research was informed by [OpenUsage](https://github.com/robinebers/open
 
 ## License
 
-[MIT](LICENSE). The agent skills under `.agents/skills/` are third-party MIT code; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+[MIT](LICENSE). The agent skills under `.agents/skills/` are third-party MIT code; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), which also credits the background photo.
