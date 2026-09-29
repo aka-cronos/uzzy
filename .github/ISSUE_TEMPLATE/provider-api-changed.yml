@@ -1,5 +1,5 @@
 name: Provider API changed
-description: A provider's card shows «Respuesta incompatible», wrong quotas or wrong resets.
+description: A provider's card shows «Incompatible response» («Respuesta incompatible» in Spanish), wrong usage limits or wrong resets.
 labels: [needs-triage]
 body:
   - type: markdown
@@ -21,7 +21,7 @@ body:
     id: symptom
     attributes:
       label: What the card shows
-      description: The state or values you see, and what the provider's own app or website shows for the same quota.
+      description: The state or values you see, and what the provider's own app or website shows for the same usage limit.
     validations:
       required: true
   - type: input
