@@ -17,6 +17,8 @@ const heroHeight = "clamp(620px, calc(100vh - 72px), 788px)";
 // gap between the fixed header and the desktop card: centred in the hero, never under 24px; shared by the aside's padding and the card's sticky offset so the card doesn't shift on scroll
 const cardGap = `max(24px, calc((${heroHeight} - 730px) / 2))`;
 const focus = "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900";
+// the X logo, filled
+const xIcon = '<path d="M17.8 3h3.1l-6.8 7.7L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.2-8.3L1.8 3h6.4l4.4 5.8zm-1.1 16.2h1.7L7.3 4.7H5.5z"/>';
 const nav = [["Features", "#features"], ["Providers", "#providers"], ["Settings", "#settings"], ["Privacy", "#privacy"]];
 // Lucide-style line icons, one per row
 const featureIcons = [
@@ -200,6 +202,18 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
           </details>
         </div>
       </section>
+
+      <!-- feedback for people who don't code; developers still have GitHub -->
+      <section id="feedback" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
+        <h2 class="text-3xl font-semibold tracking-tight text-balance">Made by a designer. Tell me what you think.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate-600 text-pretty">I’m <a href={c.X_URL} class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>@{c.MAKER}</a>, a designer who got tired of checking three places, so I built Uzzy. Found a bug, have an idea or want another provider? Send me a message on X. You don’t need to know how to code.</p>
+        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <a href={c.X_URL} class={`inline-flex min-h-11 items-center gap-2 rounded-lg bg-slate-900 px-5 font-medium text-slate-50 transition-colors duration-200 hover:bg-slate-700 ${focus}`}>
+            <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" set:html={xIcon} />Message me on X
+          </a>
+          <a href={`${c.REPO_URL}/issues`} class={`inline-flex min-h-11 items-center rounded font-medium text-slate-600 underline-offset-4 transition-colors duration-200 hover:text-slate-900 hover:underline ${focus}`}>Developers: open an issue</a>
+        </div>
+      </section>
     </main>
 
     <!-- large screens: vertically centred in the hero, then sticky while scrolling at the same offset (72px header + cardGap), so it never shifts; the grid's bottom padding stops it 64px before the CTA banner -->
@@ -238,7 +252,7 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
         <p class="text-pretty">{c.disclaimer}</p>
         <p class="text-pretty">This website uses Cloudflare Web Analytics without cookies or personal data. The app sends no telemetry.</p>
         <!-- Unsplash License: credit not required, but appreciated -->
-        <p class="text-pretty">© 2026 Uzzy · Background photo by <a href="https://unsplash.com/@norbertkowalczyk?utm_source=uzzy&utm_medium=referral" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Norbert Kowalczyk</a> on <a href="https://unsplash.com/photos/dark-curved-lines-create-a-mesmerizing-pattern-HuvxHRcOY6E?utm_source=uzzy&utm_medium=referral" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Unsplash</a>.</p>
+        <p class="text-pretty">© 2026 Uzzy · Made by <a href={c.X_URL} class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>@{c.MAKER}</a> · Background photo by <a href="https://unsplash.com/@norbertkowalczyk?utm_source=uzzy&utm_medium=referral" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Norbert Kowalczyk</a> on <a href="https://unsplash.com/photos/dark-curved-lines-create-a-mesmerizing-pattern-HuvxHRcOY6E?utm_source=uzzy&utm_medium=referral" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Unsplash</a>.</p>
       </div>
     </div>
   </footer>

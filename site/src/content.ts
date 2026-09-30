@@ -2,6 +2,8 @@
 export const DOWNLOAD_URL =
   "https://github.com/aka-cronos/uzzy/releases/latest/download/Uzzy.dmg";
 export const REPO_URL = "https://github.com/aka-cronos/uzzy";
+export const MAKER = "akacronos";
+export const X_URL = `https://x.com/${MAKER}`;
 export const VERSION = "0.1.1";
 export const REQUIREMENTS = "macOS 27 · Apple Silicon";
 
