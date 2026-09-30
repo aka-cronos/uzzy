@@ -733,17 +733,6 @@
         }
       }
     },
-    "Show %@" : {
-      "comment" : "The switch that turns a provider on or off. %@ is the provider.",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mostrar %@"
-          }
-        }
-      }
-    },
     "Shows how much of each limit you've used, or how much you have left until it resets." : {
       "localizations" : {
         "es" : {
@@ -846,6 +835,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Demasiadas consultas"
+          }
+        }
+      }
+    },
+    "Turn On %@" : {
+      "comment" : "The switch that turns a provider on or off. %@ is the provider.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar %@"
           }
         }
       }

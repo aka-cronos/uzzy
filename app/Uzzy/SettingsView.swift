@@ -100,7 +100,7 @@ private struct ProviderRow: View {
         SettingsRow(title: provider.name, description: description) {
             MoveButton(label: String(localized: "Move \(provider.name) Up"), systemImage: "chevron.up", action: moveUp)
             MoveButton(label: String(localized: "Move \(provider.name) Down"), systemImage: "chevron.down", action: moveDown)
-            Toggle("Show \(provider.name)", isOn: $isOn)
+            Toggle("Turn On \(provider.name)", isOn: $isOn)
                 .toggleStyle(.switch)
                 .labelsHidden()
                 .accessibilityHint(description)
