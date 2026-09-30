@@ -8,6 +8,10 @@ Never commit on `main` or push to it: every change reaches `main` through a pull
 
 When you work in a git worktree, remove it once its pull request is open and everything is pushed: run `git worktree remove <path>` against the main checkout. Keep the branch, and leave the main checkout on whatever branch it is on. This frees the branch so the user can check it out in the main checkout to test it.
 
+### Prototypes
+
+A prototype lives only until its answer ships. When a variant wins, comment the verdict (which variant and why) on the issue and build the winner on a fresh branch from `main`. Once that pull request is open, delete the prototype branch locally and on `origin`, and leave no pointer to it. This replaces the `prototype` skill's step of keeping the prototype on a throwaway branch.
+
 ## Agent skills
 
 ### Issue tracker
