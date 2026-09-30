@@ -37,6 +37,12 @@ export const providers = [
   },
 ];
 
+export const settings = [
+  { title: "Used or left.", body: "Choose whether the cards show how much of each usage limit you’ve used or how much is left." },
+  { title: "Only the tools you use.", body: "Turn off the providers you don’t use. They get no card, and Uzzy doesn’t read their session or query their usage limits." },
+  { title: "Your order.", body: "Move the cards up or down so the provider you check most comes first." },
+];
+
 export const privacy = [
   { title: "Read-only access.", body: "Uzzy reuses your existing sessions. It never asks for a password, signs in for you or writes credentials." },
   { title: "Straight to your providers.", body: "Usage requests go directly to Claude, Codex and Cursor. No telemetry. No server of its own." },

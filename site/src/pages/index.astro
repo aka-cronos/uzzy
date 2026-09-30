@@ -17,13 +17,18 @@ const heroHeight = "clamp(620px, calc(100vh - 72px), 788px)";
 // gap between the fixed header and the desktop card: centred in the hero, never under 24px; shared by the aside's padding and the card's sticky offset so the card doesn't shift on scroll
 const cardGap = `max(24px, calc((${heroHeight} - 730px) / 2))`;
 const focus = "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900";
-const nav = [["Features", "#features"], ["Providers", "#providers"], ["Privacy", "#privacy"]];
+const nav = [["Features", "#features"], ["Providers", "#providers"], ["Settings", "#settings"], ["Privacy", "#privacy"]];
 // Lucide-style line icons, one per row
 const featureIcons = [
   '<circle cx="4" cy="5" r="1.5"/><circle cx="4" cy="12" r="1.5"/><circle cx="4" cy="19" r="1.5"/><path d="M6 5h4l5 7M6 12h9M6 19h4l5-7"/><circle cx="18" cy="12" r="3"/>',
   '<path d="M3 7h18M3 17h18"/><circle cx="9" cy="7" r="2" fill="currentColor" stroke="none"/><circle cx="16" cy="17" r="2" fill="currentColor" stroke="none"/>',
   '<path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.8 9a7 7 0 0 1 12.1-2L20 12M4 12l2.1 5a7 7 0 0 0 12.1-2"/>',
   '<circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.3 1.8c-.9.9-1.9 1.2-1.9 2.7M12 17h.01"/>',
+];
+const settingsIcons = [
+  '<path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',
+  '<rect x="2" y="5" width="20" height="14" rx="7"/><circle cx="15" cy="12" r="3"/>',
+  '<path d="m21 16-4 4-4-4M17 20V4M3 8l4-4 4 4M7 4v16"/>',
 ];
 const privacyIcons = [
   '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
@@ -116,7 +121,7 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
 
       <section id="providers" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
         <h2 class="text-3xl font-semibold tracking-tight text-balance">Your tools already know you.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-slate-600 text-pretty">Uzzy reuses the sessions Claude Code, Codex CLI and Cursor already keep on your Mac. No extra sign-in. No API key to paste.</p>
+        <p class="mt-5 text-lg leading-relaxed text-slate-600 text-pretty">Uzzy reuses the sessions Claude Code, Codex CLI and Cursor already keep on your Mac. No extra sign-in. No API key to paste. Use one, two or all three.</p>
         <ul class={rowList}>
           {c.providers.map((p) => (
             <li class={row}>
@@ -130,6 +135,26 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
             </li>
           ))}
         </ul>
+      </section>
+
+      <section id="settings" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
+        <h2 class="text-3xl font-semibold tracking-tight text-balance">Set it up your way, or don’t.</h2>
+        <p class="mt-5 text-lg leading-relaxed text-slate-600 text-pretty">Open Settings with ⌘, from the panel. Your choices are remembered across launches.</p>
+        <ul class={rowList}>
+          {c.settings.map((s, i) => (
+            <li class={row}>
+              <span class={rowIcon}>
+                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={settingsIcons[i]} />
+              </span>
+              <div class="min-w-0">
+                <h3 class="text-lg font-semibold text-balance">{s.title}</h3>
+                <p class="mt-1.5 leading-relaxed text-slate-600 text-pretty">{s.body}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <!-- the bare @2x window from the README screenshot, without the wallpaper so it doesn't compete with the desktop card; shown at half its pixel size -->
+        <img src="/settings.png" alt="The Uzzy Settings window: a Used / Left switch for the percentage on the cards, and the Claude, Codex and Cursor providers with buttons to reorder them and a switch to turn each one on or off." width="592" height="526" class="mx-auto mt-4 h-auto w-full max-w-[592px]" loading="lazy" />
       </section>
 
       <section id="privacy" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
@@ -158,6 +183,10 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
         <h2 class="text-3xl font-semibold tracking-tight text-balance">The practical details.</h2>
         <div class="mt-10 divide-y divide-slate-200 border-y border-slate-200">
           <details class="group py-2" open>
+            <summary class={`flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded text-lg font-semibold text-balance ${focus}`}>Do I need Claude, Codex and Cursor?<span aria-hidden="true" class="text-2xl font-normal text-slate-500 group-open:rotate-45">+</span></summary>
+            <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">No, one is enough. Turn off the ones you don’t use in <a href="#settings" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Settings</a>: their cards go away and Uzzy doesn’t read their sessions.</p>
+          </details>
+          <details class="group py-2">
             <summary class={`flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded text-lg font-semibold text-balance ${focus}`}>Do I need another account?<span aria-hidden="true" class="text-2xl font-normal text-slate-500 group-open:rotate-45">+</span></summary>
             <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">No. Uzzy reuses the sessions Claude Code, Codex CLI and Cursor keep on your Mac. You’ll need to be signed in to the tools you want to check.</p>
           </details>

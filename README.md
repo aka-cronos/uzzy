@@ -37,7 +37,7 @@ Keep using Claude, Codex and Cursor. Uzzy brings their usage limits together so 
   <img src="docs/images/settings.jpg" width="520" alt="The Uzzy Settings window: a Used / Left switch for the percentage on the cards, and the Claude, Codex and Cursor providers with buttons to reorder them and a switch to turn each one on or off.">
 </p>
 
-Open Settings with ⌘, from the panel; ⌘W closes it and ⌘Q quits. Your choices are remembered across launches, and a disabled provider has no card: Uzzy does not read its session or query its usage limits.
+Open Settings with ⌘, from the panel; ⌘W closes it and ⌘Q quits. Your choices are remembered across launches. A provider you turn off has no card, and Uzzy does not read its session or query its usage limits.
 
 ## Supported providers
 
@@ -56,7 +56,7 @@ Uzzy reads Claude Code's Keychain item through `/usr/bin/security`, the tool Cla
 - Reuses, **read-only**, the sessions that already exist in Claude Code, Codex CLI and Cursor. It never asks for passwords, signs in, refreshes tokens or writes credentials.
 - Only connects to `api.anthropic.com`, `chatgpt.com` and `api2.cursor.sh`. No telemetry and no server of its own.
 - Usage data lives only in memory; nothing is written to disk.
-- Display magnitude, provider visibility and provider order preferences are stored in local `UserDefaults`; they contain no usage data, token, email or account identifier.
+- Display magnitude, which providers are turned on and provider order are stored in local `UserDefaults`; they contain no usage data, token, email or account identifier.
 
 ## Install
 

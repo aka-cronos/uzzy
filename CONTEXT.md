@@ -6,7 +6,7 @@ Uzzy shows the subscription quotas of AI services and when they reset.
 
 **Copy**:
 Any text a person reads about Uzzy: the app, the uzzy.app site, the README and the social images. The Spanish and English terms below apply to all of it.
-Marketing copy (the site, the README, the social images and the repo description) says «AI usage limits», without «subscription». While the list of providers is closed, no copy says «every» or «all» about providers or usage limits; it names Claude, Codex and Cursor instead.
+Marketing copy (the site, the README, the social images and the repo description) says «AI usage limits», without «subscription». While the list of providers is closed, no copy claims coverage beyond it with «every» or «all» about providers or usage limits; it names Claude, Codex and Cursor instead. Counting the closed list is fine, e.g. «one, two or all three».
 _Avoid_: Treating marketing text as exempt from the glossary; «subscription» in marketing copy; «every provider», «every usage limit», «all your limits».
 
 **Subscription quota**:
@@ -67,5 +67,5 @@ Claude's pay-as-you-go consumption (formerly "extra usage"), billed at API rates
 _Avoid_: Subscription quota, balance, a percentage of the limit, "extra usage" (as a label); in Spanish, «saldo», «cuota».
 
 **Disabled provider**:
-A provider the person has switched off in Uzzy. It has no card, and Uzzy does not read its session or query its quotas until the person switches it on again.
-_Avoid_: Hidden card (suggests only a display change), missing session (a separate state).
+A provider the person has switched off in Uzzy. It has no card, and Uzzy does not read its session or query its quotas until the person switches it on again. In Spanish copy it is «desactivado» (the action, «desactivar»); in English copy, «turned off» (the action, «turn off»).
+_Avoid_: Hidden card (suggests only a display change), missing session (a separate state); «hide» or «show» for switching a provider off or on.
