@@ -163,14 +163,20 @@ struct Format {
     /// to `Int` could trap.
     private static let longestCountdownMinutes = Double(Int32.max)
 
-    /// An interval that is not ahead counts as zero, and a longer one is cut
-    /// to `longestCountdownMinutes`, so invalid data never traps.
+    /// Whole minutes left, in one magnitude: days from a day up, hours from
+    /// two hours up, hours and minutes under two hours, and minutes under an
+    /// hour. A smaller unit is dropped, never rounded up, so the countdown
+    /// does not claim more time than is left. An interval that is not ahead
+    /// counts as zero, and a longer one is cut to `longestCountdownMinutes`,
+    /// so invalid data never traps.
     private func countdown(_ seconds: TimeInterval) -> String {
         let minutes = seconds > 0 ? Int(min(seconds / 60, Self.longestCountdownMinutes)) : 0
-        let (days, hours, restMinutes) = (minutes / 1440, minutes / 60 % 24, minutes % 60)
-        if days > 0 { return text("\(days) d \(hours) h") }
-        if hours > 0 { return text("\(hours) h \(restMinutes) min") }
-        return text("\(restMinutes) min")
+        let days = minutes / 1_440
+        if days > 0 { return text("\(days) d") }
+        let hours = minutes / 60
+        if hours >= 2 { return text("\(hours) h") }
+        if hours > 0 { return text("\(hours) h \(minutes % 60) min") }
+        return text("\(minutes) min")
     }
 
     /// `value` from the catalog, in the language of `locale`. A language

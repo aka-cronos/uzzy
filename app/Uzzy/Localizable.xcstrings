@@ -111,13 +111,13 @@
         }
       }
     },
-    "%lld d %lld h" : {
-      "comment" : "Time left until a reset, in days and hours.",
+    "%lld d" : {
+      "comment" : "Time left until a reset, in days.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%1$lld d %2$lld h"
+            "value" : "%lld d"
           }
         }
       }
@@ -163,8 +163,19 @@
         }
       }
     },
+    "%lld h" : {
+      "comment" : "Time left until a reset, in hours.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld h"
+          }
+        }
+      }
+    },
     "%lld h %lld min" : {
-      "comment" : "Time left until a reset, in hours and minutes.",
+      "comment" : "Time left until a reset, in hours and minutes, when under two hours.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -682,7 +693,7 @@
       }
     },
     "Resets %@ · in %@" : {
-      "comment" : "When a usage limit resets and the time left, e.g. \"Resets today, 14:42 · in 2 h 5 min\".",
+      "comment" : "When a usage limit resets and the time left, e.g. \"Resets today, 14:42 · in 1 h 20 min\".",
       "localizations" : {
         "es" : {
           "stringUnit" : {
