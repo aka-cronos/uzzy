@@ -714,6 +714,17 @@
         }
       }
     },
+    "Resets" : {
+      "comment" : "Settings section title: how cards show resets and resets available.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinicios"
+          }
+        }
+      }
+    },
     "Resets %@ · in %@" : {
       "comment" : "When a usage limit resets and the time left, e.g. \"Resets today, 14:42 · in 1 h 20 min\".",
       "localizations" : {
@@ -721,6 +732,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reinicio: %1$@ · en %2$@"
+          }
+        }
+      }
+    },
+    "Resets available" : {
+      "comment" : "Settings row title: whether cards show the banked resets of an account.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecimientos disponibles"
           }
         }
       }
@@ -772,6 +794,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Muestra una cuenta corta, como 2 h, o una detallada, como 2 h 28 min."
+          }
+        }
+      }
+    },
+    "Shows how many resets the account has available, next to the provider's name." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestra cuántos restablecimientos disponibles tiene la cuenta, junto al nombre del proveedor."
           }
         }
       }

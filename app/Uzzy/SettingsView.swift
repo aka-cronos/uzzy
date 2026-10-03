@@ -10,6 +10,7 @@ struct SettingsView: View {
     let setProviderOrder: @MainActor ([Provider]) -> Void
     @AppStorage("displayMagnitude") private var selectedMagnitude: QuotaMagnitude = .used
     @AppStorage(CountdownStyle.key) private var countdownStyle: CountdownStyle = .simple
+    @AppStorage("showBankedResets") private var showBankedResets = true
     @AppStorage(ProviderPreferences.claudeKey) private var showClaude = true
     @AppStorage(ProviderPreferences.codexKey) private var showCodex = true
     @AppStorage(ProviderPreferences.cursorKey) private var showCursor = true
@@ -57,18 +58,6 @@ struct SettingsView: View {
                     .fixedSize()
                     .accessibilityHint(description)
                 }
-                let countdownTitle = String(localized: "Time until a reset")
-                let countdownDescription = String(localized: "Shows a short countdown, like 2 h, or a detailed one, like 2 h 28 min.")
-                SettingsRow(title: countdownTitle, description: countdownDescription) {
-                    Picker(countdownTitle, selection: $countdownStyle) {
-                        Text(Format.current.name(of: CountdownStyle.simple)).tag(CountdownStyle.simple)
-                        Text(Format.current.name(of: CountdownStyle.detailed)).tag(CountdownStyle.detailed)
-                    }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
-                    .fixedSize()
-                    .accessibilityHint(countdownDescription)
-                }
             }
             // The rows follow the panel's card order. Only here can it change,
             // with buttons that keyboard and VoiceOver can reach.
@@ -88,6 +77,31 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            Section("Resets") {
+                let countdownTitle = String(localized: "Time until a reset")
+                let countdownDescription = String(localized: "Shows a short countdown, like 2 h, or a detailed one, like 2 h 28 min.")
+                SettingsRow(title: countdownTitle, description: countdownDescription) {
+                    Picker(countdownTitle, selection: $countdownStyle) {
+                        Text(Format.current.name(of: CountdownStyle.simple)).tag(CountdownStyle.simple)
+                        Text(Format.current.name(of: CountdownStyle.detailed)).tag(CountdownStyle.detailed)
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .fixedSize()
+                    .accessibilityHint(countdownDescription)
+                }
+                let bankedTitle = String(localized: "Resets available")
+                let bankedDescription = String(localized: "Shows how many resets the account has available, next to the provider's name.")
+                SettingsRow(title: bankedTitle, description: bankedDescription) {
+                    Toggle(bankedTitle, isOn: $showBankedResets)
+                        .toggleStyle(.switch)
+                        .labelsHidden()
+                        .accessibilityHint(bankedDescription)
+                        // As in `ProviderRow`: a switch with a hidden label
+                        // exposes no press action.
+                        .accessibilityAction { showBankedResets.toggle() }
+                }
             }
         }
         .formStyle(.grouped)
