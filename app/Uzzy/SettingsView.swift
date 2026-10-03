@@ -16,6 +16,30 @@ struct SettingsView: View {
     @State private var order = ProviderPreferences.order(in: .standard)
 
     var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            form
+            // Under the form, not in a section footer. A grouped row paints
+            // a card, and the window sizes to this stack.
+            if let versionLine {
+                Text(versionLine)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    // The footer text starts 30pt from the window edge.
+                    // This line sits outside the form, so it pads to match.
+                    .padding(.horizontal, 30)
+                    .padding(.bottom, 16)
+            }
+        }
+        .frame(width: Self.width)
+        .fixedSize(horizontal: false, vertical: true)
+        .onChange(of: showClaude) { _, enabled in setProviderEnabled(.claude, enabled) }
+        .onChange(of: showCodex) { _, enabled in setProviderEnabled(.codex, enabled) }
+        .onChange(of: showCursor) { _, enabled in setProviderEnabled(.cursor, enabled) }
+    }
+
+    private var form: some View {
         Form {
             Section("Usage limits") {
                 let title = String(localized: "Percentage on the cards")
@@ -55,11 +79,17 @@ struct SettingsView: View {
         }
         .formStyle(.grouped)
         .scrollDisabled(true)
-        .frame(width: Self.width)
         .fixedSize(horizontal: false, vertical: true)
-        .onChange(of: showClaude) { _, enabled in setProviderEnabled(.claude, enabled) }
-        .onChange(of: showCodex) { _, enabled in setProviderEnabled(.codex, enabled) }
-        .onChange(of: showCursor) { _, enabled in setProviderEnabled(.cursor, enabled) }
+    }
+
+    /// "Version 0.1.1 (3)" from the bundle, or nothing when either value is
+    /// missing. The build writes those keys from `MARKETING_VERSION` and
+    /// `CURRENT_PROJECT_VERSION`.
+    private var versionLine: String? {
+        Format.current.appVersion(
+            version: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String,
+            build: Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
+        )
     }
 
     private func isEnabled(_ provider: Provider) -> Binding<Bool> {
