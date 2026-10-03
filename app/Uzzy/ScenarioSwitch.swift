@@ -40,8 +40,10 @@ final class ScenarioSwitch {
 /// developer tool, so its text is plain English, left out of the catalog.
 struct ScenarioPanel: View {
     let scenarios: ScenarioSwitch
+    let updates: UpdateChecker
     let bounds: PanelBounds
     let openSettings: () -> Void
+    let downloadUpdate: () -> Void
     let choose: @MainActor (Scenario?) -> Void
     @State private var barHeight: CGFloat = 0
 
@@ -69,7 +71,7 @@ struct ScenarioPanel: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
             .onGeometryChange(for: CGFloat.self, of: \.size.height) { barHeight = $0 }
-            PanelView(core: scenarios.core, bounds: bounds, heightAbove: barHeight, openSettings: openSettings)
+            PanelView(core: scenarios.core, updates: updates, bounds: bounds, heightAbove: barHeight, openSettings: openSettings, downloadUpdate: downloadUpdate)
                 .id(ObjectIdentifier(scenarios.core))
         }
         .frame(width: PanelLayout.width, alignment: .top)

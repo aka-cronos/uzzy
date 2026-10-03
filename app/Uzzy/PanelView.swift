@@ -20,10 +20,13 @@ final class PanelBounds {
 
 struct PanelView: View {
     let core: UsageCore
+    let updates: UpdateChecker
     let bounds: PanelBounds
     /// Taken by views above the panel in the same popover.
     var heightAbove: CGFloat = 0
     let openSettings: () -> Void
+    /// Opens the download of the latest version in the browser.
+    let downloadUpdate: () -> Void
     @AppStorage("displayMagnitude") private var selectedMagnitude: QuotaMagnitude = .used
     @State private var headerHeight: CGFloat = 0
     @State private var footerHeight: CGFloat = 0
@@ -38,10 +41,15 @@ struct PanelView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(Format.appName).font(.headline)
-                .padding([.horizontal, .top], 16)
-                .padding(.bottom, 10)
-                .onGeometryChange(for: CGFloat.self, of: \.size.height) { headerHeight = $0 }
+            HStack(spacing: 8) {
+                Text(Format.appName).font(.headline)
+                if let version = updates.availableVersion {
+                    UpdateButton(version: version, action: downloadUpdate)
+                }
+            }
+            .padding([.horizontal, .top], 16)
+            .padding(.bottom, 10)
+            .onGeometryChange(for: CGFloat.self, of: \.size.height) { headerHeight = $0 }
 
             if core.state.cards.isEmpty {
                 VStack(spacing: 10) {
@@ -119,6 +127,23 @@ struct PanelView: View {
         .containerBackground(.clear, for: .window)
         .onAppear { core.show(selectedMagnitude) }
         .onChange(of: selectedMagnitude) { _, magnitude in core.show(magnitude) }
+    }
+}
+
+/// Next to the app's name while a newer version is published: a pill that
+/// opens its download. Installing it stays by hand.
+private struct UpdateButton: View {
+    let version: String
+    let action: () -> Void
+
+    var body: some View {
+        Button("Update", action: action)
+            .buttonStyle(.borderedProminent)
+            .buttonBorderShape(.capsule)
+            .controlSize(.small)
+            .accessibilityLabel(Format.current.downloadUpdate(version))
+            .accessibilityInputLabels([String(localized: "Update"), Format.current.downloadUpdate(version)])
+            .help(Format.current.downloadUpdate(version))
     }
 }
 

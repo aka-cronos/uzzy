@@ -47,6 +47,12 @@ struct Format {
         return text("Version \(version) (\(build))")
     }
 
+    /// What the panel's Update button does, for its tooltip and VoiceOver:
+    /// e.g. "Download Uzzy 0.1.2".
+    func downloadUpdate(_ version: String) -> String {
+        text("Download \(Self.appName) \(version)")
+    }
+
     /// E.g. "20.5%" in every language: a decimal point and no space before
     /// the sign, unlike the Spanish convention.
     func percent(_ value: Double) -> String {
