@@ -111,8 +111,19 @@
         }
       }
     },
+    "%lld d" : {
+      "comment" : "Time left until a reset, in days, in the simple countdown.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld d"
+          }
+        }
+      }
+    },
     "%lld d %lld h" : {
-      "comment" : "Time left until a reset, in days and hours.",
+      "comment" : "Time left until a reset, in days and hours, in the detailed countdown.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -159,6 +170,17 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "%lld h" : {
+      "comment" : "Time left until a reset, in hours, in the simple countdown.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld h"
           }
         }
       }
@@ -412,6 +434,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cursor envió la fecha de reinicio en un formato que %@ no reconoce. Pulsa Actualizar; si continúa, la integración necesita una actualización."
+          }
+        }
+      }
+    },
+    "Detailed" : {
+      "comment" : "Settings choice: the countdown to a reset with two units, e.g. \"2 h 28 min\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detallado"
           }
         }
       }
@@ -681,13 +714,35 @@
         }
       }
     },
+    "Resets" : {
+      "comment" : "Settings section title: how cards show resets and resets available.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reinicios"
+          }
+        }
+      }
+    },
     "Resets %@ · in %@" : {
-      "comment" : "When a usage limit resets and the time left, e.g. \"Resets today, 14:42 · in 2 h 5 min\".",
+      "comment" : "When a usage limit resets and the time left, e.g. \"Resets today, 14:42 · in 1 h 20 min\".",
       "localizations" : {
         "es" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reinicio: %1$@ · en %2$@"
+          }
+        }
+      }
+    },
+    "Resets available" : {
+      "comment" : "Settings row title: whether cards show the banked resets of an account.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restablecimientos disponibles"
           }
         }
       }
@@ -733,6 +788,26 @@
         }
       }
     },
+    "Shows a short countdown, like 2 h, or a detailed one, like 2 h 28 min." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestra una cuenta corta, como 2 h, o una detallada, como 2 h 28 min."
+          }
+        }
+      }
+    },
+    "Shows how many resets the account has available, next to the provider's name." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Muestra cuántos restablecimientos disponibles tiene la cuenta, junto al nombre del proveedor."
+          }
+        }
+      }
+    },
     "Shows how much of each limit you've used, or how much you have left until it resets." : {
       "localizations" : {
         "es" : {
@@ -750,6 +825,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inicia sesión en %@ y pulsa Actualizar."
+          }
+        }
+      }
+    },
+    "Simple" : {
+      "comment" : "Settings choice: the countdown to a reset with one unit, e.g. \"2 h\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Simple"
           }
         }
       }
@@ -815,6 +901,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Esta sesión no tiene límites de uso de suscripción"
+          }
+        }
+      }
+    },
+    "Time until a reset" : {
+      "comment" : "Settings row title: whether cards show a short or a detailed countdown to a reset.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tiempo hasta el reinicio"
           }
         }
       }

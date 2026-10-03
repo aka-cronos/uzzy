@@ -81,14 +81,14 @@ struct Format {
         return date.formatted(.dateTime.hour(hour).minute(.twoDigits).locale(locale))
     }
 
-    func reset(_ reset: Reset, now: Date) -> String {
+    func reset(_ reset: Reset, now: Date, countdown style: CountdownStyle = .simple) -> String {
         switch reset {
         case .unknown:
             text("Reset unknown")
         case .pendingConfirmation:
             text("Reset pending confirmation")
         case .at(let date):
-            text("Resets \(dayAndTime(date, now: now)) · in \(countdown(date.timeIntervalSince(now)))")
+            text("Resets \(dayAndTime(date, now: now)) · in \(countdown(date.timeIntervalSince(now), style: style))")
         }
     }
 
@@ -113,6 +113,14 @@ struct Format {
         switch magnitude {
         case .used: text("used")
         case .remaining: text("left")
+        }
+    }
+
+    /// The Settings choice between the two countdowns.
+    func name(of style: CountdownStyle) -> String {
+        switch style {
+        case .simple: text("Simple")
+        case .detailed: text("Detailed")
         }
     }
 
@@ -163,14 +171,26 @@ struct Format {
     /// to `Int` could trap.
     private static let longestCountdownMinutes = Double(Int32.max)
 
-    /// An interval that is not ahead counts as zero, and a longer one is cut
-    /// to `longestCountdownMinutes`, so invalid data never traps.
-    private func countdown(_ seconds: TimeInterval) -> String {
+    /// Whole minutes left. The simple countdown keeps one magnitude: days
+    /// from a day up, hours from two hours up, hours and minutes under two
+    /// hours, and minutes under an hour. The detailed one keeps two: days
+    /// and hours, hours and minutes, or minutes alone. A smaller unit is
+    /// dropped, never rounded up, so the countdown does not claim more time
+    /// than is left. An interval that is not ahead counts as zero, and a
+    /// longer one is cut to `longestCountdownMinutes`, so invalid data never
+    /// traps.
+    private func countdown(_ seconds: TimeInterval, style: CountdownStyle) -> String {
         let minutes = seconds > 0 ? Int(min(seconds / 60, Self.longestCountdownMinutes)) : 0
-        let (days, hours, restMinutes) = (minutes / 1440, minutes / 60 % 24, minutes % 60)
-        if days > 0 { return text("\(days) d \(hours) h") }
-        if hours > 0 { return text("\(hours) h \(restMinutes) min") }
-        return text("\(restMinutes) min")
+        let (days, hours) = (minutes / 1_440, minutes / 60)
+        switch style {
+        case .simple:
+            if days > 0 { return text("\(days) d") }
+            if hours >= 2 { return text("\(hours) h") }
+        case .detailed:
+            if days > 0 { return text("\(days) d \(hours % 24) h") }
+        }
+        if hours > 0 { return text("\(hours) h \(minutes % 60) min") }
+        return text("\(minutes) min")
     }
 
     /// `value` from the catalog, in the language of `locale`. A language
@@ -178,4 +198,14 @@ struct Format {
     private func text(_ value: String.LocalizationValue) -> String {
         String(localized: LocalizedStringResource(value, locale: locale, bundle: .atURL(Self.bundle.bundleURL)))
     }
+}
+
+/// How much of the time until a reset a card shows: e.g. "2 h" or
+/// "2 h 28 min". The raw value is what Settings saves.
+enum CountdownStyle: String {
+    case simple
+    case detailed
+
+    /// Where Settings saves the choice.
+    static let key = "countdownStyle"
 }

@@ -126,6 +126,7 @@ private struct CardView: View {
     let card: Card
     let magnitude: QuotaMagnitude
     let now: Date
+    @AppStorage("showBankedResets") private var showBankedResets = true
 
     private var lastReadAt: Date? {
         let quotas: [Quota]
@@ -146,7 +147,7 @@ private struct CardView: View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .firstTextBaseline) {
                 CardTitle(provider: card.provider, plan: card.plan)
-                if let bankedResets = card.bankedResets {
+                if showBankedResets, let bankedResets = card.bankedResets {
                     BankedResetsButton(count: bankedResets)
                 }
                 Spacer()
@@ -264,6 +265,7 @@ private struct QuotaView: View {
     let quota: Quota
     let magnitude: QuotaMagnitude
     let now: Date
+    @AppStorage(CountdownStyle.key) private var countdownStyle: CountdownStyle = .simple
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -285,7 +287,7 @@ private struct QuotaView: View {
                 Bar(fraction: percent / 100)
                     .opacity(quota.isStale ? 0.5 : 1)
                 if let reset = quota.reset {
-                    Text(Format.current.reset(reset, now: now))
+                    Text(Format.current.reset(reset, now: now, countdown: countdownStyle))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

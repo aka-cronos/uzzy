@@ -45,12 +45,13 @@ struct ResetTextTests {
         #expect(Format.english.reset(reset, now: now) == "Reset unknown")
     }
 
+    /// Two hours and five minutes is at least two hours, so only the hours show.
     @Test func anOrdinaryResetReadsAsItsCountdown() async throws {
         let resetAt = now.addingTimeInterval(2 * 3_600 + 5 * 60).timeIntervalSince1970
         let reset = try #require(await codexReset(resetAt: "\(resetAt)"))
 
-        #expect(Format.spanish.reset(reset, now: now).hasSuffix(" · en 2 h 5 min"))
-        #expect(Format.english.reset(reset, now: now).hasSuffix(" · in 2 h 5 min"))
+        #expect(Format.spanish.reset(reset, now: now).hasSuffix(" · en 2 h"))
+        #expect(Format.english.reset(reset, now: now).hasSuffix(" · in 2 h"))
     }
 
     @Test func aPassedResetReadsAsPendingConfirmation() async throws {

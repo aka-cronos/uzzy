@@ -38,7 +38,7 @@ struct FormatTextTests {
         let french = Format(locale: Locale(identifier: "fr_FR"))
 
         #expect(french.settings == "Settings")
-        #expect(french.reset(.at(Self.moment(day: 24, hour: 12, minute: 5)), now: now) == "Resets today, 12:05 · in 2 h 5 min")
+        #expect(french.reset(.at(Self.moment(day: 24, hour: 12, minute: 5)), now: now) == "Resets today, 12:05 · in 2 h")
     }
 
     @Test func aPercentageKeepsItsDecimalPointInEveryLanguage() {
@@ -83,14 +83,81 @@ struct FormatTextTests {
         #expect(Format.spanish.reset(.unknown, now: now) == "Reinicio desconocido")
         #expect(Format.spanish.reset(.pendingConfirmation, now: now) == "Reinicio pendiente de confirmar")
         #expect(Format.spanish.reset(.at(soon), now: now) == "Reinicio: Hoy, 10:30 · en 30 min")
-        #expect(Format.spanish.reset(.at(later), now: now) == "Reinicio: Hoy, 12:05 · en 2 h 5 min")
-        #expect(Format.spanish.reset(.at(sunday), now: now) == "Reinicio: dom, 27 sept, 14:42 · en 3 d 4 h")
+        #expect(Format.spanish.reset(.at(later), now: now) == "Reinicio: Hoy, 12:05 · en 2 h")
+        #expect(Format.spanish.reset(.at(sunday), now: now) == "Reinicio: dom, 27 sept, 14:42 · en 3 d")
 
         #expect(Format.english.reset(.unknown, now: now) == "Reset unknown")
         #expect(Format.english.reset(.pendingConfirmation, now: now) == "Reset pending confirmation")
         #expect(Format.english.reset(.at(soon), now: now) == "Resets today, 10:30\u{202F}AM · in 30 min")
-        #expect(Format.english.reset(.at(later), now: now) == "Resets today, 12:05\u{202F}PM · in 2 h 5 min")
-        #expect(Format.english.reset(.at(sunday), now: now) == "Resets Sun, Sep 27, 2:42\u{202F}PM · in 3 d 4 h")
+        #expect(Format.english.reset(.at(later), now: now) == "Resets today, 12:05\u{202F}PM · in 2 h")
+        #expect(Format.english.reset(.at(sunday), now: now) == "Resets Sun, Sep 27, 2:42\u{202F}PM · in 3 d")
+    }
+
+    /// Seconds left, and the countdown both languages show. Days start at one
+    /// day, hours at two hours, and hours with minutes at one hour. Anything
+    /// smaller is dropped, so one day and 23 hours stays "1 d".
+    static let countdownMagnitudes: [(TimeInterval, String)] = [
+        (59, "0 min"),
+        (60, "1 min"),
+        (59 * 60 + 59, "59 min"),
+        (3_600 - 1, "59 min"),
+        (3_600, "1 h 0 min"),
+        (3_600 + 59, "1 h 0 min"),
+        (3_600 + 60, "1 h 1 min"),
+        (2 * 3_600 - 60, "1 h 59 min"),
+        (2 * 3_600 - 1, "1 h 59 min"),
+        (2 * 3_600, "2 h"),
+        (5 * 3_600 + 59 * 60, "5 h"),
+        (23 * 3_600 + 59 * 60, "23 h"),
+        (24 * 3_600 - 1, "23 h"),
+        (24 * 3_600, "1 d"),
+        (24 * 3_600 + 60, "1 d"),
+        (24 * 3_600 + 23 * 3_600, "1 d"),
+        (2 * 24 * 3_600, "2 d"),
+    ]
+
+    @Test(arguments: countdownMagnitudes)
+    func aCountdownShortensToItsMagnitude(seconds: TimeInterval, countdown: String) {
+        let reset = Reset.at(now.addingTimeInterval(seconds))
+
+        #expect(Format.spanish.reset(reset, now: now).hasSuffix(" · en \(countdown)"))
+        #expect(Format.english.reset(reset, now: now).hasSuffix(" · in \(countdown)"))
+    }
+
+    /// Seconds left, and the detailed countdown both languages show: days
+    /// with hours, hours with minutes, or minutes alone, as before the
+    /// simple countdown existed.
+    static let detailedCountdowns: [(TimeInterval, String)] = [
+        (59, "0 min"),
+        (3_600 - 1, "59 min"),
+        (3_600, "1 h 0 min"),
+        (2 * 3_600 + 28 * 60, "2 h 28 min"),
+        (24 * 3_600 - 1, "23 h 59 min"),
+        (24 * 3_600, "1 d 0 h"),
+        (24 * 3_600 + 23 * 3_600 + 59 * 60, "1 d 23 h"),
+        (3 * 24 * 3_600 + 4 * 3_600, "3 d 4 h"),
+    ]
+
+    @Test(arguments: detailedCountdowns)
+    func aDetailedCountdownKeepsTwoUnits(seconds: TimeInterval, countdown: String) {
+        let reset = Reset.at(now.addingTimeInterval(seconds))
+
+        #expect(Format.spanish.reset(reset, now: now, countdown: .detailed).hasSuffix(" · en \(countdown)"))
+        #expect(Format.english.reset(reset, now: now, countdown: .detailed).hasSuffix(" · in \(countdown)"))
+    }
+
+    /// The reset copy without a countdown is the same in both styles.
+    @Test(arguments: [CountdownStyle.simple, .detailed])
+    func aResetWithoutADateReadsTheSameInEveryCountdownStyle(style: CountdownStyle) {
+        #expect(Format.english.reset(.unknown, now: now, countdown: style) == "Reset unknown")
+        #expect(Format.english.reset(.pendingConfirmation, now: now, countdown: style) == "Reset pending confirmation")
+    }
+
+    @Test func theCountdownStylesAreNamedForSettings() {
+        #expect(Format.english.name(of: CountdownStyle.simple) == "Simple")
+        #expect(Format.english.name(of: CountdownStyle.detailed) == "Detailed")
+        #expect(Format.spanish.name(of: CountdownStyle.simple) == "Simple")
+        #expect(Format.spanish.name(of: CountdownStyle.detailed) == "Detallado")
     }
 
     @Test func usageCreditsReadAsTheAmountSpentThisMonth() {
