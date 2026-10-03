@@ -9,6 +9,7 @@ struct SettingsView: View {
     let setProviderEnabled: @MainActor (Provider, Bool) -> Void
     let setProviderOrder: @MainActor ([Provider]) -> Void
     @AppStorage("displayMagnitude") private var selectedMagnitude: QuotaMagnitude = .used
+    @AppStorage(CountdownStyle.key) private var countdownStyle: CountdownStyle = .simple
     @AppStorage(ProviderPreferences.claudeKey) private var showClaude = true
     @AppStorage(ProviderPreferences.codexKey) private var showCodex = true
     @AppStorage(ProviderPreferences.cursorKey) private var showCursor = true
@@ -55,6 +56,18 @@ struct SettingsView: View {
                     .labelsHidden()
                     .fixedSize()
                     .accessibilityHint(description)
+                }
+                let countdownTitle = String(localized: "Time until a reset")
+                let countdownDescription = String(localized: "Shows a short countdown, like 2 h, or a detailed one, like 2 h 28 min.")
+                SettingsRow(title: countdownTitle, description: countdownDescription) {
+                    Picker(countdownTitle, selection: $countdownStyle) {
+                        Text(Format.current.name(of: CountdownStyle.simple)).tag(CountdownStyle.simple)
+                        Text(Format.current.name(of: CountdownStyle.detailed)).tag(CountdownStyle.detailed)
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .fixedSize()
+                    .accessibilityHint(countdownDescription)
                 }
             }
             // The rows follow the panel's card order. Only here can it change,

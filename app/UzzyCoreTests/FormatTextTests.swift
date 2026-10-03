@@ -124,6 +124,42 @@ struct FormatTextTests {
         #expect(Format.english.reset(reset, now: now).hasSuffix(" · in \(countdown)"))
     }
 
+    /// Seconds left, and the detailed countdown both languages show: days
+    /// with hours, hours with minutes, or minutes alone, as before the
+    /// simple countdown existed.
+    static let detailedCountdowns: [(TimeInterval, String)] = [
+        (59, "0 min"),
+        (3_600 - 1, "59 min"),
+        (3_600, "1 h 0 min"),
+        (2 * 3_600 + 28 * 60, "2 h 28 min"),
+        (24 * 3_600 - 1, "23 h 59 min"),
+        (24 * 3_600, "1 d 0 h"),
+        (24 * 3_600 + 23 * 3_600 + 59 * 60, "1 d 23 h"),
+        (3 * 24 * 3_600 + 4 * 3_600, "3 d 4 h"),
+    ]
+
+    @Test(arguments: detailedCountdowns)
+    func aDetailedCountdownKeepsTwoUnits(seconds: TimeInterval, countdown: String) {
+        let reset = Reset.at(now.addingTimeInterval(seconds))
+
+        #expect(Format.spanish.reset(reset, now: now, countdown: .detailed).hasSuffix(" · en \(countdown)"))
+        #expect(Format.english.reset(reset, now: now, countdown: .detailed).hasSuffix(" · in \(countdown)"))
+    }
+
+    /// The reset copy without a countdown is the same in both styles.
+    @Test(arguments: [CountdownStyle.simple, .detailed])
+    func aResetWithoutADateReadsTheSameInEveryCountdownStyle(style: CountdownStyle) {
+        #expect(Format.english.reset(.unknown, now: now, countdown: style) == "Reset unknown")
+        #expect(Format.english.reset(.pendingConfirmation, now: now, countdown: style) == "Reset pending confirmation")
+    }
+
+    @Test func theCountdownStylesAreNamedForSettings() {
+        #expect(Format.english.name(of: CountdownStyle.simple) == "Simple")
+        #expect(Format.english.name(of: CountdownStyle.detailed) == "Detailed")
+        #expect(Format.spanish.name(of: CountdownStyle.simple) == "Simple")
+        #expect(Format.spanish.name(of: CountdownStyle.detailed) == "Detallado")
+    }
+
     @Test func usageCreditsReadAsTheAmountSpentThisMonth() {
         #expect(Format.spanish.money(spent) == "53,06\u{00A0}US$")
         #expect(Format.spanish.usageCredits(spent, limit: limit) == "53,06\u{00A0}US$ de 40\u{00A0}US$ este mes")
