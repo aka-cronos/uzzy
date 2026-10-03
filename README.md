@@ -54,9 +54,9 @@ Uzzy reads Claude Code's Keychain item through `/usr/bin/security`, the tool Cla
 ## Privacy
 
 - Reuses, **read-only**, the sessions that already exist in Claude Code, Codex CLI and Cursor. It never asks for passwords, signs in, refreshes tokens or writes credentials.
-- Only connects to `api.anthropic.com`, `chatgpt.com` and `api2.cursor.sh`. No telemetry and no server of its own.
+- Only connects to `api.anthropic.com`, `chatgpt.com` and `api2.cursor.sh` to read usage limits, and to `api.github.com` once a day to ask for the latest version. That check sends no token and nothing about you or your usage, and you can turn it off in Settings. No telemetry and no server of its own.
 - Usage data lives only in memory; nothing is written to disk.
-- Display magnitude, which providers are turned on and provider order are stored in local `UserDefaults`; they contain no usage data, token, email or account identifier.
+- Display magnitude, which providers are turned on, provider order and whether to check for updates are stored in local `UserDefaults`; they contain no usage data, token, email or account identifier.
 
 ## Install
 
@@ -67,7 +67,7 @@ Download `Uzzy.dmg` from [uzzy.app](https://uzzy.app) or [GitHub Releases](https
 
 To open it at login, add it under System Settings → General → Login Items.
 
-There are no automatic updates yet: to update, download the new `Uzzy.dmg`.
+Uzzy doesn't update itself. When a newer version is published, an **Update** button appears next to the name in the panel and downloads the new `Uzzy.dmg`; install it the same way.
 
 To build it yourself, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
