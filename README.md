@@ -30,7 +30,7 @@ Keep using Claude, Codex and Cursor. Uzzy brings their usage limits together so 
 - **Different limits stay different.** Check each usage limit («5 horas», «Semanal», «Cursor Models»…) on its own, with its reset in local time, a countdown and the time of its last reading. Five-hour and weekly limits are never blended into one number, and usage credits and banked resets are shown next to them.
 - **Checks while you look.** Uzzy refreshes readings as you open the panel (unless the last reading is under five minutes old), then every five minutes while it stays open, and on demand with the refresh button. Close it and the requests stop.
 - **Missing doesn’t mean zero.** If a session expires or a provider can’t be reached, Uzzy tells you what happened (no session, expired session, offline, incompatible response…) and the other providers keep working. When a refresh fails, the card keeps the last valid reading and marks it as out of date.
-- **Native settings.** Choose whether the cards show how much is used or left and how detailed the countdown to a reset is, and turn each provider on or off or change the order of the cards.
+- **Native settings.** Choose whether the cards show how much is used or left, turn each provider on or off or change the order of the cards, and pick how detailed the countdown to a reset is and whether the resets available on an account are shown.
 - **Your language.** The interface follows the system language: English or Spanish.
 
 <p align="center">
