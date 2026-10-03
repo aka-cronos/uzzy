@@ -332,6 +332,17 @@
         }
       }
     },
+    "Asks GitHub once a day for a newer version of %@, without sending any data about you. You install it yourself." : {
+      "comment" : "%@ is the app's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pregunta a GitHub una vez al día si hay una versión más reciente de %@, sin enviar ningún dato tuyo. La instalas tú."
+          }
+        }
+      }
+    },
     "Billing cycle" : {
       "comment" : "A usage limit period.",
       "localizations" : {
@@ -339,6 +350,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ciclo de facturación"
+          }
+        }
+      }
+    },
+    "Check for updates" : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Buscar actualizaciones"
           }
         }
       }
@@ -445,6 +466,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Detallado"
+          }
+        }
+      }
+    },
+    "Download %@ %@" : {
+      "comment" : "The app's name, then the newer version, e.g. \"Download Uzzy 0.1.2\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Descargar %1$@ %2$@"
           }
         }
       }
@@ -974,6 +1006,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dato no interpretable"
+          }
+        }
+      }
+    },
+    "Update" : {
+      "comment" : "The panel button, next to the app's name, that downloads a newer version. Not \"Actualizar\" in Spanish: that is the Refresh button.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nueva versión"
+          }
+        }
+      }
+    },
+    "Updates" : {
+      "comment" : "Settings section.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualizaciones"
           }
         }
       }

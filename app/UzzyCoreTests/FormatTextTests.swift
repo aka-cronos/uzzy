@@ -33,6 +33,11 @@ struct FormatTextTests {
         #expect(Format.english.closeWindow == "Close Window")
     }
 
+    @Test func theUpdateButtonNamesTheVersionItDownloads() {
+        #expect(Format.spanish.downloadUpdate("0.1.2") == "Descargar \(Format.appName) 0.1.2")
+        #expect(Format.english.downloadUpdate("0.1.2") == "Download \(Format.appName) 0.1.2")
+    }
+
     /// A language the catalog lacks gets English, with its own region's formats.
     @Test func anotherLanguageFallsBackToEnglish() {
         let french = Format(locale: Locale(identifier: "fr_FR"))

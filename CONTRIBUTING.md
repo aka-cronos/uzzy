@@ -34,6 +34,12 @@ Debug builds add a bar on top of the panel to pick a scenario: the real panel th
 build/Build/Products/Debug/Uzzy.app/Contents/MacOS/Uzzy -scenario stale
 ```
 
+A Debug build never asks GitHub for the latest version. To see the panel's Update button, pass a version to offer:
+
+```sh
+build/Build/Products/Debug/Uzzy.app/Contents/MacOS/Uzzy -update 9.9.9
+```
+
 Release builds leave the scenarios, the fakes and the sample responses out.
 
 ### Install your own build

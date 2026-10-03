@@ -21,6 +21,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
         initialEnabledProviders: ProviderPreferences.enabledProviders(in: .standard),
         initialOrder: ProviderPreferences.order(in: .standard)
     )
+    #if DEBUG
+    /// A Debug build never asks GitHub. `-update <version>` offers that
+    /// version instead, e.g. `-update 9.9.9`.
+    private let updates = UpdateChecker(
+        currentVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String,
+        transport: SingleAnswerTransport(
+            UserDefaults.standard.string(forKey: "update").map { .latestRelease(tag: "v\($0)") } ?? .networkError
+        ),
+        clock: SystemClock(),
+        isEnabled: UpdatePreferences.checksForUpdates(in: .standard)
+    )
+    #else
+    private let updates = UpdateChecker(
+        currentVersion: Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String,
+        transport: URLSessionTransport(),
+        clock: SystemClock(),
+        isEnabled: UpdatePreferences.checksForUpdates(in: .standard)
+    )
+    #endif
     private var settingsWindow: NSWindow?
     #if DEBUG
     private lazy var scenarios = ScenarioSwitch(realCore: realCore)
@@ -47,15 +66,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
         let popover = NSPopover()
         self.popover = popover
         #if DEBUG
-        let content = PanelHostingController(rootView: ScenarioPanel(scenarios: scenarios, bounds: panelBounds, openSettings: { [weak self] in
+        let content = PanelHostingController(rootView: ScenarioPanel(scenarios: scenarios, updates: updates, bounds: panelBounds, openSettings: { [weak self] in
             self?.showSettings(nil)
+        }, downloadUpdate: { [weak self] in
+            self?.downloadUpdate()
         }) { [weak self] scenario in
             guard let self else { return }
             Task { await self.scenarios.show(scenario, panelIsOpen: self.popover?.isShown == true) }
         })
         #else
-        let content = PanelHostingController(rootView: PanelView(core: realCore, bounds: panelBounds, openSettings: { [weak self] in
+        let content = PanelHostingController(rootView: PanelView(core: realCore, updates: updates, bounds: panelBounds, openSettings: { [weak self] in
             self?.showSettings(nil)
+        }, downloadUpdate: { [weak self] in
+            self?.downloadUpdate()
         }))
         #endif
         content.sizingOptions = .preferredContentSize
@@ -113,6 +136,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
             name: NSApplication.didChangeScreenParametersNotification,
             object: nil
         )
+
+        updates.start()
 
         #if DEBUG
         // `-scenario <id>` opens the panel on that scenario, e.g. `-scenario stale`.
@@ -240,7 +265,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
             window.title = Format.current.settings
             let content = NSHostingController(rootView: SettingsView(
                 setProviderEnabled: { [weak self] provider, enabled in self?.setProviderEnabled(enabled, for: provider) },
-                setProviderOrder: { [weak self] order in self?.setProviderOrder(order) }
+                setProviderOrder: { [weak self] order in self?.setProviderOrder(order) },
+                setUpdateChecks: { [weak self] enabled in self?.updates.setEnabled(enabled) }
             ))
             // The window takes the form's height, so no row is clipped.
             content.sizingOptions = [.preferredContentSize]
@@ -251,6 +277,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
         }
         NSApp.activate(ignoringOtherApps: true)
         settingsWindow?.makeKeyAndOrderFront(nil)
+        closePanel()
+    }
+
+    /// Hands the latest `Uzzy.dmg` to the browser, which downloads it, and
+    /// gets the panel out of its way.
+    private func downloadUpdate() {
+        NSWorkspace.shared.open(UpdateChecker.download)
         closePanel()
     }
 

@@ -8,12 +8,14 @@ struct SettingsView: View {
 
     let setProviderEnabled: @MainActor (Provider, Bool) -> Void
     let setProviderOrder: @MainActor ([Provider]) -> Void
+    let setUpdateChecks: @MainActor (Bool) -> Void
     @AppStorage("displayMagnitude") private var selectedMagnitude: QuotaMagnitude = .used
     @AppStorage(CountdownStyle.key) private var countdownStyle: CountdownStyle = .simple
     @AppStorage("showBankedResets") private var showBankedResets = true
     @AppStorage(ProviderPreferences.claudeKey) private var showClaude = true
     @AppStorage(ProviderPreferences.codexKey) private var showCodex = true
     @AppStorage(ProviderPreferences.cursorKey) private var showCursor = true
+    @AppStorage(UpdatePreferences.checkKey) private var checkForUpdates = true
     /// `@AppStorage` cannot hold a list, so the order is saved by hand.
     @State private var order = ProviderPreferences.order(in: .standard)
 
@@ -39,6 +41,7 @@ struct SettingsView: View {
         .onChange(of: showClaude) { _, enabled in setProviderEnabled(.claude, enabled) }
         .onChange(of: showCodex) { _, enabled in setProviderEnabled(.codex, enabled) }
         .onChange(of: showCursor) { _, enabled in setProviderEnabled(.cursor, enabled) }
+        .onChange(of: checkForUpdates) { _, enabled in setUpdateChecks(enabled) }
     }
 
     private var form: some View {
@@ -101,6 +104,19 @@ struct SettingsView: View {
                         // As in `ProviderRow`: a switch with a hidden label
                         // exposes no press action.
                         .accessibilityAction { showBankedResets.toggle() }
+                }
+            }
+            Section("Updates") {
+                let title = String(localized: "Check for updates")
+                let description = String(localized: "Asks GitHub once a day for a newer version of \(Format.appName), without sending any data about you. You install it yourself.")
+                SettingsRow(title: title, description: description) {
+                    Toggle(title, isOn: $checkForUpdates)
+                        .toggleStyle(.switch)
+                        .labelsHidden()
+                        .accessibilityHint(description)
+                        // As in `ProviderRow`: a switch with a hidden label
+                        // exposes no press action.
+                        .accessibilityAction { checkForUpdates.toggle() }
                 }
             }
         }

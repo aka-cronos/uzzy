@@ -43,6 +43,26 @@ public actor SampleTransport: HTTPTransport {
     }
 }
 
+/// Answers every request with the same result, which the test can change,
+/// and records the requests it receives.
+public actor SingleAnswerTransport: HTTPTransport {
+    public private(set) var requests: [URLRequest] = []
+    private var result: HTTPResult
+
+    public init(_ result: HTTPResult) {
+        self.result = result
+    }
+
+    public func send(_ request: URLRequest) async -> HTTPResult {
+        requests.append(request)
+        return result
+    }
+
+    public func answer(with result: HTTPResult) {
+        self.result = result
+    }
+}
+
 public struct FixedClock: WallClock {
     private let moment: Date
 
@@ -266,6 +286,11 @@ extension HTTPResult {
         let credits = resetCredits.map { #", "rate_limit_reset_credits": \#($0)"# } ?? ""
         let body = #"{"plan_type": "plus", "rate_limit": \#(rateLimit), "additional_rate_limits": \#(additional)\#(credits)}"#
         return .response(HTTPResponse(status: 200, headers: ["Content-Type": "application/json"], body: Data(body.utf8)))
+    }
+
+    /// GitHub's latest release, answered with a 200, with the given tag.
+    public static func latestRelease(tag: String) -> HTTPResult {
+        json(#"{"tag_name": "\#(tag)", "prerelease": false, "draft": false}"#)
     }
 
     /// An empty response with `status`.
