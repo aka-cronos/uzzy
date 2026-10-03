@@ -36,6 +36,17 @@ struct Format {
     /// The main menu command that closes the front window or the panel (⌘W).
     var closeWindow: String { text("Close Window") }
 
+    /// The line at the bottom of Settings, e.g. "Version 0.1.1 (3)". The
+    /// caller passes `CFBundleShortVersionString` and `CFBundleVersion`.
+    /// `nil` when either is missing or only whitespace, so the line never
+    /// invents a version.
+    func appVersion(version: String?, build: String?) -> String? {
+        let version = version?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let build = build?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !version.isEmpty, !build.isEmpty else { return nil }
+        return text("Version \(version) (\(build))")
+    }
+
     /// E.g. "20.5%" in every language: a decimal point and no space before
     /// the sign, unlike the Spanish convention.
     func percent(_ value: Double) -> String {

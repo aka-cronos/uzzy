@@ -140,6 +140,25 @@ struct FormatTextTests {
         #expect(Format.english.name(of: QuotaMagnitude.remaining) == "left")
     }
 
+    /// The Settings line a bug report can paste, from the marketing version
+    /// and the build. The literals are the 0.1.1 (3) release, not a formula.
+    @Test func theSettingsLineNamesTheVersionAndBuild() {
+        #expect(Format.english.appVersion(version: "0.1.1", build: "3") == "Version 0.1.1 (3)")
+        #expect(Format.spanish.appVersion(version: "0.1.1", build: "3") == "Versión 0.1.1 (3)")
+    }
+
+    /// A missing or blank bundle value is not a version, so the line is left
+    /// out instead of showing a placeholder.
+    @Test func theSettingsLineIsAbsentWhenABundleValueIsMissing() {
+        #expect(Format.english.appVersion(version: nil, build: "3") == nil)
+        #expect(Format.english.appVersion(version: "0.1.1", build: nil) == nil)
+        #expect(Format.english.appVersion(version: nil, build: nil) == nil)
+        #expect(Format.english.appVersion(version: "", build: "3") == nil)
+        #expect(Format.english.appVersion(version: "0.1.1", build: "") == nil)
+        #expect(Format.english.appVersion(version: "   ", build: "3") == nil)
+        #expect(Format.english.appVersion(version: "0.1.1", build: "\n") == nil)
+    }
+
     /// «Cuota» reads as a fee in Spanish, so the Spanish copy says «límite de
     /// uso» instead, as the glossary in `CONTEXT.md` records.
     @Test func theSpanishCopyCallsUsageLimitsLimitesDeUso() throws {
