@@ -1,6 +1,6 @@
 # Third-party notices
 
-Uzzy's own code is under the [MIT license](LICENSE). The agent skills under `.agents/skills/` are copied from the repositories below, under their licenses; `skills-lock.json` records the exact source of each one. `commit-workflow` and `create-pull-request` come from [aka-cronos/skills](https://github.com/aka-cronos/skills), by the same author as Uzzy. The background photo is credited at the end.
+Uzzy's own code is under the [MIT license](LICENSE). The agent skills under `.agents/skills/` are copied from the repositories below, under their licenses; `skills-lock.json` records the exact source of each one. `commit-workflow` and `create-pull-request` come from [aka-cronos/skills](https://github.com/aka-cronos/skills), by the same author as Uzzy. The providers' logos and the background photo are credited at the end.
 
 ## mattpocock/skills
 
@@ -61,6 +61,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Provider logos
+
+The Claude, Codex and Cursor logos are trademarks of Anthropic, OpenAI and Anysphere. They are not under Uzzy's MIT license. Uzzy shows them only to identify each provider: next to its name in the panel and in Settings (`app/Uzzy/Assets.xcassets/ProviderLogo*.imageset`, drawn in one color) and on the uzzy.app site (`site/public/cover/claude.svg`, `codex.svg` and `cursor.svg`). Uzzy is not affiliated with, endorsed by or sponsored by any of them.
 
 ## Background photo
 
