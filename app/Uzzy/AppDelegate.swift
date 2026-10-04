@@ -148,6 +148,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
             Task {
                 await scenarios.show(scenario, panelIsOpen: false)
                 item.button?.isEnabled = true
+                await statusItemPlaced()
                 if !popover.isShown {
                     openPanel()
                 }
@@ -155,6 +156,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
         }
         #endif
     }
+
+    #if DEBUG
+    /// The menu bar places the icon over the first moments after launch. Until
+    /// then its window is empty or off screen, and a popover shown from it
+    /// never appears, or appears in a corner of the screen. Placed means on a
+    /// screen and still for a tenth of a second. Gives up after two seconds.
+    private func statusItemPlaced() async {
+        var lastFrame: NSRect?
+        for _ in 0..<20 {
+            try? await Task.sleep(for: .milliseconds(100))
+            guard let window = statusItem?.button?.window else { return }
+            let frame = window.frame
+            if !frame.isEmpty, window.screen != nil, frame == lastFrame { return }
+            lastFrame = frame
+        }
+    }
+    #endif
 
     @objc private func systemDidWake() {
         core.systemWoke()
