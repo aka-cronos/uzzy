@@ -80,6 +80,42 @@ struct FormatTextTests {
         #expect(Format.english.dayAndTime(sunday, now: now) == "Sun, Sep 27, 2:42\u{202F}PM")
     }
 
+    /// Seconds since a reading, and how long ago each language says it was.
+    /// Minutes start at one minute, hours at one hour and days at one day.
+    /// Anything smaller is dropped, so 59 seconds is still "just now" and
+    /// one day and 23 hours stays "1 d ago".
+    static let timesAgo: [(TimeInterval, String, String)] = [
+        (-60, "just now", "ahora mismo"),
+        (0, "just now", "ahora mismo"),
+        (59, "just now", "ahora mismo"),
+        (60, "1 min ago", "hace 1 min"),
+        (2 * 60 + 59, "2 min ago", "hace 2 min"),
+        (3_600 - 1, "59 min ago", "hace 59 min"),
+        (3_600, "1 h ago", "hace 1 h"),
+        (2 * 3_600 - 1, "1 h ago", "hace 1 h"),
+        (24 * 3_600 - 1, "23 h ago", "hace 23 h"),
+        (24 * 3_600, "1 d ago", "hace 1 d"),
+        (24 * 3_600 + 23 * 3_600, "1 d ago", "hace 1 d"),
+        (3 * 24 * 3_600, "3 d ago", "hace 3 d"),
+    ]
+
+    @Test(arguments: timesAgo)
+    func aPastMomentReadsAsHowLongAgoItWas(seconds: TimeInterval, english: String, spanish: String) {
+        let reading = now.addingTimeInterval(-seconds)
+
+        #expect(Format.english.timeAgo(reading, now: now) == english)
+        #expect(Format.spanish.timeAgo(reading, now: now) == spanish)
+    }
+
+    /// A reading dated absurdly far back is cut to the longest interval
+    /// shown, instead of trapping on the conversion to whole minutes.
+    @Test func aMomentTooFarBackStillReadsInDays() {
+        let reading = now.addingTimeInterval(-.greatestFiniteMagnitude)
+
+        #expect(Format.english.timeAgo(reading, now: now).hasSuffix(" d ago"))
+        #expect(Format.spanish.timeAgo(reading, now: now).hasSuffix(" d"))
+    }
+
     @Test func aResetReadsAsItsMomentAndCountdown() {
         let soon = Self.moment(day: 24, hour: 10, minute: 30)
         let later = Self.moment(day: 24, hour: 12, minute: 5)
