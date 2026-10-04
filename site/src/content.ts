@@ -4,7 +4,7 @@ export const DOWNLOAD_URL =
 export const REPO_URL = "https://github.com/aka-cronos/uzzy";
 export const MAKER = "akacronos";
 export const X_URL = `https://x.com/${MAKER}`;
-export const VERSION = "0.2.0";
+export const VERSION = "0.3.0";
 export const REQUIREMENTS = "macOS 27 · Apple Silicon";
 
 export const hero = {
@@ -15,7 +15,7 @@ export const hero = {
 export const why = "Keep using Claude, Codex and Cursor. Uzzy brings their usage limits together so you can stop checking each one separately.";
 
 export const features = [
-  { title: "Three tools. One quick check.", body: "Open Uzzy from your menu bar to see Claude, Codex and Cursor together, with a separate card for each provider and its plan." },
+  { title: "Three tools. One quick check.", body: "Open Uzzy from your menu bar to see Claude, Codex and Cursor together, with a separate card for each provider, led by its logo and showing its plan." },
   { title: "Different limits stay different.", body: "Check each usage limit on its own, with its reset time, countdown and last reading. Five-hour and weekly limits are never blended into one number." },
   { title: "Checks while you look.", body: "Uzzy refreshes readings when needed as you open the panel, then every five minutes while it stays open. Close it and the requests stop." },
   { title: "Missing doesn’t mean zero.", body: "If a session expires or a provider can’t be reached, Uzzy tells you what happened. The other providers keep working." },
