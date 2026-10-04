@@ -208,14 +208,16 @@ private struct CardView: View {
     }
 }
 
-/// The provider's name and, when the provider reports it, the account's plan:
-/// «Claude · Max». A plan that does not fit is cut before the name is.
+/// The provider's logo, its name and, when the provider reports it, the
+/// account's plan: «Claude · Max». A plan that does not fit is cut before the
+/// name is.
 private struct CardTitle: View {
     let provider: Provider
     let plan: String?
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 4) {
+            ProviderLogo(provider: provider)
             Text(provider.name)
                 .fontWeight(.semibold)
                 .layoutPriority(1)
@@ -477,12 +479,37 @@ private struct FailureMessage: View {
     }
 }
 
+/// The provider's mark, tinted like the text beside it so it holds its
+/// contrast in light and dark. Decorative: the name next to it is the label.
+struct ProviderLogo: View {
+    let provider: Provider
+
+    var body: some View {
+        Image(provider.logo)
+            .resizable()
+            .scaledToFit()
+            // A square box, so the names line up whatever the mark's shape.
+            .frame(width: 14, height: 14)
+            // Sits on the text's descender line, centered on its lowercase.
+            .alignmentGuide(.firstTextBaseline) { $0[.bottom] - 2.5 }
+            .accessibilityHidden(true)
+    }
+}
+
 extension Provider {
     var name: String {
         switch self {
         case .claude: "Claude"
         case .codex: "Codex"
         case .cursor: "Cursor"
+        }
+    }
+
+    var logo: ImageResource {
+        switch self {
+        case .claude: .providerLogoClaude
+        case .codex: .providerLogoCodex
+        case .cursor: .providerLogoCursor
         }
     }
 

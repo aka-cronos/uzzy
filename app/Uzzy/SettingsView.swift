@@ -170,7 +170,7 @@ private struct ProviderRow: View {
 
     var body: some View {
         let description = String(localized: "Uses the \(provider.officialApp) session on this Mac.")
-        SettingsRow(title: provider.name, description: description) {
+        SettingsRow(title: provider.name, logo: provider, description: description) {
             MoveButton(label: String(localized: "Move \(provider.name) Up"), systemImage: "chevron.up", action: moveUp)
             MoveButton(label: String(localized: "Move \(provider.name) Down"), systemImage: "chevron.down", action: moveDown)
             Toggle("Turn On \(provider.name)", isOn: $isOn)
@@ -206,13 +206,20 @@ private struct MoveButton: View {
 /// control such as a segmented one above the title.
 private struct SettingsRow<Control: View>: View {
     let title: String
+    /// The provider whose logo leads the title, on a provider's row.
+    var logo: Provider?
     let description: String
     @ViewBuilder let control: Control
 
     var body: some View {
         HStack {
             VStack(alignment: .leading, spacing: 2) {
-                Text(title)
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    if let logo {
+                        ProviderLogo(provider: logo)
+                    }
+                    Text(title)
+                }
                 Text(description)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
