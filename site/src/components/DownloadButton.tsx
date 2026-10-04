@@ -1,3 +1,4 @@
+import { DownloadSimpleIcon } from "@phosphor-icons/react";
 import type { VariantProps } from "class-variance-authority";
 
 import { buttonVariants } from "@/components/ui/button";
@@ -27,20 +28,12 @@ export function DownloadButton({
       className={cn(buttonVariants({ variant, size, className }))}
     >
       {icon && (
-        // Lucide "download"
-        <svg
-          className="size-[18px]"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+        <DownloadSimpleIcon
+          size={18}
+          weight="bold"
           aria-hidden="true"
-        >
-          <path d="M12 15V3M7 10l5 5 5-5" />
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-        </svg>
+          className="transition-transform duration-200 ease-out-strong group-hover/button:translate-y-0.5"
+        />
       )}
       {label}
     </a>

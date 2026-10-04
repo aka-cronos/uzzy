@@ -43,6 +43,9 @@ export const settings = [
   { title: "Used or left.", body: "Choose whether the cards show how much of each usage limit you’ve used or how much is left." },
   { title: "Only the tools you use.", body: "Turn off the providers you don’t use. They get no card, and Uzzy doesn’t read their session or query their usage limits." },
   { title: "Your order.", body: "Move the cards up or down so the provider you check most comes first." },
+  { title: "Short or detailed countdowns.", body: "See the time until a reset as a short countdown, like 2 h, or a detailed one, like 2 h 28 min." },
+  { title: "Resets available.", body: "Show how many resets the account has available next to the provider’s name, or hide the badge." },
+  { title: "Updates on your terms.", body: "Once a day Uzzy asks GitHub for a newer version, without sending any data about you. Turn the check off whenever you like; you install updates yourself." },
 ];
 
 export const privacy = [
