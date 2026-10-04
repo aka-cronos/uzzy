@@ -94,11 +94,11 @@ mv Config/Local.xcconfig app/Config/Local.xcconfig
 | `CONTEXT.md` | Domain vocabulary (used quota, reset, last valid reading…). |
 | `docs/agents/` | Agent conventions: issues, triage labels, domain docs. |
 | `docs/images/` | Screenshots used in the README, and `main-bg.jpg`, the background image. |
-| `.agents/skills/` | Agent skills used to work on the repo, copied from their upstream repos (see `skills-lock.json`). |
+| `.agents/skills/` | Agent skills used to work on the repo, copied from their upstream repos (see `skills-lock.json`), plus `release`, which is this repo's own. |
 
 ## Releases
 
-Releases are built by [`.github/workflows/release.yml`](.github/workflows/release.yml) from a `v*` tag, never on a local Mac. It signs the app with Developer ID and Hardened Runtime, notarizes and staples both the app and `Uzzy.dmg`, and attaches `Uzzy.dmg` to a **draft** GitHub Release. Only the maintainer cuts releases.
+Releases are built by [`.github/workflows/release.yml`](.github/workflows/release.yml) from a `v*` tag, never on a local Mac. It signs the app with Developer ID and Hardened Runtime, notarizes and staples both the app and `Uzzy.dmg`, and attaches `Uzzy.dmg` to a **draft** GitHub Release. Only the maintainer cuts releases. An agent can carry its share of the steps below with the `release` skill: it opens the pull requests, checks the draft's `Uzzy.dmg` and drafts the notes, and leaves the merges, the hand test and the publish to the maintainer.
 
 1. **Bump.** Open a pull request that sets `MARKETING_VERSION` (e.g. `0.1.0`) and adds 1 to `CURRENT_PROJECT_VERSION` in every target of `app/Uzzy.xcodeproj`, and merge it.
 2. **Tag.** Tag the merged commit on `main` and push the tag. The tag without its `v` and anything after a `-` must equal `MARKETING_VERSION`, or the workflow fails before it signs anything. Try the pipeline with a release candidate first; tags with a `-` become prereleases, which `releases/latest` ignores.
