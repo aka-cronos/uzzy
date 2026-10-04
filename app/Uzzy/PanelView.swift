@@ -479,7 +479,8 @@ private struct FailureMessage: View {
     }
 }
 
-/// The provider's mark, tinted like the text beside it so it holds its
+/// The provider's mark. Claude's keeps its own orange, as its owner draws it;
+/// the others are tinted like the text beside them, so they hold their
 /// contrast in light and dark. Decorative: the name next to it is the label.
 struct ProviderLogo: View {
     let provider: Provider

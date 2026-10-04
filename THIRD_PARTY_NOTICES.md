@@ -64,7 +64,7 @@ SOFTWARE.
 
 ## Provider logos
 
-The Claude, Codex and Cursor logos are trademarks of Anthropic, OpenAI and Anysphere. They are not under Uzzy's MIT license. Uzzy shows them only to identify each provider: next to its name in the panel and in Settings (`app/Uzzy/Assets.xcassets/ProviderLogo*.imageset`, drawn in one color) and on the uzzy.app site (`site/public/cover/claude.svg`, `codex.svg` and `cursor.svg`). Uzzy is not affiliated with, endorsed by or sponsored by any of them.
+The Claude, Codex and Cursor logos are trademarks of Anthropic, OpenAI and Anysphere. They are not under Uzzy's MIT license. Uzzy shows them only to identify each provider: next to its name in the panel and in Settings (`app/Uzzy/Assets.xcassets/ProviderLogo*.imageset`) and on the uzzy.app site (`site/public/cover/claude.svg`, `codex.svg` and `cursor.svg`). Uzzy is not affiliated with, endorsed by or sponsored by any of them.
 
 ## Background photo
 
