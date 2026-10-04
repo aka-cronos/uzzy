@@ -91,10 +91,10 @@ mv Config/Local.xcconfig app/Config/Local.xcconfig
 | `app/UzzyCoreTests/` | Tests through the usage core, with the fake dependencies. |
 | `app/Config/` | Shared build settings (signing). |
 | `brand/` | Vector masters of the logo, the app icon glyph and the menu bar icon, on a 32-unit grid. |
-| `CONTEXT.md` | Domain vocabulary (used quota, reset, last valid reading…). |
+| `GLOSSARY.md` | Domain vocabulary (used quota, reset, last valid reading…). |
 | `docs/agents/` | Agent conventions: issues, triage labels, domain docs. |
 | `docs/images/` | Screenshots used in the README, and `main-bg.jpg`, the background image. |
-| `.agents/skills/` | Agent skills used to work on the repo, copied from their upstream repos (see `skills-lock.json`), plus `release`, which is this repo's own. |
+| `.agents/skills/` | `release`, the one agent skill that is this repo's own. The rest are the team's global skills, installed outside the repo. |
 
 ## Releases
 
@@ -137,14 +137,14 @@ Test fixtures and sample responses must be sanitized: no real tokens, emails, ac
 
 ## Domain language
 
-Use the terms in [CONTEXT.md](CONTEXT.md) (subscription quota, reset, last valid reading, session, account…) in code, issues and pull requests.
+Use the terms in [GLOSSARY.md](GLOSSARY.md) (subscription quota, reset, last valid reading, session, account…) in code, issues and pull requests.
 
 ## Commits and pull requests
 
 - Never commit to `main`; every change reaches it through a pull request.
-- Commits follow [Conventional Commits](https://www.conventionalcommits.org/): `type(scope): summary`, imperative, lowercase, subject up to 72 characters. See `.agents/skills/commit-workflow/references/`.
+- Commits follow [Conventional Commits](https://www.conventionalcommits.org/): `type(scope): summary`, imperative, lowercase, subject up to 72 characters. See the `commit-workflow` skill in [aka-cronos/skills](https://github.com/aka-cronos/skills).
 - Keep one logical change per commit and link the issue in the pull request.
 
 ## Working with agents
 
-The repository is developed with coding agents. [AGENTS.md](AGENTS.md) holds their instructions, and `.agents/skills/` the skills they use (linked from `.claude/skills/`). You don't need an agent to contribute, but the same rules apply to both.
+The repository is developed with coding agents. [AGENTS.md](AGENTS.md) holds their instructions. The skills they use are the team's global ones, installed outside the repo; only `release`, which is specific to Uzzy, lives here, in `.agents/skills/` (linked from `.claude/skills/`). You don't need an agent to contribute, but the same rules apply to both.

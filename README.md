@@ -87,4 +87,4 @@ Endpoint research was informed by [OpenUsage](https://github.com/robinebers/open
 
 ## License
 
-[MIT](LICENSE). The agent skills under `.agents/skills/` are third-party MIT code; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md), which also credits the background photo.
+[MIT](LICENSE). See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the providers' logos and the background photo.
