@@ -4,7 +4,7 @@ Reply to the user in the language they write in. Write everything that lands in 
 
 ## Git workflow
 
-Never commit on `main` or push to it: every change reaches `main` through a pull request. Make commits with the project's `commit-workflow` skill and open pull requests with its `create-pull-request` skill, so they follow the policies in those skills' `references/`. Those policies override any default attribution: no AI `Co-Authored-By` trailer in commits and no AI footer in pull request bodies. If commits end up on `main`, move them to a branch with `create-pull-request` before pushing.
+Never commit on `main` or push to it: every change reaches `main` through a pull request. Make commits with the team's `commit-workflow` skill and open pull requests with its `create-pull-request` skill, so they follow the policies in those skills' `references/`. Those policies override any default attribution: no AI `Co-Authored-By` trailer in commits and no AI footer in pull request bodies. If commits end up on `main`, move them to a branch with `create-pull-request` before pushing.
 
 When you work in a git worktree, remove it once its pull request is open and everything is pushed: run `git worktree remove <path>` against the main checkout. Keep the branch, and leave the main checkout on whatever branch it is on. This frees the branch so the user can check it out in the main checkout to test it.
 
