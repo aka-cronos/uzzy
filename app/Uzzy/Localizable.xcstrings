@@ -1,6 +1,17 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%@ ago" : {
+      "comment" : "How long ago the card figures were read, e.g. \"2 min ago\". %@ is the time, e.g. \"2 min\". It always follows other words.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "hace %@"
+          }
+        }
+      }
+    },
     "%@ asked to wait. It will be checked again from %@." : {
       "comment" : "The provider, then a moment, e.g. \"today, 14:42\".",
       "localizations" : {
@@ -112,7 +123,7 @@
       }
     },
     "%lld d" : {
-      "comment" : "Time left until a reset, in days, in the simple countdown.",
+      "comment" : "Days, in one magnitude: the time left until a reset in the simple countdown, or the time since the last reading.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -175,7 +186,7 @@
       }
     },
     "%lld h" : {
-      "comment" : "Time left until a reset, in hours, in the simple countdown.",
+      "comment" : "Hours, in one magnitude: the time left until a reset in the simple countdown, or the time since the last reading.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -238,7 +249,7 @@
       }
     },
     "%lld min" : {
-      "comment" : "Minutes: the time left until a reset, or the length of a usage limit period.",
+      "comment" : "Minutes: the time left until a reset, the time since the last reading, or the length of a usage limit period.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -533,7 +544,7 @@
       }
     },
     "Last reading: %@" : {
-      "comment" : "When the card figures were last read, e.g. \"Last reading: today, 14:42\".",
+      "comment" : "How long ago the card figures were last read, e.g. \"Last reading: 2 min ago\".",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1116,6 +1127,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Semanal"
+          }
+        }
+      }
+    },
+    "just now" : {
+      "comment" : "The card figures were read less than a minute ago. It always follows other words, e.g. \"Last reading: just now\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ahora mismo"
           }
         }
       }

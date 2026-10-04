@@ -177,9 +177,11 @@ private struct CardView: View {
                 }
                 Spacer()
                 if let lastReadAt {
-                    Text("Last reading: \(Format.current.dayAndTime(lastReadAt, now: now))")
+                    Text("Last reading: \(Format.current.timeAgo(lastReadAt, now: now))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                        // The exact moment, which the relative time leaves out.
+                        .help(Format.current.dayAndTime(lastReadAt, now: now))
                 }
             }
 

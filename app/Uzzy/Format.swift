@@ -156,6 +156,21 @@ struct Format {
         "\(day(date, now: now)), \(time(date))"
     }
 
+    /// How long ago a moment was, in one magnitude: e.g. "2 min ago", "3 h
+    /// ago" or "2 d ago", and "just now" under a minute. A smaller unit is
+    /// dropped, never rounded up, so a reading is not shown as older than it
+    /// is. A moment that is not behind `now` reads "just now", and a longer
+    /// interval is cut to `longestCountdownMinutes`, so invalid data never
+    /// traps. It always follows other words, so English starts in lowercase.
+    func timeAgo(_ date: Date, now: Date) -> String {
+        let seconds = now.timeIntervalSince(date)
+        let minutes = seconds > 0 ? Int(min(seconds / 60, Self.longestCountdownMinutes)) : 0
+        if minutes >= 1_440 { return text("\(text("\(minutes / 1_440) d")) ago") }
+        if minutes >= 60 { return text("\(text("\(minutes / 60) h")) ago") }
+        if minutes >= 1 { return text("\(text("\(minutes) min")) ago") }
+        return text("just now")
+    }
+
     private func day(_ date: Date, now: Date) -> String {
         let calendar = Calendar.current
         if calendar.isDate(date, inSameDayAs: now) { return text("today") }
