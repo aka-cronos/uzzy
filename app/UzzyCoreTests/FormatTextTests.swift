@@ -268,7 +268,7 @@ struct FormatTextTests {
     }
 
     /// «Cuota» reads as a fee in Spanish, so the Spanish copy says «límite de
-    /// uso» instead, as the glossary in `CONTEXT.md` records.
+    /// uso» instead, as the glossary in `GLOSSARY.md` records.
     @Test func theSpanishCopyCallsUsageLimitsLimitesDeUso() throws {
         let path = try #require(#bundle.path(forResource: "Localizable", ofType: "strings", inDirectory: nil, forLocalization: "es"))
         let catalog = try #require(NSDictionary(contentsOfFile: path) as? [String: String])

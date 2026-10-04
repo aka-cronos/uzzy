@@ -85,7 +85,7 @@ The workflow left a draft release with `Uzzy.dmg`.
    is named exactly `Uzzy.dmg`, which the site's download link depends on, and that the release
    is a prerelease exactly when the tag has a `-`.
 2. **Write the notes.** Replace GitHub's generated list with one sentence per change a user
-   would notice, in the vocabulary of `CONTEXT.md`, each ending in its pull request number. Leave
+   would notice, in the vocabulary of `GLOSSARY.md`, each ending in its pull request number. Leave
    out site-only, docs, CI and chore pull requests; keep the "Full Changelog" line. Apply them
    with `gh release edit <tag> --notes-file`.
 3. **Hand over.** Give the maintainer the draft's URL, the notes, "Try the draft" from

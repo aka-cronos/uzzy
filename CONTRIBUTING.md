@@ -91,7 +91,7 @@ mv Config/Local.xcconfig app/Config/Local.xcconfig
 | `app/UzzyCoreTests/` | Tests through the usage core, with the fake dependencies. |
 | `app/Config/` | Shared build settings (signing). |
 | `brand/` | Vector masters of the logo, the app icon glyph and the menu bar icon, on a 32-unit grid. |
-| `CONTEXT.md` | Domain vocabulary (used quota, reset, last valid reading…). |
+| `GLOSSARY.md` | Domain vocabulary (used quota, reset, last valid reading…). |
 | `docs/agents/` | Agent conventions: issues, triage labels, domain docs. |
 | `docs/images/` | Screenshots used in the README, and `main-bg.jpg`, the background image. |
 | `.agents/skills/` | `release`, the one agent skill that is this repo's own. The rest are the team's global skills, installed outside the repo. |
@@ -137,7 +137,7 @@ Test fixtures and sample responses must be sanitized: no real tokens, emails, ac
 
 ## Domain language
 
-Use the terms in [CONTEXT.md](CONTEXT.md) (subscription quota, reset, last valid reading, session, account…) in code, issues and pull requests.
+Use the terms in [GLOSSARY.md](GLOSSARY.md) (subscription quota, reset, last valid reading, session, account…) in code, issues and pull requests.
 
 ## Commits and pull requests
 

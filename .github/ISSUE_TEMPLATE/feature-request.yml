@@ -16,6 +16,6 @@ body:
     id: proposal
     attributes:
       label: Proposal
-      description: What you would like Uzzy to do. Use the terms in CONTEXT.md where they apply.
+      description: What you would like Uzzy to do. Use the terms in GLOSSARY.md where they apply.
     validations:
       required: true
