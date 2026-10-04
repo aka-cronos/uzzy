@@ -15,7 +15,15 @@ pnpm build     # typecheck, then static site in dist/
 
 The copy lives in `src/content.ts` and the page in `src/pages/index.astro`. Every image the site uses lives in `public/`, including copies of the brand marks, so this directory builds on its own.
 
-### Icons
+### Interface icons
+
+The page's icons come from [Phosphor](https://phosphoricons.com) through `@phosphor-icons/react`, the `iconLibrary` set in `components.json`, so components added with the shadcn CLI use it too. Import the names that end in `Icon` (`DownloadSimpleIcon`, not `DownloadSimple`), and give decorative ones `aria-hidden="true"`. They render to inline SVG at build time like the other React components.
+
+### Motion
+
+Animations are CSS only, in `src/styles/global.css`: the hero's entrance, the panel opening from the menu bar icon, the header's hairline on scroll and the FAQ answers opening. Movement is switched off under `prefers-reduced-motion`, and the scroll and height effects sit behind `@supports`, so browsers without them show the page as it was.
+
+### App icons
 
 `public/favicon.ico` (32×32), `public/icon-192.png` and `public/icon-512.png` (listed in `public/site.webmanifest`) come from `public/brand/app-icon-1024.png`. That PNG is a macOS app icon, with the opaque rounded square at 824×824 in the middle of a transparent margin that only holds its drop shadow; the commands crop that margin away so the icon fills the favicon and home-screen sizes. From `site/public/`, with only macOS's `sips`:
 

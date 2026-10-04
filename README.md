@@ -30,11 +30,11 @@ Keep using Claude, Codex and Cursor. Uzzy brings their usage limits together so 
 - **Different limits stay different.** Check each usage limit («5 horas», «Semanal», «Cursor Models»…) on its own, with its reset in local time, a countdown and how long ago it was last read. Five-hour and weekly limits are never blended into one number, and usage credits and banked resets are shown next to them.
 - **Checks while you look.** Uzzy refreshes readings as you open the panel (unless the last reading is under five minutes old), then every five minutes while it stays open, and on demand with the refresh button. Close it and the requests stop.
 - **Missing doesn’t mean zero.** If a session expires or a provider can’t be reached, Uzzy tells you what happened (no session, expired session, offline, incompatible response…) and the other providers keep working. When a refresh fails, the card keeps the last valid reading and marks it as out of date.
-- **Native settings.** Choose whether the cards show how much is used or left, turn each provider on or off or change the order of the cards, and pick how detailed the countdown to a reset is and whether the resets available on an account are shown. The installed version and build are shown at the bottom.
+- **Native settings.** Choose whether the cards show how much is used or left, turn each provider on or off or change the order of the cards, pick how detailed the countdown to a reset is and whether the resets available on an account are shown, and turn the daily check for updates on or off. The installed version and build are shown at the bottom.
 - **Your language.** The interface follows the system language: English or Spanish.
 
 <p align="center">
-  <img src="docs/images/settings.jpg" width="520" alt="The Uzzy Settings window: a Used / Left switch for the percentage on the cards, and the Claude, Codex and Cursor providers with buttons to reorder them and a switch to turn each one on or off.">
+  <img src="docs/images/settings.jpg" width="520" alt="The Uzzy Settings window: a Used / Left switch for the percentage on the cards; the Claude, Codex and Cursor providers with buttons to reorder them and a switch to turn each one on or off; a Simple / Detailed switch for the time until a reset and a switch for the resets available; a switch to check for updates; and the installed version at the bottom.">
 </p>
 
 Open Settings with ⌘, from the panel; ⌘W closes it and ⌘Q quits. Your choices are remembered across launches. A provider you turn off has no card, and Uzzy does not read its session or query its usage limits.

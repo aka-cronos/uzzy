@@ -6,6 +6,24 @@ import Layout from "@/layouts/Layout.astro";
 import DesktopCard from "@/components/DesktopCard.astro";
 import Lockup from "@/components/Lockup.astro";
 import { DownloadButton } from "@/components/DownloadButton";
+import { buttonVariants } from "@/components/ui/button";
+import {
+  ArrowCircleUpIcon,
+  ArrowsClockwiseIcon,
+  ArrowsDownUpIcon,
+  CardsThreeIcon,
+  ClockCounterClockwiseIcon,
+  CpuIcon,
+  LockSimpleIcon,
+  PercentIcon,
+  PlusIcon,
+  QuestionIcon,
+  ShareNetworkIcon,
+  SlidersHorizontalIcon,
+  TimerIcon,
+  ToggleRightIcon,
+  XLogoIcon,
+} from "@phosphor-icons/react";
 import * as c from "@/content";
 
 const logos = { Claude: "/cover/claude.svg", Codex: "/cover/codex.svg", Cursor: "/cover/cursor.svg" };
@@ -17,27 +35,16 @@ const heroHeight = "clamp(620px, calc(100vh - 72px), 788px)";
 // gap between the fixed header and the desktop card: centred in the hero, never under 24px; shared by the aside's padding and the card's sticky offset so the card doesn't shift on scroll
 const cardGap = `max(24px, calc((${heroHeight} - 730px) / 2))`;
 const focus = "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900";
-// the X logo, filled
-const xIcon = '<path d="M17.8 3h3.1l-6.8 7.7L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.2-8.3L1.8 3h6.4l4.4 5.8zm-1.1 16.2h1.7L7.3 4.7H5.5z"/>';
 const nav = [["Features", "#features"], ["Providers", "#providers"], ["Settings", "#settings"], ["Privacy", "#privacy"]];
-// Lucide-style line icons, one per row
-const featureIcons = [
-  '<circle cx="4" cy="5" r="1.5"/><circle cx="4" cy="12" r="1.5"/><circle cx="4" cy="19" r="1.5"/><path d="M6 5h4l5 7M6 12h9M6 19h4l5-7"/><circle cx="18" cy="12" r="3"/>',
-  '<path d="M3 7h18M3 17h18"/><circle cx="9" cy="7" r="2" fill="currentColor" stroke="none"/><circle cx="16" cy="17" r="2" fill="currentColor" stroke="none"/>',
-  '<path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.8 9a7 7 0 0 1 12.1-2L20 12M4 12l2.1 5a7 7 0 0 0 12.1-2"/>',
-  '<circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.3 1.8c-.9.9-1.9 1.2-1.9 2.7M12 17h.01"/>',
-];
-const settingsIcons = [
-  '<path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',
-  '<rect x="2" y="5" width="20" height="14" rx="7"/><circle cx="15" cy="12" r="3"/>',
-  '<path d="m21 16-4 4-4-4M17 20V4M3 8l4-4 4 4M7 4v16"/>',
-];
-const privacyIcons = [
-  '<rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>',
-  '<circle cx="4" cy="12" r="2"/><circle cx="20" cy="5" r="2"/><circle cx="20" cy="19" r="2"/><path d="m6 11 12-5M6 13l12 5"/>',
-  '<rect x="5" y="5" width="14" height="14" rx="2"/><path d="M9 9h6v6H9zM9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/>',
-];
+// Phosphor icons, one per row
+const featureIcons = [CardsThreeIcon, SlidersHorizontalIcon, ArrowsClockwiseIcon, QuestionIcon];
+const settingsIcons = [PercentIcon, ToggleRightIcon, ArrowsDownUpIcon, TimerIcon, ClockCounterClockwiseIcon, ArrowCircleUpIcon];
+const privacyIcons = [LockSimpleIcon, ShareNetworkIcon, CpuIcon];
+const iconSize = 20;
 const rowIcon = "grid size-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700 ring-1 ring-slate-200";
+const summary = `flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded text-lg font-semibold text-balance [&::-webkit-details-marker]:hidden ${focus}`;
+// turns into a cross while its answer is open
+const plusIcon = "shrink-0 text-slate-500 transition-transform duration-200 ease-out-strong group-open:rotate-45";
 const rowList = "mt-10 divide-y divide-slate-200";
 const row = "flex gap-5 py-6";
 
@@ -63,7 +70,7 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
 ---
 <Layout>
   <script is:inline type="application/ld+json" slot="head" set:html={jsonLd} />
-  <header class="fixed inset-x-0 top-0 z-50 bg-slate-50/60 backdrop-blur-md">
+  <header class="header-edge fixed inset-x-0 top-0 z-50 border-b border-transparent bg-slate-50/60 backdrop-blur-md">
     <div class="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-6 sm:px-10 lg:px-12">
       <Lockup class={focus} />
       <nav class="flex items-center gap-1 text-sm font-medium text-slate-600" aria-label="Main">
@@ -78,18 +85,18 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
   <div class="mx-auto grid max-w-[1440px] gap-16 pt-[72px] px-6 sm:px-10 xl:grid-cols-[minmax(0,1fr)_560px] lg:px-12 xl:pb-16">
     <main class="min-w-0">
       <section class="flex max-w-[60ch] flex-col justify-center gap-9 py-16 xl:h-(--hero) xl:py-0" style={`--hero:${heroHeight}`}>
-        <div class="flex flex-col gap-4">
+        <div class="rise flex flex-col gap-4">
           <h1 class="text-4xl leading-[1.1] font-semibold tracking-tight text-pretty sm:text-5xl">{c.hero.title}</h1>
           <p class="text-lg leading-relaxed text-pretty text-slate-600">{c.hero.subtitle}</p>
         </div>
-        <ul class="flex flex-wrap gap-3" aria-label="Supported providers">
+        <ul class="rise flex flex-wrap gap-3 [--i:1]" aria-label="Supported providers">
           {c.providers.map((p) => (
             <li class="flex items-center gap-2 rounded-full border border-slate-300 bg-slate-100 px-3.5 py-1 text-sm font-medium text-slate-700">
               <img src={logo(p.name)} alt="" width="16" height={p.name === "Cursor" ? 18 : 16} class={onLight(p.name)} />{p.name}
             </li>
           ))}
         </ul>
-        <div class="flex flex-col gap-3">
+        <div class="rise flex flex-col gap-3 [--i:2]">
           <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
             <DownloadButton />
             <a href={c.REPO_URL} class={`inline-flex min-h-11 items-center rounded font-medium text-slate-600 underline-offset-4 transition-colors duration-200 hover:text-slate-900 hover:underline ${focus}`}>View on GitHub</a>
@@ -110,7 +117,7 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
           {c.features.map((f, i) => (
             <div class={row}>
               <span class={rowIcon}>
-                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={featureIcons[i]} />
+                {(() => { const Icon = featureIcons[i]; return <Icon size={iconSize} aria-hidden="true" />; })()}
               </span>
               <div class="min-w-0">
                 <h3 class="text-lg font-semibold text-balance">{f.title}</h3>
@@ -141,12 +148,12 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
 
       <section id="settings" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
         <h2 class="text-3xl font-semibold tracking-tight text-balance">Set it up your way, or don’t.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-slate-600 text-pretty">Open Settings with ⌘, from the panel. Your choices are remembered across launches.</p>
+        <p class="mt-5 text-lg leading-relaxed text-slate-600 text-pretty">Open Settings with ⌘, from the panel. Your choices are remembered across launches, and the installed version is shown at the bottom.</p>
         <ul class={rowList}>
           {c.settings.map((s, i) => (
             <li class={row}>
               <span class={rowIcon}>
-                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={settingsIcons[i]} />
+                {(() => { const Icon = settingsIcons[i]; return <Icon size={iconSize} aria-hidden="true" />; })()}
               </span>
               <div class="min-w-0">
                 <h3 class="text-lg font-semibold text-balance">{s.title}</h3>
@@ -156,7 +163,7 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
           ))}
         </ul>
         <!-- the bare @2x window from the README screenshot, without the wallpaper so it doesn't compete with the desktop card; shown at half its pixel size -->
-        <img src="/settings.png" alt="The Uzzy Settings window: a Used / Left switch for the percentage on the cards, and the Claude, Codex and Cursor providers with buttons to reorder them and a switch to turn each one on or off." width="592" height="526" class="mx-auto mt-4 h-auto w-full max-w-[592px]" loading="lazy" />
+        <img src="/settings.png" alt="The Uzzy Settings window: a Used / Left switch for the percentage on the cards; the Claude, Codex and Cursor providers with buttons to reorder them and a switch to turn each one on or off; a Simple / Detailed switch for the time until a reset and a switch for the resets available; a switch to check for updates; and the installed version at the bottom." width="592" height="866" class="mx-auto mt-4 h-auto w-full max-w-[592px]" loading="lazy" />
       </section>
 
       <section id="privacy" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
@@ -165,7 +172,7 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
           {c.privacy.map((p, i) => (
             <li class={row}>
               <span class={rowIcon}>
-                <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={privacyIcons[i]} />
+                {(() => { const Icon = privacyIcons[i]; return <Icon size={iconSize} aria-hidden="true" />; })()}
               </span>
               <div class="min-w-0">
                 <h3 class="text-lg font-semibold text-balance">{p.title}</h3>
@@ -185,20 +192,24 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
         <h2 class="text-3xl font-semibold tracking-tight text-balance">The practical details.</h2>
         <div class="mt-10 divide-y divide-slate-200 border-y border-slate-200">
           <details class="group py-2" open>
-            <summary class={`flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded text-lg font-semibold text-balance ${focus}`}>Do I need Claude, Codex and Cursor?<span aria-hidden="true" class="text-2xl font-normal text-slate-500 group-open:rotate-45">+</span></summary>
+            <summary class={summary}>Do I need Claude, Codex and Cursor?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
             <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">No, one is enough. Turn off the ones you don’t use in <a href="#settings" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Settings</a>: their cards go away and Uzzy doesn’t read their sessions.</p>
           </details>
           <details class="group py-2">
-            <summary class={`flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded text-lg font-semibold text-balance ${focus}`}>Do I need another account?<span aria-hidden="true" class="text-2xl font-normal text-slate-500 group-open:rotate-45">+</span></summary>
+            <summary class={summary}>Do I need another account?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
             <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">No. Uzzy reuses the sessions Claude Code, Codex CLI and Cursor keep on your Mac. You’ll need to be signed in to the tools you want to check.</p>
           </details>
           <details class="group py-2">
-            <summary class={`flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded text-lg font-semibold text-balance ${focus}`}>Where does my data go?<span aria-hidden="true" class="text-2xl font-normal text-slate-500 group-open:rotate-45">+</span></summary>
+            <summary class={summary}>Where does my data go?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
             <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">Uzzy queries your providers directly using your existing sessions. It has no server of its own and sends no telemetry.</p>
           </details>
           <details class="group py-2">
-            <summary class={`flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded text-lg font-semibold text-balance ${focus}`}>What if a reading is unavailable?<span aria-hidden="true" class="text-2xl font-normal text-slate-500 group-open:rotate-45">+</span></summary>
+            <summary class={summary}>What if a reading is unavailable?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
             <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">Uzzy explains what went wrong. If it has an earlier reading for the same account, it shows it as out of date. Missing data is never shown as zero.</p>
+          </details>
+          <details class="group py-2">
+            <summary class={summary}>How do I update Uzzy?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
+            <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">Uzzy doesn’t update itself. When a newer version is published, an Update button appears next to the name in the panel and downloads the new <code class="font-mono text-[0.9em]">Uzzy.dmg</code>. Install it the same way as the first time.</p>
           </details>
         </div>
       </section>
@@ -208,8 +219,8 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
         <h2 class="text-3xl font-semibold tracking-tight text-balance">Tell me what you think.</h2>
         <p class="mt-5 text-lg leading-relaxed text-slate-600 text-pretty">I’m <a href={c.X_URL} class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>@{c.MAKER}</a>, a designer who got tired of checking three places, so I built Uzzy. Found a bug, have an idea or want another provider? Send me a message on X. You don’t need to know how to code.</p>
         <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-          <a href={c.X_URL} class={`inline-flex min-h-11 items-center gap-2 rounded-lg bg-slate-900 px-5 font-medium text-slate-50 transition-colors duration-200 hover:bg-slate-700 ${focus}`}>
-            <svg class="size-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" set:html={xIcon} />Message me on X
+          <a href={c.X_URL} class={buttonVariants()}>
+            <XLogoIcon size={18} aria-hidden="true" />Message me on X
           </a>
           <a href={`${c.REPO_URL}/issues`} class={`inline-flex min-h-11 items-center rounded font-medium text-slate-600 underline-offset-4 transition-colors duration-200 hover:text-slate-900 hover:underline ${focus}`}>Developers: open an issue</a>
         </div>
