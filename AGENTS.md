@@ -12,6 +12,10 @@ When you work in a git worktree, remove it once its pull request is open and eve
 
 A prototype lives only until its answer ships. When a variant wins, comment the verdict (which variant and why) on the issue and build the winner on a fresh branch from `main`. Once that pull request is open, delete the prototype branch locally and on `origin`, and leave no pointer to it. This replaces the `prototype` skill's step of keeping the prototype on a throwaway branch.
 
+## Design assets
+
+`docs/images/main-bg.jpg` (1440×1024) is the brand wallpaper already tinted as the site's dark surface (wallpaper at 40% over `slate-950`). Use it as-is (full opacity, `cover`) whenever a design needs that background, such as the dmg window, images or mockups, instead of re-compositing `site/public/cover/bg.jpg`. Its credit is in `THIRD_PARTY_NOTICES.md`.
+
 ## Agent skills
 
 ### Issue tracker
