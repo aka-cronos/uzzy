@@ -1,6 +1,6 @@
 ## Language
 
-Reply to the user in the language they write in. Write everything that lands in the repo or on GitHub in English: code, comments, test names, docs, `GLOSSARY.md`, ADRs, commit messages, issues and pull requests. The one exception is the app's user-facing copy, which ships in English and Spanish through `app/Uzzy/Localizable.xcstrings`: every new string gets both, with English following the glossary in `GLOSSARY.md`.
+Reply to the user in the language they write in. Write everything that lands in the repo or on GitHub in English: code, comments, test names, docs, `GLOSSARY.md`, ADRs, commit messages, issues and pull requests. The one exception is the app's user-facing copy, which ships in English and Spanish through `app/Uzzy/Localizable.xcstrings`; its English follows the glossary in `GLOSSARY.md`.
 
 ## Git workflow
 
