@@ -45,18 +45,27 @@ Open Settings with ⌘, from the panel; ⌘W closes it and ⌘Q quits. Your choi
 |---|---|---|
 | **Claude** | Claude Code (the Keychain and `~/.claude.json`) | 5 hours, weekly, and weekly per model when the plan has them; also the usage credits spent this month and their monthly limit («Créditos de uso»), when usage credits are on |
 | **Codex** | Codex CLI signed in with ChatGPT (`~/.codex/auth.json` or `$CODEX_HOME`) | 5 hours, weekly, any extra limit the plan has, and the account's banked resets |
-| **Cursor** | Cursor (its local `state.vscdb`) | «Cursor Models» and «Other Models» for the billing cycle |
+| **Cursor** | Cursor (its local `state.vscdb`, and its safeStorage key in the Keychain once you allow it) | «Cursor Models» and «Other Models» for the billing cycle |
 
 Each card also shows the account's plan next to its title, e.g. «Claude · Max», when the provider reports a plan Uzzy knows: Claude Code keeps it in its Keychain item, Codex sends it with the usage limits and Cursor keeps it in `state.vscdb`.
 
 Uzzy reads Claude Code's Keychain item through `/usr/bin/security`, the tool Claude Code writes it with. The item already trusts that tool, so macOS shows no Keychain prompt, even after Claude Code refreshes its token.
 
+Since Cursor 3.27, Cursor encrypts its session in `state.vscdb` with a key it keeps in the Keychain (`Cursor Safe Storage`, account `Cursor`). That key also protects Cursor's other secrets, such as its MCP sign-ins, so Uzzy never reads it on its own:
+
+- The Cursor card asks first. Only after you click **Allow Access** does Uzzy read the key, and macOS may show its Keychain prompt. Uzzy reads the item itself, never through `/usr/bin/security`, so choosing **Always Allow** trusts Uzzy alone and no other program.
+- Uzzy uses the key only to decrypt the access token, then discards the key. The token stays in memory, like every other session, and is never written anywhere. Uzzy never reads the refresh token or Cursor's other secrets, and never changes the item or its access control.
+- Only opening the panel or clicking Refresh reads the key; automatic refreshes reuse the token already decrypted.
+- Turning Cursor off, or **Revoke…** in Settings, withdraws your consent and forgets the session; turning Cursor on asks again. If you chose **Always Allow**, macOS keeps trusting Uzzy until you remove it: open Keychain Access, search for `Cursor Safe Storage` (account `Cursor`), and remove Uzzy in **Access Control**.
+- A session Cursor stores unencrypted, as older versions do, is read as before, without the Keychain.
+
 ## Privacy
 
-- Reuses, **read-only**, the sessions that already exist in Claude Code, Codex CLI and Cursor. It never asks for passwords, signs in, refreshes tokens or writes credentials.
+- Reuses, **read-only**, the sessions that already exist in Claude Code, Codex CLI and Cursor. It never asks for passwords, signs in, refreshes tokens or writes credentials. Cursor's encrypted session is read only after you allow it (see above).
+- Turning a provider off drops everything Uzzy held of its session (its token, account and figures) at once; turning it on reads the session again from the official app.
 - Only connects to `api.anthropic.com`, `chatgpt.com` and `api2.cursor.sh` to read usage limits, and to `api.github.com` once a day to ask for the latest version. That check sends no token and nothing about you or your usage, and you can turn it off in Settings. No telemetry and no server of its own.
 - Usage data lives only in memory; nothing is written to disk.
-- Display magnitude, which providers are turned on, provider order and whether to check for updates are stored in local `UserDefaults`; they contain no usage data, token, email or account identifier.
+- Display magnitude, which providers are turned on, provider order, whether to check for updates and whether you allowed access to Cursor's key are stored in local `UserDefaults`; they contain no usage data, token, email or account identifier.
 
 ## Install
 
