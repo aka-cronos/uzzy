@@ -4,7 +4,7 @@ export const DOWNLOAD_URL =
 export const REPO_URL = "https://github.com/aka-cronos/uzzy";
 export const MAKER = "akacronos";
 export const X_URL = `https://x.com/${MAKER}`;
-export const VERSION = "0.3.0";
+export const VERSION = "0.3.1";
 export const REQUIREMENTS = "macOS 27 · Apple Silicon";
 
 export const hero = {
@@ -49,7 +49,7 @@ export const settings = [
 ];
 
 export const privacy = [
-  { title: "Read-only access.", body: "Uzzy reuses your existing sessions. It never asks for a password, signs in for you or writes credentials." },
+  { title: "Read-only access.", body: "Uzzy reuses your existing sessions. It never asks for a password, signs in for you or writes credentials. It reads Cursor’s encrypted session only after you allow access to its key in the Keychain." },
   { title: "Straight to your providers.", body: "Usage requests go directly to Claude, Codex and Cursor. Once a day Uzzy asks GitHub for the latest version, unless you turn that off. No telemetry. No server of its own." },
   { title: "Readings stay in memory.", body: "Uzzy doesn’t save usage readings to disk." },
 ];
