@@ -70,6 +70,9 @@ public enum Failure: Error, Sendable, Equatable {
     case sessionWithoutSubscriptionQuotas
     /// The user denied access to the session (the Keychain prompt).
     case sessionAccessDenied
+    /// The session is encrypted with a key the user has not let the app
+    /// read. Only the user can grant it; nothing is read until then.
+    case sessionNeedsAccess
     /// The Keychain or another provider session store could not be read.
     case sessionStoreUnavailable
     /// The provider's session store is currently locked.

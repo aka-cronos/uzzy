@@ -148,6 +148,12 @@ struct ScenarioTests {
         #expect(core.now() > Samples.readingMoment)
     }
 
+    @Test func cursorNeedsAccessAsksOnTheCursorCard() async {
+        let core = await Scenario.cursorNeedsAccess.start()
+
+        #expect(contents(of: core)[.cursor] == .failed(.sessionNeedsAccess))
+    }
+
     @Test func sessionAccessDeniedShowsTheKeychainAccessDenied() async {
         let core = await Scenario.sessionAccessDenied.start()
 

@@ -6,6 +6,8 @@ import UzzyCore
 struct SettingsView: View {
     static let width: CGFloat = 480
 
+    /// The real accounts' core, which holds the consent to read Cursor's key.
+    let core: UsageCore
     let setProviderEnabled: @MainActor (Provider, Bool) -> Void
     let setProviderOrder: @MainActor ([Provider]) -> Void
     let setUpdateChecks: @MainActor (Bool) -> Void
@@ -18,6 +20,10 @@ struct SettingsView: View {
     @AppStorage(UpdatePreferences.checkKey) private var checkForUpdates = true
     /// `@AppStorage` cannot hold a list, so the order is saved by hand.
     @State private var order = ProviderPreferences.order(in: .standard)
+    @State private var isConfirmingRevocation = false
+    /// The steps to remove Uzzy from the keychain item, after the consent
+    /// is withdrawn: macOS may still trust the app with the key.
+    @State private var isShowingKeychainSteps = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -40,7 +46,11 @@ struct SettingsView: View {
         .fixedSize(horizontal: false, vertical: true)
         .onChange(of: showClaude) { _, enabled in setProviderEnabled(.claude, enabled) }
         .onChange(of: showCodex) { _, enabled in setProviderEnabled(.codex, enabled) }
-        .onChange(of: showCursor) { _, enabled in setProviderEnabled(.cursor, enabled) }
+        .onChange(of: showCursor) { _, enabled in
+            let hadAccess = core.isCursorAccessGranted
+            setProviderEnabled(.cursor, enabled)
+            if !enabled, hadAccess { isShowingKeychainSteps = true }
+        }
         .onChange(of: checkForUpdates) { _, enabled in setUpdateChecks(enabled) }
     }
 
@@ -72,6 +82,14 @@ struct SettingsView: View {
                         moveUp: move(provider, by: -1),
                         moveDown: move(provider, by: 1)
                     )
+                    if provider == .cursor, showCursor, core.isCursorAccessGranted {
+                        let title = String(localized: "Keychain access")
+                        let description = String(localized: "\(Format.appName) can read the key Cursor encrypts its session with.")
+                        SettingsRow(title: title, description: description) {
+                            Button("Revoke…") { isConfirmingRevocation = true }
+                                .accessibilityHint(description)
+                        }
+                    }
                 }
             } header: {
                 Text("Providers")
@@ -122,6 +140,20 @@ struct SettingsView: View {
         }
         .formStyle(.grouped)
         .scrollDisabled(true)
+        .alert("Revoke access to Cursor's key?", isPresented: $isConfirmingRevocation) {
+            Button("Revoke", role: .destructive) {
+                core.revokeCursorAccess()
+                isShowingKeychainSteps = true
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("\(Format.appName) will stop reading the Cursor session until you allow it again on the Cursor card.")
+        }
+        .alert("Remove \(Format.appName) from the keychain item", isPresented: $isShowingKeychainSteps) {
+            Button("OK") {}
+        } message: {
+            Text("\(Format.appName) no longer reads Cursor's key. If you chose Always Allow, macOS still lets it, and only you can remove that: open Keychain Access, search for \"Cursor Safe Storage\" (account Cursor), open it, and in Access Control remove \(Format.appName), then Save Changes.")
+        }
         .fixedSize(horizontal: false, vertical: true)
     }
 

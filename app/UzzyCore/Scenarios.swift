@@ -47,7 +47,7 @@ extension Scenario {
     /// visible state of the panel.
     public static let all: [Scenario] = [
         quotas, usageCredits, uncappedUsageCredits, loading, newAccount, stale, pendingConfirmation, unknownReset, unavailable, withoutSubscriptionQuotas,
-        uninterpretable, noSession, sessionExpired, reusedSessionRejected, sessionAccessDenied, unavailableSessionStores,
+        uninterpretable, noSession, sessionExpired, reusedSessionRejected, sessionAccessDenied, cursorNeedsAccess, unavailableSessionStores,
         incompatibleSession, incompatibleResponse, incompatibleCursorReset,
         networkFailures, refused, longContent, bankedResets,
     ]
@@ -200,6 +200,13 @@ extension Scenario {
     /// Claude Code's session.
     public static let sessionAccessDenied = Scenario("sessionAccessDenied", "No access to the session") { stage in
         await stage.sessionReaders[.claude]?.answer(with: .accessDenied)
+        await stage.openPanel()
+    }
+
+    /// Cursor's session is encrypted and the user has not allowed reading
+    /// its key: the card asks for access.
+    public static let cursorNeedsAccess = Scenario("cursorNeedsAccess", "Cursor asks for access") { stage in
+        await stage.sessionReaders[.cursor]?.answer(with: .needsAccess)
         await stage.openPanel()
     }
 

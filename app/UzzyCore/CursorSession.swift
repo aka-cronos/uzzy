@@ -4,18 +4,40 @@ import SQLite3
 /// Reads, read-only, the session Cursor keeps on this Mac: the access token
 /// under `cursorAuth/accessToken` in the `ItemTable` of its `state.vscdb`,
 /// and the plan under `cursorAuth/stripeMembershipType` next to it.
-/// The account identity is the `sub` claim of that token. It never reads
-/// the refresh token, never refreshes tokens, never writes to the database
-/// and never reads the Keychain, even though Cursor keeps a token there too.
+/// The account identity is the `sub` claim of that token.
+///
+/// Since Cursor 3.27 the token is encrypted with a key Cursor keeps in the
+/// Keychain (`CursorSafeStorage`). That key also protects Cursor's other
+/// secrets, so the Keychain is only read once the user consents, and only
+/// to decrypt the access token. A token stored as plaintext never touches
+/// the Keychain. It never reads the refresh token, never refreshes tokens,
+/// never writes to the database or the Keychain, and never reads the stale
+/// `cursor-access-token` item Cursor left in the Keychain.
 public struct CursorSessionReader: SessionReader {
     private let databaseFile: URL
+    private let consent: any AccessConsent
+    private let keychain: any SafeStorageKeychain
 
-    public init(home: URL = FileManager.default.homeDirectoryForCurrentUser) {
-        self.init(databaseFile: home.appending(path: "Library/Application Support/Cursor/User/globalStorage/state.vscdb"))
+    public init(
+        home: URL = FileManager.default.homeDirectoryForCurrentUser,
+        consent: any AccessConsent,
+        keychain: any SafeStorageKeychain = CursorSafeStorageKeychain()
+    ) {
+        self.init(
+            databaseFile: home.appending(path: "Library/Application Support/Cursor/User/globalStorage/state.vscdb"),
+            consent: consent,
+            keychain: keychain
+        )
     }
 
-    public init(databaseFile: URL) {
+    public init(
+        databaseFile: URL,
+        consent: any AccessConsent = MemoryAccessConsent(),
+        keychain: any SafeStorageKeychain = CursorSafeStorageKeychain()
+    ) {
         self.databaseFile = databaseFile
+        self.consent = consent
+        self.keychain = keychain
     }
 
     // Off the main actor: the database may be busy while Cursor writes to it.
@@ -24,6 +46,8 @@ public struct CursorSessionReader: SessionReader {
         guard FileManager.default.fileExists(atPath: databaseFile.path(percentEncoded: false)) else { return .noSession }
         let (token, plan) = stored()
         switch token {
+        case .found(let value) where value.hasPrefix(CursorSafeStorage.prefix):
+            return decrypting(value, plan: plan)
         case .found(let token) where !token.isEmpty:
             return .session(Session(accessToken: token, accountID: Self.subject(of: token), plan: plan))
         case .found, .missing:
@@ -33,6 +57,25 @@ public struct CursorSessionReader: SessionReader {
         case .busy:
             return .storeBusy
         case .unavailable:
+            return .storeUnavailable
+        }
+    }
+
+    /// Checks the format before asking for anything: a value Uzzy cannot
+    /// decrypt is never worth a Keychain prompt.
+    private func decrypting(_ value: String, plan: String?) -> SessionReading {
+        guard let ciphertext = CursorSafeStorage.ciphertext(of: value) else { return .unknownFormat }
+        guard consent.isGranted() else { return .needsAccess }
+        switch keychain.password() {
+        case .found(var password):
+            defer { CursorSafeStorage.wipe(&password) }
+            guard let token = CursorSafeStorage.token(decrypting: ciphertext, password: password) else {
+                return .unknownFormat
+            }
+            return .session(Session(accessToken: token, accountID: Self.subject(of: token), plan: plan))
+        case .denied:
+            return .accessDenied
+        case .notFound, .unavailable:
             return .storeUnavailable
         }
     }

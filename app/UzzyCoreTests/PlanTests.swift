@@ -169,7 +169,12 @@ struct PlanTests {
         )
     }
 
-    @Test(arguments: [("free", "Hobby"), ("pro", "Pro"), ("pro_plus", "Pro+"), ("ultra", "Ultra")])
+    /// The plans from before, and those of accounts unified with xAI, by
+    /// the names Cursor's own app shows.
+    @Test(arguments: [
+        ("free", "Hobby"), ("pro", "Pro"), ("pro_plus", "Pro+"), ("ultra", "Ultra"),
+        ("plus", "Plus"), ("premium", "Premium"), ("super", "Super"), ("unified_ultra", "Ultra"),
+    ])
     func aKnownCursorPlanIsShownByCursorsName(membershipType: String, name: String) async throws {
         let database = try SampleCursorDatabase()
         try database.store(accessToken: SampleCursorDatabase.token(subject: "auth0|sample-user"))

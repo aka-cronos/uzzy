@@ -68,7 +68,7 @@ struct PanelView: View {
                     TimelineView(.everyMinute) { _ in
                         VStack(spacing: 0) {
                             ForEach(core.state.cards, id: \.provider) { card in
-                                CardView(card: card, magnitude: core.state.magnitude, now: core.now())
+                                CardView(card: card, magnitude: core.state.magnitude, now: core.now(), allowCursorAccess: core.allowCursorAccess)
                                 if card.provider != core.state.cards.last?.provider {
                                     Divider()
                                 }
@@ -151,6 +151,7 @@ private struct CardView: View {
     let card: Card
     let magnitude: QuotaMagnitude
     let now: Date
+    let allowCursorAccess: () -> Void
     @AppStorage("showBankedResets") private var showBankedResets = true
 
     private var lastReadAt: Date? {
@@ -193,6 +194,8 @@ private struct CardView: View {
                     title: "Checking new account…",
                     detail: "The \(card.provider.officialApp) session belongs to another account. The previous account's figures were cleared."
                 )
+            case .failed(.sessionNeedsAccess):
+                AccessRequest(allow: allowCursorAccess)
             case .failed(let failure):
                 FailureMessage(failure: failure, provider: card.provider, now: now)
             case .quotas(let quotas):
@@ -396,6 +399,25 @@ private struct Message: View {
     }
 }
 
+/// Cursor encrypts its session with a key in the keychain that also protects
+/// its other secrets, so the card asks before Uzzy reads it. Nothing is read
+/// until the user allows it.
+private struct AccessRequest: View {
+    let allow: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Message(
+                title: "Allow access to the Cursor session",
+                detail: "Cursor encrypts its session with a key in your keychain. The same key protects Cursor's other secrets, such as its MCP sign-ins. \(Format.appName) uses it only to read the session, and macOS may ask you to allow it."
+            )
+            Button("Allow Access", action: allow)
+                .controlSize(.small)
+                .help("Lets \(Format.appName) read the key Cursor encrypts its session with. You can revoke it in Settings.")
+        }
+    }
+}
+
 /// Why the card has no quotas, and what to do about it.
 private struct FailureMessage: View {
     let failure: Failure
@@ -416,11 +438,23 @@ private struct FailureMessage: View {
                 title: "No access to the session",
                 detail: "Access to the \(provider.officialApp) session in the keychain was denied. Click Refresh to ask again."
             )
+        case .sessionNeedsAccess:
+            // The card shows `AccessRequest` instead; a session that needs
+            // access keeps no figures, so this is never shown next to them.
+            Message(
+                title: "Allow access to the Cursor session",
+                detail: "Cursor encrypts its session with a key in your keychain. Click Refresh, then Allow Access."
+            )
         case .sessionStoreUnavailable:
             if provider == .claude {
                 Message(
                     title: "Keychain unavailable",
                     detail: "Couldn't read the Claude Code session in the keychain. Check that it's unlocked and click Refresh."
+                )
+            } else if provider == .cursor {
+                Message(
+                    title: "Couldn't read the session",
+                    detail: "Couldn't open the Cursor session or its key in the keychain. Check that Cursor works and the keychain is unlocked, then click Refresh."
                 )
             } else {
                 Message(

@@ -9,10 +9,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
     private var popover: NSPopover?
     private var eventMonitors: [Any] = []
     private let panelBounds = PanelBounds()
+    /// Shared by Cursor's session reader and the core, which withdraws it
+    /// when Cursor is turned off.
+    private static let cursorAccess = DefaultsAccessConsent(key: "cursorKeychainAccess")
     private let realCore = UsageCore(
         claudeSessionReader: ClaudeCodeSessionReader(),
         codexSessionReader: CodexCLISessionReader(),
-        cursorSessionReader: CursorSessionReader(),
+        cursorSessionReader: CursorSessionReader(consent: AppDelegate.cursorAccess),
+        cursorAccess: AppDelegate.cursorAccess,
         transport: URLSessionTransport(),
         clock: SystemClock(),
         initialMagnitude: QuotaMagnitude(
@@ -282,6 +286,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
                                   styleMask: [.titled, .closable], backing: .buffered, defer: false)
             window.title = Format.current.settings
             let content = NSHostingController(rootView: SettingsView(
+                core: realCore,
                 setProviderEnabled: { [weak self] provider, enabled in self?.setProviderEnabled(enabled, for: provider) },
                 setProviderOrder: { [weak self] order in self?.setProviderOrder(order) },
                 setUpdateChecks: { [weak self] enabled in self?.updates.setEnabled(enabled) }
