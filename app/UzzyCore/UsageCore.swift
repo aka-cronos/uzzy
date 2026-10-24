@@ -45,11 +45,16 @@ public final class UsageCore {
     }
 
     private let clock: any WallClock
+    private let cursorAccess: any AccessConsent
+
+    /// The user let the app read the key Cursor encrypts its session with.
+    public private(set) var isCursorAccessGranted: Bool
 
     public init(
         claudeSessionReader: any SessionReader,
         codexSessionReader: any SessionReader,
         cursorSessionReader: any SessionReader,
+        cursorAccess: any AccessConsent = MemoryAccessConsent(),
         transport: any HTTPTransport,
         clock: any WallClock,
         log: any EventLog = SystemLog(),
@@ -58,6 +63,7 @@ public final class UsageCore {
         initialOrder: [Provider] = Provider.allCases
     ) {
         self.clock = clock
+        self.cursorAccess = cursorAccess
         magnitude = initialMagnitude
         order = Provider.order(completing: initialOrder)
         providers = [
@@ -68,6 +74,11 @@ public final class UsageCore {
             ProviderRefresh(Cursor.self, sessionReader: cursorSessionReader, transport: transport, clock: clock, log: log,
                             isEnabled: initialEnabledProviders.contains(.cursor)),
         ]
+        // A provider turned off while the app was not running keeps no consent.
+        if !initialEnabledProviders.contains(.cursor) {
+            cursorAccess.setGranted(false)
+        }
+        isCursorAccessGranted = cursorAccess.isGranted()
     }
 
     public func now() -> Date {
@@ -79,9 +90,41 @@ public final class UsageCore {
         self.magnitude = magnitude
     }
 
-    /// A disabled provider has neither a card nor session or network work.
+    /// A disabled provider has neither a card nor session or network work,
+    /// and keeps nothing of its session. Turning Cursor off also withdraws
+    /// the consent to read its key, so turning it on asks again.
     public func setEnabled(_ enabled: Bool, for provider: Provider) {
-        providers.first(where: { $0.provider == provider })?.setEnabled(enabled)
+        if !enabled, provider == .cursor {
+            setCursorAccess(false)
+        }
+        refresh(of: provider)?.setEnabled(enabled)
+    }
+
+    /// The user consents, on the Cursor card, to let the app read the key
+    /// Cursor encrypts its session with, and the session is read at once:
+    /// a user action, so macOS may show its Keychain prompt.
+    public func allowCursorAccess() {
+        setCursorAccess(true)
+        guard let cursor = refresh(of: .cursor), cursor.isEnabled else { return }
+        cursor.restart()
+        cursor.refresh()
+    }
+
+    /// Withdraws that consent and forgets the decrypted session. macOS may
+    /// still trust the app with the key; only the user can remove it from
+    /// the item's access control.
+    public func revokeCursorAccess() {
+        setCursorAccess(false)
+        refresh(of: .cursor)?.restart()
+    }
+
+    private func setCursorAccess(_ granted: Bool) {
+        cursorAccess.setGranted(granted)
+        isCursorAccessGranted = granted
+    }
+
+    private func refresh(of provider: Provider) -> ProviderRefresh? {
+        providers.first { $0.provider == provider }
     }
 
     /// Only sorts the cards: no provider is read or queried again.

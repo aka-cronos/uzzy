@@ -53,9 +53,13 @@ enum Cursor: ProviderAdapter {
         session.plan.flatMap { planNames[$0] }
     }
 
-    /// Every `stripeMembershipType` Uzzy knows. Any other value, such as a
-    /// trial, shows no plan.
-    private static let planNames = ["free": "Hobby", "pro": "Pro", "pro_plus": "Pro+", "ultra": "Ultra"]
+    /// Every `stripeMembershipType` Uzzy knows, by the name Cursor's own app
+    /// shows: the plans from before and those of accounts unified with xAI.
+    /// Any other value, such as a trial, shows no plan.
+    private static let planNames = [
+        "free": "Hobby", "pro": "Pro", "pro_plus": "Pro+", "ultra": "Ultra",
+        "plus": "Plus", "premium": "Premium", "super": "Super", "unified_ultra": "Ultra",
+    ]
 
     /// `billingCycleEnd` is a string of epoch milliseconds.
     private static func date(fromMilliseconds text: String) -> Date? {

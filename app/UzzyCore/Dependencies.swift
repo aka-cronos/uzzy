@@ -1,4 +1,5 @@
 import Foundation
+import Synchronization
 
 // External dependencies of the usage core. They are injected so tests use
 // fakes and the app uses thin real implementations.
@@ -30,10 +31,58 @@ public enum SessionReading: Sendable, Equatable {
     /// The session store was locked by another process.
     case storeBusy
     case unknownFormat
+    /// The session is encrypted with a key the user has not let the app
+    /// read yet. Nothing was read from the Keychain.
+    case needsAccess
 }
 
 public protocol SessionReader: Sendable {
     func read() async -> SessionReading
+}
+
+/// Whether the user let the app read a provider's encryption key from the
+/// Keychain. Withdrawn whenever the provider is turned off.
+public protocol AccessConsent: Sendable {
+    func isGranted() -> Bool
+    func setGranted(_ granted: Bool)
+}
+
+/// Consent kept only in memory, given to no one at first.
+public final class MemoryAccessConsent: AccessConsent {
+    private let granted: Mutex<Bool>
+
+    public init(granted: Bool = false) {
+        self.granted = Mutex(granted)
+    }
+
+    public func isGranted() -> Bool {
+        granted.withLock { $0 }
+    }
+
+    public func setGranted(_ granted: Bool) {
+        self.granted.withLock { $0 = granted }
+    }
+}
+
+/// Consent saved in the app's defaults under `key`.
+public struct DefaultsAccessConsent: AccessConsent {
+    private let key: String
+
+    public init(key: String) {
+        self.key = key
+    }
+
+    public func isGranted() -> Bool {
+        UserDefaults.standard.bool(forKey: key)
+    }
+
+    public func setGranted(_ granted: Bool) {
+        if granted {
+            UserDefaults.standard.set(true, forKey: key)
+        } else {
+            UserDefaults.standard.removeObject(forKey: key)
+        }
+    }
 }
 
 public struct HTTPResponse: Sendable, Equatable {

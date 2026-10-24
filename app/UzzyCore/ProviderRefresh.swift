@@ -94,6 +94,14 @@ final class ProviderRefresh {
         reading.lastValidReadingOfAnyAccount?.plan
     }
 
+    /// Forgets the session and reading, then starts over as if just
+    /// enabled: reads the session again if the panel is open.
+    func restart() {
+        guard isEnabled else { return }
+        setEnabled(false)
+        setEnabled(true)
+    }
+
     func setEnabled(_ enabled: Bool) {
         guard isEnabled != enabled else { return }
         isEnabled = enabled
@@ -423,6 +431,7 @@ private extension Failure {
         case .storeUnavailable: self = .sessionStoreUnavailable
         case .storeBusy: self = .sessionStoreBusy
         case .unknownFormat: self = .incompatibleSession
+        case .needsAccess: self = .sessionNeedsAccess
         }
     }
 

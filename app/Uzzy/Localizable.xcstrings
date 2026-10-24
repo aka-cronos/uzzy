@@ -34,6 +34,17 @@
         }
       }
     },
+    "%@ can read the key Cursor encrypts its session with." : {
+      "comment" : "Description of the Keychain access row. %@ is the app's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ puede leer la clave con la que Cursor cifra su sesión."
+          }
+        }
+      }
+    },
     "%@ didn't accept the saved session. Click Refresh to check it again." : {
       "comment" : "%@ is the provider.",
       "localizations" : {
@@ -52,6 +63,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ no respondió a tiempo. Pulsa Actualizar para reintentar."
+          }
+        }
+      }
+    },
+    "%@ no longer reads Cursor's key. If you chose Always Allow, macOS still lets it, and only you can remove that: open Keychain Access, search for \"Cursor Safe Storage\" (account Cursor), open it, and in Access Control remove %@, then Save Changes." : {
+      "comment" : "Steps to remove Uzzy from the access control of Cursor's keychain item. Use the names macOS shows in Keychain Access in each language. %@ is the app's name, twice.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ ya no lee la clave de Cursor. Si elegiste Permitir siempre, macOS se lo sigue permitiendo, y solo tú puedes quitarlo: abre Acceso a Llaveros, busca «Cursor Safe Storage» (cuenta Cursor), ábrelo y, en Control de acceso, quita %2$@ y pulsa Guardar cambios."
           }
         }
       }
@@ -107,6 +129,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ este mes"
+          }
+        }
+      }
+    },
+    "%@ will stop reading the Cursor session until you allow it again on the Cursor card." : {
+      "comment" : "Message of the revocation confirmation. %@ is the app's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ dejará de leer la sesión de Cursor hasta que vuelvas a permitirlo en la tarjeta de Cursor."
           }
         }
       }
@@ -343,6 +376,28 @@
         }
       }
     },
+    "Allow Access" : {
+      "comment" : "Button on the Cursor card that lets Uzzy read the key Cursor encrypts its session with.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir acceso"
+          }
+        }
+      }
+    },
+    "Allow access to the Cursor session" : {
+      "comment" : "Title on the Cursor card when Cursor's session is encrypted and the user has not let Uzzy read its key.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permite el acceso a la sesión de Cursor"
+          }
+        }
+      }
+    },
     "Asks GitHub once a day for a newer version of %@, without sending any data about you. You install it yourself." : {
       "comment" : "%@ is the app's name.",
       "localizations" : {
@@ -361,6 +416,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ciclo de facturación"
+          }
+        }
+      }
+    },
+    "Cancel" : {
+      "comment" : "Dismisses a confirmation without doing anything.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
           }
         }
       }
@@ -439,6 +505,17 @@
         }
       }
     },
+    "Couldn't open the Cursor session or its key in the keychain. Check that Cursor works and the keychain is unlocked, then click Refresh." : {
+      "comment" : "Cursor's session database or its key in the keychain could not be read.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo abrir la sesión de Cursor ni su clave en el llavero. Comprueba que Cursor funcione y que el llavero esté desbloqueado, y pulsa Actualizar."
+          }
+        }
+      }
+    },
     "Couldn't read the Claude Code session in the keychain. Check that it's unlocked and click Refresh." : {
       "localizations" : {
         "es" : {
@@ -455,6 +532,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "No se pudo leer la sesión"
+          }
+        }
+      }
+    },
+    "Cursor encrypts its session with a key in your keychain. Click Refresh, then Allow Access." : {
+      "comment" : "Shown when access to Cursor's key is needed and no button can be shown.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cursor cifra su sesión con una clave de tu llavero. Pulsa Actualizar y luego Permitir acceso."
+          }
+        }
+      }
+    },
+    "Cursor encrypts its session with a key in your keychain. The same key protects Cursor's other secrets, such as its MCP sign-ins. %@ uses it only to read the session, and macOS may ask you to allow it." : {
+      "comment" : "Explains what the user grants before Uzzy reads Cursor's key. %@ is the app's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cursor cifra su sesión con una clave de tu llavero. Esa misma clave protege los demás secretos de Cursor, como sus inicios de sesión en MCP. %@ la usa solo para leer la sesión, y macOS puede pedirte que lo permitas."
           }
         }
       }
@@ -533,6 +632,17 @@
         }
       }
     },
+    "Keychain access" : {
+      "comment" : "Settings row under Cursor while Uzzy may read the key Cursor encrypts its session with.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acceso al llavero"
+          }
+        }
+      }
+    },
     "Keychain unavailable" : {
       "localizations" : {
         "es" : {
@@ -550,6 +660,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Última lectura: %@"
+          }
+        }
+      }
+    },
+    "Lets %@ read the key Cursor encrypts its session with. You can revoke it in Settings." : {
+      "comment" : "Help tag of the Allow Access button. %@ is the app's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permite que %@ lea la clave con la que Cursor cifra su sesión. Puedes revocarlo en Ajustes."
           }
         }
       }
@@ -612,6 +733,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sin sesión"
+          }
+        }
+      }
+    },
+    "OK" : {
+      "comment" : "Dismisses an informational alert.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aceptar"
           }
         }
       }
@@ -724,6 +856,17 @@
         }
       }
     },
+    "Remove %@ from the keychain item" : {
+      "comment" : "Title of the steps to remove Uzzy from the access control of Cursor's keychain item. %@ is the app's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quita %@ del ítem del llavero"
+          }
+        }
+      }
+    },
     "Renew the session in %@ and click Refresh." : {
       "comment" : "%@ is the official app.",
       "localizations" : {
@@ -786,6 +929,39 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Restablecimientos disponibles"
+          }
+        }
+      }
+    },
+    "Revoke" : {
+      "comment" : "Confirms withdrawing the consent to read Cursor's key.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revocar"
+          }
+        }
+      }
+    },
+    "Revoke access to Cursor's key?" : {
+      "comment" : "Title of the confirmation before withdrawing the consent to read Cursor's key.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "¿Revocar el acceso a la clave de Cursor?"
+          }
+        }
+      }
+    },
+    "Revoke…" : {
+      "comment" : "Button that withdraws the consent to read Cursor's key; it asks for confirmation.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revocar…"
           }
         }
       }

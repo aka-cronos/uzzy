@@ -121,6 +121,43 @@ struct ProviderVisibilityTests {
         }
     }
 
+    func reader(of provider: Provider) -> ControlledSessionReader {
+        switch provider {
+        case .claude: claudeReader
+        case .codex: codexReader
+        case .cursor: cursorReader
+        }
+    }
+
+    /// Turning a provider off keeps nothing of its session: turned on again,
+    /// it reads the session from the official app and never sends the token
+    /// it held before, even from the queries no user action asked for.
+    @Test(arguments: Provider.allCases)
+    func reEnablingNeverReusesTheTokenHeldBefore(provider: Provider) async {
+        await reader(of: provider).answer(with: .session(Session(accessToken: "old-token", accountID: "sample-account")))
+        core.panelOpened()
+        await core.queriesFinished()
+        core.panelClosed()
+
+        core.setEnabled(false, for: provider)
+        await reader(of: provider).answer(with: .session(Session(accessToken: "new-token", accountID: "sample-account")))
+        core.setEnabled(true, for: provider)
+        let sentBefore = await transport.requests(to: provider).count
+        core.systemWoke()
+        clock.advance(by: 5 * 60)
+        await core.queriesFinished()
+
+        #expect(await transport.requests(to: provider).count == sentBefore)
+        #expect(core.state.cards.first { $0.provider == provider }?.content == .loading)
+        #expect(core.state.cards.first { $0.provider == provider }?.plan == nil)
+
+        core.panelOpened()
+        await core.queriesFinished()
+
+        let sentAfter = await transport.requests(to: provider).dropFirst(sentBefore)
+        #expect(sentAfter.map { $0.value(forHTTPHeaderField: "Authorization") } == ["Bearer new-token"])
+    }
+
     @Test func enablingWhileClosedWaitsForTheNextPanelOpening() async {
         core.setEnabled(false, for: .codex)
         core.panelOpened()
