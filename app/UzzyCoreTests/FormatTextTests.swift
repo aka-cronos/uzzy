@@ -278,4 +278,24 @@ struct FormatTextTests {
         #expect(catalog["Usage limits"] == "Límites de uso")
         #expect(catalog["Usage limit unavailable"] == "Límite no disponible")
     }
+
+    /// Every string the app shows ships in Spanish too. This reads the source
+    /// catalog, because the compiled Spanish table leaves out an untranslated
+    /// key instead of listing it, so it cannot say which keys are missing.
+    @Test func everyStringInTheCatalogHasASpanishValue() throws {
+        let url = URL(filePath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .appending(path: "Uzzy/Localizable.xcstrings")
+        let json = try JSONSerialization.jsonObject(with: Data(contentsOf: url)) as? [String: Any]
+        let strings = try #require(json?["strings"] as? [String: [String: Any]])
+
+        let untranslated = strings.filter { _, entry in
+            entry["shouldTranslate"] as? Bool != false
+                && (entry["localizations"] as? [String: Any])?["es"] == nil
+        }
+
+        #expect(!strings.isEmpty)
+        #expect(untranslated.isEmpty, "No Spanish value for: \(untranslated.keys.sorted())")
+    }
 }
