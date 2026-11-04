@@ -3,7 +3,7 @@ import Testing
 import UzzyCore
 
 /// The Cursor card, end to end: Cursor's session, its usage query and its
-/// two bags of the billing cycle, Cursor Models and Other Models.
+/// weekly included usage or two legacy bags of the billing cycle.
 @MainActor
 @Suite(.timeLimit(.minutes(1)))
 struct CursorPanelTests {
@@ -55,7 +55,7 @@ struct CursorPanelTests {
         await openPanel()
 
         let requests = await transport.requests(to: .cursor)
-        #expect(requests.count == 1)
+        #expect(requests.count == 2)
         #expect(requests.first?.httpMethod == "POST")
         #expect(requests.first?.url == URL(string: "https://api2.cursor.sh/aiserver.v1.DashboardService/GetCurrentPeriodUsage"))
         #expect(requests.first?.allHTTPHeaderFields == [
@@ -64,6 +64,77 @@ struct CursorPanelTests {
             "Connect-Protocol-Version": "1",
         ])
         #expect(requests.first?.httpBody == Data("{}".utf8))
+    }
+
+    @Test(arguments: [0.0, 37.5, 100.0])
+    func unifiedPlansShowOnlyTheirWeeklyTotal(percent: Double) async {
+        await transport.answer(with: .json("""
+            {"billingCycleEnd":"1792195200000","planUsage":{"totalPercentUsed":\(percent),"autoPercentUsed":99}}
+            """), for: .cursor)
+        await transport.answerCursorMetadata(with: .json("""
+            {"isMerged":true,"planInfo":{"includedUsagePeriod":"INCLUDED_USAGE_PERIOD_WEEKLY","includedUsageResetsAt":"1791590400000"}}
+            """))
+        await openPanel()
+        #expect(cursorContent() == .quotas([
+            Quota(period: .weekly, value: .percent(percent, calculated: false), reset: .at(cycleEnd), readAt: Samples.readingMoment),
+        ]))
+        let request = await transport.requests(to: .cursor).last
+        #expect(request?.url?.lastPathComponent == "GetPlanInfo")
+        #expect(request?.value(forHTTPHeaderField: "Authorization") == "Bearer sample-token")
+        #expect(request?.httpBody == Data("{}".utf8))
+    }
+
+    @Test func missingWeeklyUsageAndResetStayUnknownInsteadOfUsingLegacyValues() async {
+        await transport.answerCursorMetadata(with: .json("""
+            {"isMerged":true,"planInfo":{"includedUsagePeriod":2}}
+            """))
+        await transport.answer(with: .json("""
+            {"billingCycleEnd":"1791590400000","planUsage":{"autoPercentUsed":45,"apiPercentUsed":22}}
+            """), for: .cursor)
+        await openPanel()
+        #expect(cursorContent() == .quotas([
+            Quota(period: .weekly, value: .unavailable, reset: .unknown, readAt: Samples.readingMoment),
+        ]))
+    }
+
+    @Test(arguments: [
+        .networkError, .status(401), .status(429),
+        .json(#"{"planInfo":{"includedUsagePeriod":99}}"#),
+        .json("{}"), .json(#"{"isMerged":true}"#),
+        .json(#"{"isMerged":true,"planInfo":{"includedUsagePeriod":1}}"#),
+    ] as [HTTPResult])
+    func failedOrUnknownMetadataNeverFallsBackToLegacyQuotas(result: HTTPResult) async {
+        await transport.answerCursorMetadata(with: result)
+        await openPanel()
+        guard case .failed = cursorContent() else {
+            Issue.record("Expected metadata failure, got legacy quotas")
+            return
+        }
+    }
+
+    @Test func unifiedWeeklyUsageSupportsTheRemainingMagnitude() async {
+        core.show(.remaining)
+        await transport.answerCursorMetadata(with: .json("""
+            {"planInfo":{"includedUsagePeriod":2,"includedUsageResetsAt":"1791590400000"}}
+            """))
+        await openPanel()
+        #expect(cursorContent() == .quotas([
+            Quota(period: .weekly, value: .percent(96.9, calculated: true), reset: .at(cycleEnd), readAt: Samples.readingMoment),
+        ]))
+    }
+
+    @Test(arguments: ["soon", "0", "9223372036854775807"])
+    func anInvalidWeeklyResetNeverUsesTheBillingCycle(reset: String) async {
+        await transport.answerCursorMetadata(with: .json("""
+            {"isMerged":true,"planInfo":{"includedUsagePeriod":2,"includedUsageResetsAt":"\(reset)"}}
+            """))
+        await openPanel()
+        guard case .quotas(let quotas) = cursorContent() else {
+            Issue.record("Expected a weekly reading")
+            return
+        }
+        #expect(quotas.count == 1)
+        #expect(quotas.first?.reset == .unknown)
     }
 
     @Test func remainingQuotaIsCalculatedForEachBagSeparately() async {

@@ -24,7 +24,7 @@ enum Codex: ProviderAdapter {
     /// response, and the reading decides whether they agree. Credits, spend
     /// control, model usage and every identifier are ignored; the plan is
     /// read apart.
-    static func quotas(from body: Data, readAt moment: Date) -> Result<[QuotaReading], Failure> {
+    static func quotas(from body: Data, metadata: Data?, readAt moment: Date) -> Result<[QuotaReading], Failure> {
         guard let response = try? JSONDecoder().decode(Response.self, from: body) else { return .failure(.incompatibleResponse) }
         // A named limit may arrive in several entries, so its windows are
         // gathered by name before they are read. Names keep the order in

@@ -114,7 +114,7 @@ struct CursorSessionTests {
         try database.store(accessToken: SampleCursorDatabase.token(subject: "auth0|sample-user", issuedAt: 2))
         await transport.hold()
         core.refresh()
-        await transport.waitForRequests(2)
+        await transport.waitForRequests(3)
 
         #expect(showsQuotas())
         await transport.release()
@@ -128,7 +128,7 @@ struct CursorSessionTests {
         try database.store(accessToken: SampleCursorDatabase.token(subject: "auth0|other-user"))
         await transport.hold()
         core.refresh()
-        await transport.waitForRequests(2)
+        await transport.waitForRequests(3)
 
         #expect(cursorContent() == .loadingNewAccount)
         await transport.release()
@@ -144,7 +144,7 @@ struct CursorSessionTests {
         try database.store(accessToken: token)
         await transport.hold()
         core.refresh()
-        await transport.waitForRequests(2)
+        await transport.waitForRequests(3)
 
         #expect(cursorContent() == .loading)
         await transport.release()

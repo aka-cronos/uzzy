@@ -46,7 +46,7 @@ extension Scenario {
     /// Every scenario, in the order to review them. Together they show every
     /// visible state of the panel.
     public static let all: [Scenario] = [
-        quotas, usageCredits, uncappedUsageCredits, loading, newAccount, stale, pendingConfirmation, unknownReset, unavailable, withoutSubscriptionQuotas,
+        quotas, cursorWeekly, usageCredits, uncappedUsageCredits, loading, newAccount, stale, pendingConfirmation, unknownReset, unavailable, withoutSubscriptionQuotas,
         uninterpretable, noSession, sessionExpired, reusedSessionRejected, sessionAccessDenied, cursorNeedsAccess, unavailableSessionStores,
         incompatibleSession, incompatibleResponse, incompatibleCursorReset,
         networkFailures, refused, longContent, bankedResets,
@@ -55,6 +55,19 @@ extension Scenario {
     /// Every card shows the sample quotas, and its plan next to its name:
     /// «Claude · Max», «Codex · Plus» and «Cursor · Pro+».
     public static let quotas = Scenario("quotas", "Usage limits up to date") { stage in
+        await stage.openPanel()
+    }
+
+    public static let cursorWeekly = Scenario("cursorWeekly", "Cursor weekly included usage") { stage in
+        await stage.sessionReaders[.cursor]!.answer(with: .session(
+            Session(accessToken: "sample-token", accountID: "sample-account", plan: "super")
+        ))
+        await stage.transport.answer(with: .json("""
+            {"billingCycleEnd":"1791590400000","planUsage":{"totalPercentUsed":0,"autoPercentUsed":0}}
+            """), for: .cursor)
+        await stage.transport.answerCursorMetadata(with: .json("""
+            {"isMerged":true,"planInfo":{"includedUsagePeriod":"INCLUDED_USAGE_PERIOD_WEEKLY","includedUsageResetsAt":"1790726400000"}}
+            """))
         await stage.openPanel()
     }
 

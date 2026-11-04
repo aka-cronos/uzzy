@@ -36,7 +36,7 @@ public actor SampleTransport: HTTPTransport {
         requests.append(request)
         let body = switch request.url?.host {
         case "chatgpt.com": codexResponse
-        case "api2.cursor.sh": cursorResponse
+        case "api2.cursor.sh": request.url?.lastPathComponent == "GetPlanInfo" ? Samples.cursorPlanResponse : cursorResponse
         default: claudeResponse
         }
         return .response(HTTPResponse(status: 200, headers: ["Content-Type": "application/json"], body: body))
@@ -198,6 +198,7 @@ public struct NoSessionReader: SessionReader {
 public actor ControlledTransport: HTTPTransport {
     public private(set) var requests: [URLRequest] = []
     private var results: [Provider: HTTPResult] = [.claude: .claudeSample, .codex: .codexSample, .cursor: .cursorSample]
+    private var cursorMetadata: HTTPResult = .json(#"{"planInfo":{"includedUsagePeriod":"INCLUDED_USAGE_PERIOD_MONTHLY"}}"#)
     private var held: Set<Provider> = []
     private var heldRequests: [CheckedContinuation<Void, Never>] = []
     private var requestWaiters: [(count: Int, continuation: CheckedContinuation<Void, Never>)] = []
@@ -213,6 +214,7 @@ public actor ControlledTransport: HTTPTransport {
         if held.contains(provider) {
             await withCheckedContinuation { heldRequests.append($0) }
         }
+        if request.url?.lastPathComponent == "GetPlanInfo" { return cursorMetadata }
         return results[provider] ?? .networkError
     }
 
@@ -221,6 +223,10 @@ public actor ControlledTransport: HTTPTransport {
         for each in provider.map({ [$0] }) ?? Provider.allCases {
             results[each] = result
         }
+    }
+
+    public func answerCursorMetadata(with result: HTTPResult) {
+        cursorMetadata = result
     }
 
     /// Holds the requests of `provider`, or of every provider.

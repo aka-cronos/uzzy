@@ -19,7 +19,7 @@ enum Claude: ProviderAdapter {
     /// Every copy goes into the reading, which decides whether they agree.
     /// `extra_usage` adds the usage credits spent after them; nothing else in
     /// the response about spend or amounts is read.
-    static func quotas(from body: Data, readAt moment: Date) -> Result<[QuotaReading], Failure> {
+    static func quotas(from body: Data, metadata: Data?, readAt moment: Date) -> Result<[QuotaReading], Failure> {
         guard let response = try? JSONDecoder().decode(Response.self, from: body) else { return .failure(.incompatibleResponse) }
         let limits = response.limits ?? []
         // One pass groups the entries, so reading each quota does not scan

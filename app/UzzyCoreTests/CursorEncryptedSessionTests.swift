@@ -91,7 +91,7 @@ struct CursorEncryptedSessionTests {
         #expect(showsQuotas())
         #expect(core.isCursorAccessGranted)
         #expect(keychain.reads == 1)
-        #expect(await cursorRequests().map { $0.value(forHTTPHeaderField: "Authorization") } == ["Bearer \(Self.token)"])
+        #expect(await cursorRequests().map { $0.value(forHTTPHeaderField: "Authorization") } == Array(repeating: "Bearer \(Self.token)", count: 2))
     }
 
     /// Only a user action reads the session; the cadence and waking from
@@ -107,7 +107,7 @@ struct CursorEncryptedSessionTests {
         await core.queriesFinished()
 
         #expect(keychain.reads == 1)
-        #expect(await cursorRequests().count == 3)
+        #expect(await cursorRequests().count == 6)
     }
 
     @Test func turningCursorOffWithdrawsConsentAndTurningItOnAsksAgain() async throws {
@@ -123,7 +123,7 @@ struct CursorEncryptedSessionTests {
 
         #expect(cursorContent() == .failed(.sessionNeedsAccess))
         #expect(keychain.reads == 1)
-        #expect(await cursorRequests().count == 1)
+        #expect(await cursorRequests().count == 2)
     }
 
     @Test func revokingForgetsTheSessionAndAsksAgain() async throws {
@@ -139,7 +139,7 @@ struct CursorEncryptedSessionTests {
         #expect(!consent.isGranted())
         #expect(cursorContent() == .failed(.sessionNeedsAccess))
         #expect(keychain.reads == 1)
-        #expect(await cursorRequests().count == 1)
+        #expect(await cursorRequests().count == 2)
     }
 
     /// Cursor turned off in an earlier run keeps no consent saved.
