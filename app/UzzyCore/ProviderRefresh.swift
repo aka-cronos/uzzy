@@ -6,8 +6,10 @@ import Observation
 protocol ProviderAdapter {
     static var provider: Provider { get }
     static func request(for session: Session) -> URLRequest
+    /// Additional plan metadata required to interpret the usage response.
+    static func metadataRequest(for session: Session) -> URLRequest?
     /// Returns a specific failure when the response cannot be translated.
-    static func quotas(from body: Data, readAt moment: Date) -> Result<[QuotaReading], Failure>
+    static func quotas(from body: Data, metadata: Data?, readAt moment: Date) -> Result<[QuotaReading], Failure>
     /// The banked resets in a response whose quotas were read, if it holds
     /// a positive count. Never fails the reading.
     static func bankedResets(from body: Data) -> Int?
@@ -18,6 +20,8 @@ protocol ProviderAdapter {
 }
 
 extension ProviderAdapter {
+    static func metadataRequest(for session: Session) -> URLRequest? { nil }
+
     static func bankedResets(from body: Data) -> Int? {
         nil
     }
@@ -255,10 +259,22 @@ final class ProviderRefresh {
             }
         }
         guard isCurrent(queryID) else { return nil }
-        let result = await transport.send(adapter.request(for: session))
+        var result = await transport.send(adapter.request(for: session))
+        guard isCurrent(queryID) else { return nil }
+        var metadata: Data?
+        if case .response(let response) = result, response.status == 200,
+           let request = adapter.metadataRequest(for: session) {
+            let extra = await transport.send(request)
+            guard isCurrent(queryID) else { return nil }
+            if case .response(let response) = extra, response.status == 200 {
+                metadata = response.body
+            } else {
+                result = extra
+            }
+        }
         guard isCurrent(queryID) else { return nil }
         let failure: Failure
-        switch answer(to: result, of: session, at: clock.now()) {
+        switch answer(to: result, metadata: metadata, of: session, at: clock.now()) {
         case .quotas(let quotas, let bankedResets, let plan):
             return .quotas(LastValidReading(quotas: quotas, accountID: session.accountID, bankedResets: bankedResets, plan: plan))
         case .failed(let why): failure = why
@@ -295,7 +311,7 @@ final class ProviderRefresh {
 
     /// The quotas in the provider's answer to a query made with `session`,
     /// or why there are none.
-    private func answer(to result: HTTPResult, of session: Session, at moment: Date) -> Answer {
+    private func answer(to result: HTTPResult, metadata: Data?, of session: Session, at moment: Date) -> Answer {
         let response: HTTPResponse
         switch result {
         case .response(let received): response = received
@@ -305,7 +321,7 @@ final class ProviderRefresh {
         }
         switch response.status {
         case 200:
-            switch adapter.quotas(from: response.body, readAt: moment) {
+            switch adapter.quotas(from: response.body, metadata: metadata, readAt: moment) {
             case .success(let quotas):
                 return .quotas(
                     quotas,

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Cursor adapter: builds the usage query of Cursor's session and translates
-/// its response into the two quota bags of the billing cycle.
+/// its response into weekly unified usage or legacy billing-cycle bags.
 enum Cursor: ProviderAdapter {
     static let provider = Provider.cursor
 
@@ -16,22 +16,37 @@ enum Cursor: ProviderAdapter {
         return request
     }
 
-    /// Returns an error when the response does not have the expected format.
-    ///
-    /// Both bags share the billing cycle and its end. `totalPercentUsed`
-    /// contradicts the usage the provider shows, so it is never read, and
-    /// neither are the amounts or the text messages.
-    static func quotas(from body: Data, readAt moment: Date) -> Result<[QuotaReading], Failure> {
+    static func metadataRequest(for session: Session) -> URLRequest? {
+        var request = request(for: session)
+        request.url = URL(string: "https://api2.cursor.sh/aiserver.v1.DashboardService/GetPlanInfo")!
+        return request
+    }
+
+    static func quotas(from body: Data, metadata: Data?, readAt moment: Date) -> Result<[QuotaReading], Failure> {
         let response: Response
+        let plan: PlanResponse
         do {
             response = try JSONDecoder().decode(Response.self, from: body)
+            guard let metadata else { return .failure(.incompatibleResponse) }
+            plan = try JSONDecoder().decode(PlanResponse.self, from: metadata)
         } catch DecodingError.typeMismatch(_, let context)
-            where context.codingPath.map(\.stringValue) == ["billingCycleEnd"] {
+            where ["billingCycleEnd", "includedUsageResetsAt"].contains(context.codingPath.last?.stringValue) {
             return .failure(.incompatibleResetFormat)
         } catch {
             return .failure(.incompatibleResponse)
         }
-        guard let usage = response.planUsage else { return .failure(.incompatibleResponse) }
+        guard let info = plan.planInfo, let usage = response.planUsage else { return .failure(.incompatibleResponse) }
+        if plan.isMerged == true || info.includedUsagePeriod == .weekly {
+            guard info.includedUsagePeriod == .weekly else {
+                return .failure(.incompatibleResponse)
+            }
+            return .success([QuotaReading(
+                period: .weekly,
+                usedPercents: [usage.totalPercentUsed].compactMap { $0 },
+                resets: [info.includedUsageResetsAt.flatMap(date(fromMilliseconds:))].compactMap { $0 },
+                readAt: moment
+            )])
+        }
         let resets = [response.billingCycleEnd.flatMap(date(fromMilliseconds:))].compactMap { $0 }
         func reading(_ bag: String, _ usedPercent: Double?) -> QuotaReading {
             QuotaReading(
@@ -67,6 +82,38 @@ enum Cursor: ProviderAdapter {
         return Date(timeIntervalSince1970: TimeInterval(milliseconds) / 1000)
     }
 
+    private struct PlanResponse: Decodable {
+        let isMerged: Bool?
+        let planInfo: PlanInfo?
+    }
+
+    private struct PlanInfo: Decodable {
+        let includedUsagePeriod: UsagePeriod?
+        let includedUsageResetsAt: String?
+    }
+
+    private enum UsagePeriod: Decodable {
+        case weekly
+        case monthly
+
+        init(from decoder: Decoder) throws {
+            let value = try decoder.singleValueContainer()
+            if let name = try? value.decode(String.self) {
+                switch name {
+                case "INCLUDED_USAGE_PERIOD_WEEKLY": self = .weekly
+                case "INCLUDED_USAGE_PERIOD_MONTHLY", "INCLUDED_USAGE_PERIOD_UNSPECIFIED": self = .monthly
+                default: throw DecodingError.dataCorruptedError(in: value, debugDescription: "Unknown included usage period")
+                }
+            } else {
+                switch try value.decode(Int.self) {
+                case 2: self = .weekly
+                case 0, 1: self = .monthly
+                default: throw DecodingError.dataCorruptedError(in: value, debugDescription: "Unknown included usage period")
+                }
+            }
+        }
+    }
+
     private struct Response: Decodable {
         let billingCycleEnd: String?
         let planUsage: PlanUsage?
@@ -75,5 +122,6 @@ enum Cursor: ProviderAdapter {
     private struct PlanUsage: Decodable {
         let autoPercentUsed: Double?
         let apiPercentUsed: Double?
+        let totalPercentUsed: Double?
     }
 }

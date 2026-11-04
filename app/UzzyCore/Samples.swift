@@ -71,10 +71,12 @@ public enum Samples {
     }
     """#.utf8)
 
+    public static let cursorPlanResponse = Data(#"{"planInfo":{"includedUsagePeriod":"INCLUDED_USAGE_PERIOD_MONTHLY"}}"#.utf8)
+
     /// Cursor's `POST /aiserver.v1.DashboardService/GetCurrentPeriodUsage`.
     /// The billing cycle runs from 2026-09-10 to 2026-10-10 (UTC). Includes
-    /// fields that are ignored: `totalPercentUsed`, which contradicts the
-    /// real usage, the amounts in cents and the text messages.
+    /// fields ignored for legacy plans: `totalPercentUsed`, which contradicts
+    /// the separate bags, the amounts in cents and the text messages.
     public static let cursorUsageResponse = Data(#"""
     {
       "billingCycleStart": "1788998400000",
