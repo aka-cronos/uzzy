@@ -21,6 +21,12 @@ enum Claude: ProviderAdapter {
     /// the response about spend or amounts is read.
     static func quotas(from body: Data, metadata: Data?, readAt moment: Date) -> Result<[QuotaReading], Failure> {
         guard let response = try? JSONDecoder().decode(Response.self, from: body) else { return .failure(.incompatibleResponse) }
+        let hasSupportedLimit = (response.limits ?? []).contains {
+            ["session", "weekly_all"].contains($0.kind ?? "")
+                || ($0.kind == "weekly_scoped" && $0.scope?.model?.display_name != nil)
+        }
+        guard response.hasQuotaWindowKeys || hasSupportedLimit
+        else { return .failure(.incompatibleResponse) }
         let limits = response.limits ?? []
         // One pass groups the entries, so reading each quota does not scan
         // `limits[]` again.
@@ -82,6 +88,22 @@ enum Claude: ProviderAdapter {
         let seven_day_opus: Window?
         let limits: [Limit]?
         let extra_usage: ExtraUsage?
+        let hasQuotaWindowKeys: Bool
+
+        private enum CodingKeys: String, CodingKey {
+            case five_hour, seven_day, seven_day_sonnet, seven_day_opus, limits, extra_usage
+        }
+
+        init(from decoder: any Decoder) throws {
+            let values = try decoder.container(keyedBy: CodingKeys.self)
+            hasQuotaWindowKeys = [.five_hour, .seven_day, .seven_day_sonnet, .seven_day_opus].contains { values.contains($0) }
+            five_hour = try values.decodeIfPresent(Window.self, forKey: .five_hour)
+            seven_day = try values.decodeIfPresent(Window.self, forKey: .seven_day)
+            seven_day_sonnet = try values.decodeIfPresent(Window.self, forKey: .seven_day_sonnet)
+            seven_day_opus = try values.decodeIfPresent(Window.self, forKey: .seven_day_opus)
+            limits = try values.decodeIfPresent([Limit].self, forKey: .limits)
+            extra_usage = try values.decodeIfPresent(ExtraUsage.self, forKey: .extra_usage)
+        }
     }
 
     /// `extra_usage`, the usage-credit meter. It is read leniently: no value

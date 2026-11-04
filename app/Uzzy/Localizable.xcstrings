@@ -1,6 +1,61 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Credit balance": {
+      "comment": "Positive general prepaid balance, separate from monthly spending.",
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saldo de créditos"
+          }
+        }
+      }
+    },
+    "Cloud session credits": {
+      "comment": "Restricted Claude cloud-session grant, separate from general prepaid balance.",
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Créditos para sesiones en la nube"
+          }
+        }
+      }
+    },
+    "%@ credits left": {
+      "comment": "Exact Codex credit quantity, not money.",
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ créditos restantes"
+          }
+        }
+      }
+    },
+    "%@ of %@ left": {
+      "comment": "Remaining cloud-session money and original allowance.",
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ de %2$@ restantes"
+          }
+        }
+      }
+    },
+    "Expires %@, %@": {
+      "comment": "Exact local expiry date and time of cloud-session credit.",
+      "localizations": {
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vence %1$@, %2$@"
+          }
+        }
+      }
+    },
     "%@ ago" : {
       "comment" : "How long ago the card figures were read, e.g. \"2 min ago\". %@ is the time, e.g. \"2 min\". It always follows other words.",
       "localizations" : {

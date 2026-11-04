@@ -46,7 +46,7 @@ extension Scenario {
     /// Every scenario, in the order to review them. Together they show every
     /// visible state of the panel.
     public static let all: [Scenario] = [
-        quotas, cursorWeekly, usageCredits, uncappedUsageCredits, loading, newAccount, stale, pendingConfirmation, unknownReset, unavailable, withoutSubscriptionQuotas,
+        quotas, cursorWeekly, creditBalances, staleCreditBalances, hiddenCreditBalances, usageCredits, uncappedUsageCredits, loading, newAccount, stale, pendingConfirmation, unknownReset, unavailable, withoutSubscriptionQuotas,
         uninterpretable, noSession, sessionExpired, reusedSessionRejected, sessionAccessDenied, cursorNeedsAccess, unavailableSessionStores,
         incompatibleSession, incompatibleResponse, incompatibleCursorReset,
         networkFailures, refused, longContent, bankedResets,
@@ -100,7 +100,7 @@ extension Scenario {
     public static let loading = Scenario("loading", "Checking usage limits") { stage in
         await stage.transport.hold()
         await stage.openPanel(waitingFor: [])
-        await stage.transport.waitForRequests(stage.core.enabledProviders.count)
+        await stage.transport.waitForQuotaRequests(stage.core.enabledProviders.count)
     }
 
     /// «Checking new account…»: every session changed to another account,
@@ -110,7 +110,7 @@ extension Scenario {
         await stage.answerEverySession(with: .session(Session(accessToken: "other-token", accountID: "other-account")))
         await stage.transport.hold()
         stage.core.refresh()
-        await stage.transport.waitForRequests(stage.core.enabledProviders.count * 2)
+        await stage.transport.waitForQuotaRequests(stage.core.enabledProviders.count * 2)
     }
 
     /// «Out of date»: a later query of every card failed, so each keeps
@@ -206,7 +206,7 @@ extension Scenario {
         stage.core.panelClosed()
         await stage.transport.hold()
         stage.core.panelOpened()
-        await stage.transport.waitForRequests(stage.core.enabledProviders.count * 3)
+        await stage.transport.waitForQuotaRequests(stage.core.enabledProviders.count * 3)
     }
 
     /// «No access to the session»: the user denied the Keychain prompt for
@@ -378,4 +378,53 @@ final class Stage {
     }
 }
 
+#endif
+
+#if DEBUG
+extension Scenario {
+    public static let creditBalances = Scenario("creditBalances", "Positive credit balances and cloud credit") { stage in
+        await configureCredits(stage)
+        await stage.openPanel()
+    }
+
+    public static let staleCreditBalances = Scenario("staleCreditBalances", "Optional balances out of date; usage limits fresh") { stage in
+        await configureCredits(stage)
+        await stage.openPanel()
+        stage.core.panelClosed()
+        stage.clock.advance(by: 60)
+        await stage.transport.answerCredits(with: .timeout, for: .claude)
+        await stage.transport.answerCredits(with: .networkError, for: .cursor)
+        await stage.transport.answer(with: .json(codexCreditResponse(balance: "broken")), for: .codex)
+        stage.core.refresh()
+        await stage.core.queriesFinished()
+    }
+
+    public static let hiddenCreditBalances = Scenario("hiddenCreditBalances", "Zero, unlimited and expired credit hidden") { stage in
+        await configureCredits(stage, cloudCreditLifetime: -1)
+        await stage.transport.answerCredits(with: .json(#"{"amount":0,"currency":"USD"}"#), for: .claude)
+        await stage.transport.answerCredits(with: .json(#"{"billingMode":2,"eligible":true}"#), for: .cursor)
+        await stage.transport.answer(with: .json(codexCreditResponse(balance: "123.45", unlimited: true)), for: .codex)
+        await stage.openPanel()
+        stage.core.panelClosed()
+    }
+
+    private static func configureCredits(_ stage: Stage, cloudCreditLifetime: TimeInterval = 86_400) async {
+        let expiry = stage.clock.now().addingTimeInterval(cloudCreditLifetime).ISO8601Format()
+        await stage.transport.answerProfile(with: .json(#"{"account":{"uuid":"sample-account"},"organization":{"uuid":"00000000-0000-4000-8000-000000000201"}}"#))
+        await stage.transport.answerCredits(with: .json(#"{"amount":725,"currency":"USD","amount_without_scoped_credits":725,"tranches":[]}"#), for: .claude)
+        await stage.transport.answerCredits(with: .json(#"{"billingMode":2,"eligible":true,"availableCents":"725","autoTopUp":{"enabled":false}}"#), for: .cursor)
+        let usage = String(decoding: Samples.claudeUsageResponse, as: UTF8.self)
+            .replacingOccurrences(of: #""iguana_necktie": null"#, with: """
+                "iguana_necktie":{"remaining_dollars":90,"limit_dollars":120,"used_dollars":30,"resets_at":"\(expiry)"}
+                """)
+        await stage.transport.answer(with: .json(usage), for: .claude)
+        await stage.transport.answer(with: .json(codexCreditResponse(balance: "123.45")), for: .codex)
+    }
+
+    private static func codexCreditResponse(balance: String, unlimited: Bool = false) -> String {
+        String(decoding: Samples.codexUsageResponse, as: UTF8.self)
+            .replacingOccurrences(of: #""balance": "0""#, with: #""balance": "\#(balance)""#)
+            .replacingOccurrences(of: #""unlimited": false"#, with: #""unlimited": \#(unlimited)"#)
+    }
+}
 #endif

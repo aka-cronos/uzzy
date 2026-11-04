@@ -66,6 +66,24 @@ struct Format {
         return text("\(money(spent)) of \(money(limit)) this month")
     }
 
+    func creditBalance(_ value: CreditValue) -> String {
+        switch value {
+        case .money(let amount): money(amount)
+        case .credits(let amount):
+            text("\(amount.formatted(.number.precision(.fractionLength(0...38)).locale(locale))) credits left")
+        }
+    }
+
+    func cloudCredit(_ remaining: Money, total: Money?) -> String {
+        guard let total else { return money(remaining) }
+        return text("\(money(remaining)) of \(money(total)) left")
+    }
+
+    func creditExpiry(_ date: Date) -> String {
+        let day = date.formatted(.dateTime.year().month(.abbreviated).day().locale(locale))
+        return text("Expires \(day), \(time(date))")
+    }
+
     /// In the currency's own format for the region; a whole amount drops its
     /// decimals, e.g. "$40".
     func money(_ money: Money) -> String {

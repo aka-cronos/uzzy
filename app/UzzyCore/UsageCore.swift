@@ -12,12 +12,15 @@ public final class UsageCore {
         return PanelState(
             magnitude: magnitude,
             cards: orderedProviders.filter(\.isEnabled).map {
-                Card(
+                var card = Card(
                     provider: $0.provider,
                     content: $0.content(in: magnitude, at: now),
                     bankedResets: $0.bankedResets,
                     plan: $0.plan
                 )
+                card.creditBalance = $0.creditBalanceState.visible(at: now)
+                card.cloudCredit = $0.cloudCreditState.visible(at: now)
+                return card
             },
             isQuerying: providers.contains { $0.isEnabled && $0.isQuerying }
         )
