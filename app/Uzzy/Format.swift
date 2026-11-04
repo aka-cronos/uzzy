@@ -75,13 +75,23 @@ struct Format {
     }
 
     func cloudCredit(_ remaining: Money, total: Money?) -> String {
-        guard let total else { return money(remaining) }
-        return text("\(money(remaining)) of \(money(total)) left")
+        guard let total else { return cloudMoney(remaining) }
+        return text("\(cloudMoney(remaining)) of \(cloudMoney(total)) left")
     }
 
-    func creditExpiry(_ date: Date) -> String {
-        let day = date.formatted(.dateTime.year().month(.abbreviated).day().locale(locale))
-        return text("Expires \(day), \(time(date))")
+    private func cloudMoney(_ value: Money) -> String {
+        var amount = value.amount
+        var cents = Decimal()
+        NSDecimalRound(&cents, &amount, 2, .plain)
+        guard cents != value.amount else { return money(value) }
+        return value.amount.formatted(.currency(code: value.currency).precision(.fractionLength(0...128)).locale(locale))
+    }
+
+    func creditExpiry(_ date: Date, timeZone: TimeZone = .autoupdatingCurrent) -> String {
+        var style = Date.FormatStyle.dateTime.year().month(.abbreviated).day().locale(locale)
+        style.timeZone = timeZone
+        let day = date.formatted(style)
+        return text("Expires \(day), \(time(date, timeZone: timeZone))")
     }
 
     /// In the currency's own format for the region; a whole amount drops its
@@ -96,13 +106,15 @@ struct Format {
 
     /// In the region's hour cycle: e.g. "2:42 PM" in the US; a 24-hour clock
     /// pads the hour, e.g. "09:05".
-    func time(_ date: Date) -> String {
+    func time(_ date: Date, timeZone: TimeZone = .autoupdatingCurrent) -> String {
         let hour: Date.FormatStyle.Symbol.Hour = switch locale.hourCycle {
         case .zeroToEleven, .oneToTwelve: .defaultDigits(amPM: .abbreviated)
         case .zeroToTwentyThree, .oneToTwentyFour: .twoDigits(amPM: .omitted)
         @unknown default: .defaultDigits(amPM: .abbreviated)
         }
-        return date.formatted(.dateTime.hour(hour).minute(.twoDigits).locale(locale))
+        var style = Date.FormatStyle.dateTime.hour(hour).minute(.twoDigits).locale(locale)
+        style.timeZone = timeZone
+        return date.formatted(style)
     }
 
     func reset(_ reset: Reset, now: Date, countdown style: CountdownStyle = .simple) -> String {

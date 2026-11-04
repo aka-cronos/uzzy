@@ -22,7 +22,7 @@ struct CreditBalanceTests {
         guard case .quotas(let quotas) = card?.content else { Issue.record("Expected subscription quotas"); return }
         #expect(quotas.first?.value == .percent(12, calculated: false))
     }
-    @Test(arguments: ["0", "-1", "NaN", "Infinity", "12junk", "1e999", "999999999999999999999999999999999999999999"])
+    @Test(arguments: ["0", "-1", "NaN", "Infinity", "12junk", "1e999", "1" + String(repeating: "0", count: 200), "999999999999999999999999999999999999999999"])
     func invalidOrZeroCodexBalancesNeverHideQuotas(_ balance: String) async {
         let transport = SampleTransport(codexResponse: Data("""
             {"rate_limit":{"primary_window":{"used_percent":12,"limit_window_seconds":18000}},
@@ -63,9 +63,10 @@ struct CreditBalanceTests {
         #expect(core.state.cards.first { $0.provider == .claude }?.cloudCredit == nil)
     }
 
-    @Test func cursorPrepaidIsMoneyEvenWithAutoTopUpOff() async {
+    @Test(arguments: ["1", "2", #""PREPAID_BILLING_MODE_ON_DEMAND""#, #""PREPAID_BILLING_MODE_PREPAID""#])
+    func cursorKnownModesPreservePositiveMoneyDespiteSeparateUseRestrictions(_ mode: String) async {
         let transport = ControlledTransport()
-        await transport.answerCredits(with: .json(#"{"billingMode":"PREPAID_BILLING_MODE_PREPAID","eligible":true,"availableCents":"725","autoTopUp":{"enabled":false},"noUsageBasedAllowed":true}"#), for: .cursor)
+        await transport.answerCredits(with: .json(#"{"billingMode":\#(mode),"eligible":true,"availableCents":"725","autoTopUp":{"enabled":false},"noUsageBasedAllowed":true}"#), for: .cursor)
         let core = UsageCore(
             claudeSessionReader: NoSessionReader(), codexSessionReader: NoSessionReader(),
             cursorSessionReader: SampleSessionReader(), transport: transport, clock: FixedClock(Samples.readingMoment)
@@ -84,4 +85,15 @@ struct CreditBalanceTests {
         #expect(core.state.cards.first { $0.provider == .codex }?.creditBalance?.value == .credits(pow(Decimal(10), 38)))
     }
 
+    @Test(arguments: ["", #","credits":null"#, #","credits":{"balance":"123.45","unlimited":true}"#])
+    func absentAndUnlimitedCodexCreditsLeaveQuotasVisible(_ creditFields: String) async {
+        let transport = SampleTransport(codexResponse: Data("""
+            {"rate_limit":{"primary_window":{"used_percent":12,"limit_window_seconds":18000}}\(creditFields)}
+            """.utf8))
+        let core = UsageCore(claudeSessionReader: NoSessionReader(), codexSessionReader: SampleSessionReader(), cursorSessionReader: NoSessionReader(), transport: transport, clock: FixedClock(Samples.readingMoment), initialEnabledProviders: [.codex])
+        core.panelOpened()
+        await core.queriesFinished()
+        #expect(core.state.cards.first?.creditBalance == nil)
+        guard case .quotas = core.state.cards.first?.content else { Issue.record("Expected valid quotas"); return }
+    }
 }

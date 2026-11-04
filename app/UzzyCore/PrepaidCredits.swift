@@ -15,7 +15,7 @@ extension Cursor {
             let availableCents: String?
         }
         guard let response = try? JSONDecoder().decode(Response.self, from: body) else { return .invalid(keeping: nil) }
-        guard response.billingMode == .prepaid, response.eligible == true else { return .ineligible }
+        guard response.eligible == true else { return .ineligible }
         guard let cents = CreditDecimal.parse(response.availableCents ?? "0", integer: true), cents <= Decimal(Int64.max) else { return .invalid(keeping: nil) }
         guard cents > 0 else { return .zero }
         return .reading(CreditReading(

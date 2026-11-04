@@ -292,7 +292,6 @@ final class ProviderRefresh {
         case .quotas(let quotas, let bankedResets, let plan):
             let valid = LastValidReading(quotas: quotas, accountID: session.accountID, bankedResets: bankedResets, plan: plan)
             reading = .quotas(valid)
-            staleCredits()
             if let accountID = session.accountID, !accountID.isEmpty, case .response(let response) = result {
                 if provider == .claude {
                     cloudCreditState = Claude.cloudCredit(from: response.body, accountID: accountID, at: clock.now())

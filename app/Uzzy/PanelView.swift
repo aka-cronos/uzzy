@@ -206,10 +206,10 @@ private struct CardView: View {
                 QuotasView(quotas: quotas, magnitude: magnitude, now: now)
             }
             if let credit = card.creditBalance {
-                CreditRow(reading: credit, isCloud: false, now: now)
+                CreditRow(reading: credit, isCloud: false, providerReadAt: lastReadAt, now: now)
             }
             if let credit = card.cloudCredit {
-                CreditRow(reading: credit, isCloud: true, now: now)
+                CreditRow(reading: credit, isCloud: true, providerReadAt: lastReadAt, now: now)
             }
         }
         .padding(.vertical, 14)
@@ -220,6 +220,7 @@ private struct CardView: View {
 private struct CreditRow: View {
     let reading: CreditReading
     let isCloud: Bool
+    let providerReadAt: Date?
     let now: Date
 
     var body: some View {
@@ -240,7 +241,7 @@ private struct CreditRow: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
-            if reading.isStale {
+            if reading.isStale || providerReadAt.map({ reading.readAt < $0 }) == true {
                 Text("Last reading: \(Format.current.timeAgo(reading.readAt, now: now))")
                     .font(.caption)
                     .foregroundStyle(.secondary)
