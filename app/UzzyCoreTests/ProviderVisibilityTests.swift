@@ -32,7 +32,7 @@ struct ProviderVisibilityTests {
         #expect(await claudeReader.reads == 1)
         #expect(await codexReader.reads == 1)
         #expect(await cursorReader.reads == 1)
-        #expect(await transport.requests.count == 3)
+        #expect(await transport.requests.count == 4)
     }
 
     @Test func restoredChoicesHideAndNeverReadDisabledProviders() async {
@@ -52,7 +52,7 @@ struct ProviderVisibilityTests {
         #expect(await codexReader.reads == 0)
         #expect(await transport.requests(to: .codex).isEmpty)
         #expect(await transport.requests(to: .claude).count == 1)
-        #expect(await transport.requests(to: .cursor).count == 1)
+        #expect(await transport.requests(to: .cursor).count == 2)
     }
 
     @Test func allDisabledHasNoCardsOrSessionAndNetworkWork() async {
@@ -155,7 +155,7 @@ struct ProviderVisibilityTests {
         await core.queriesFinished()
 
         let sentAfter = await transport.requests(to: provider).dropFirst(sentBefore)
-        #expect(sentAfter.map { $0.value(forHTTPHeaderField: "Authorization") } == ["Bearer new-token"])
+        #expect(sentAfter.map { $0.value(forHTTPHeaderField: "Authorization") } == Array(repeating: "Bearer new-token", count: provider == .cursor ? 2 : 1))
     }
 
     @Test func enablingWhileClosedWaitsForTheNextPanelOpening() async {

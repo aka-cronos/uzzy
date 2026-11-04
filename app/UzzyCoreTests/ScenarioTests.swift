@@ -38,6 +38,15 @@ struct ScenarioTests {
         #expect(core.state.cards.map(\.plan) == ["Max", "Plus", "Pro+"])
     }
 
+    @Test func cursorWeeklyShowsSuperWithOnlyItsIncludedWeeklyLimit() async {
+        let core = await Scenario.cursorWeekly.start()
+        let card = core.state.cards.first { $0.provider == .cursor }
+        #expect(card?.plan == "Super")
+        #expect(quotas(card?.content) == [
+            Quota(period: .weekly, value: .percent(0, calculated: false), reset: .at(Date(timeIntervalSince1970: 1_790_726_400)), readAt: Samples.readingMoment),
+        ])
+    }
+
     @Test func usageCreditsShowsClaudeSpendingPastItsMonthlyLimit() async {
         let core = await Scenario.usageCredits.start()
 
