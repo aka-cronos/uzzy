@@ -22,6 +22,25 @@ struct ScenarioTests {
     let claudeFiveHourReset = Date(timeIntervalSince1970: 1_790_182_800)
     let claudeWeeklyReset = Date(timeIntervalSince1970: 1_790_326_800)
 
+    @Test func creditScenariosShowPositiveStaleAndHiddenBalances() async {
+        for (scenario, stale) in [(Scenario.creditBalances, false), (.staleCreditBalances, true)] {
+            let core = await scenario.start()
+            let cards = Dictionary(uniqueKeysWithValues: core.state.cards.map { ($0.provider, $0) })
+            #expect(cards[.claude]?.creditBalance?.value == .money(Money(amount: Decimal(string: "7.25")!, currency: "USD")))
+            #expect(cards[.cursor]?.creditBalance?.value == .money(Money(amount: Decimal(string: "7.25")!, currency: "USD")))
+            #expect(cards[.codex]?.creditBalance?.value == .credits(Decimal(string: "123.45")!))
+            #expect(cards[.claude]?.cloudCredit?.value == .money(Money(amount: 90, currency: "USD")))
+            #expect(cards[.claude]?.cloudCredit?.total == Money(amount: 120, currency: "USD"))
+            #expect(core.state.cards.allSatisfy { $0.creditBalance?.isStale == stale })
+            #expect(cards[.claude]?.cloudCredit?.isStale == false)
+            #expect(core.state.cards.allSatisfy { if case .quotas = $0.content { true } else { false } })
+            core.panelClosed()
+        }
+        let hidden = await Scenario.hiddenCreditBalances.start()
+        #expect(hidden.state.cards.allSatisfy { $0.creditBalance == nil && $0.cloudCredit == nil })
+        hidden.panelClosed()
+    }
+
     @Test func quotasShowEverySampleReading() async {
         let core = await Scenario.quotas.start()
         let cards = contents(of: core)

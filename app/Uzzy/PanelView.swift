@@ -205,9 +205,58 @@ private struct CardView: View {
                 FailureMessage(failure: failure, provider: card.provider, now: now)
                 QuotasView(quotas: quotas, magnitude: magnitude, now: now)
             }
+            if let credit = card.creditBalance {
+                CreditRow(reading: credit, isCloud: false, providerReadAt: lastReadAt, now: now)
+            }
+            if let credit = card.cloudCredit {
+                CreditRow(reading: credit, isCloud: true, providerReadAt: lastReadAt, now: now)
+            }
         }
         .padding(.vertical, 14)
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+private struct CreditRow: View {
+    let reading: CreditReading
+    let isCloud: Bool
+    let providerReadAt: Date?
+    let now: Date
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(isCloud ? LocalizedStringKey("Cloud session credits") : LocalizedStringKey("Credit balance"))
+                if reading.isStale {
+                    Text("Out of date").font(.caption.weight(.semibold)).foregroundStyle(.orange)
+                }
+                Spacer(minLength: 6)
+                Text(amount)
+                    .fontWeight(.semibold)
+                    .monospacedDigit()
+                    .foregroundStyle(reading.isStale ? .secondary : .primary)
+            }
+            if let expiry = reading.expiresAt {
+                Text(Format.current.creditExpiry(expiry))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            if reading.isStale || providerReadAt.map({ reading.readAt < $0 }) == true {
+                Text("Last reading: \(Format.current.timeAgo(reading.readAt, now: now))")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .help(Format.current.dayAndTime(reading.readAt, now: now))
+            }
+        }
+        .padding(.top, 14)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var amount: String {
+        if isCloud, case .money(let remaining) = reading.value {
+            return Format.current.cloudCredit(remaining, total: reading.total)
+        }
+        return Format.current.creditBalance(reading.value)
     }
 }
 

@@ -38,6 +38,8 @@ public struct Card: Sendable, Equatable {
     /// `nil` when the card shows no quotas, or the provider reported no plan
     /// Uzzy knows: it is never guessed.
     public var plan: String?
+    public var creditBalance: CreditReading?
+    public var cloudCredit: CreditReading?
 
     public init(provider: Provider, content: CardContent, bankedResets: Int? = nil, plan: String? = nil) {
         self.provider = provider
@@ -182,15 +184,7 @@ extension Money {
     /// or a code that is not a current ISO 4217 currency, so no currency is
     /// ever guessed.
     init?(minorUnits: Int, currency: String) {
-        guard minorUnits >= 0, Locale.commonISOCurrencyCodes.contains(currency) else { return nil }
-        let format = NumberFormatter()
-        format.locale = Locale(identifier: "en_US_POSIX")
-        format.numberStyle = .currency
-        format.currencyCode = currency
-        self.init(
-            amount: Decimal(sign: .plus, exponent: -format.maximumFractionDigits, significand: Decimal(minorUnits)),
-            currency: currency
-        )
+        self.init(exactMinorUnits: Decimal(minorUnits), currency: currency)
     }
 }
 

@@ -58,7 +58,7 @@ struct ClaudePanelTests {
         core.panelOpened()
         await core.queriesFinished()
 
-        let requests = await transport.requests
+        let requests = await transport.quotaRequests
         #expect(requests.count == 1)
         #expect(requests.first?.httpMethod == "GET")
         #expect(requests.first?.url == URL(string: "https://api.anthropic.com/api/oauth/usage"))

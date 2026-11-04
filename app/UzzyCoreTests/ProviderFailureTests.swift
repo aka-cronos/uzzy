@@ -169,7 +169,7 @@ struct ProviderFailureTests {
         await core.queriesFinished()
 
         #expect(claudeContent() == .failed(.incompatibleResponse))
-        #expect(await transport.requests.count == 1)
+        #expect(await transport.quotaRequests.count == 1)
     }
 
     // MARK: Oversized responses
@@ -311,7 +311,7 @@ struct ProviderFailureTests {
         clock.advance(by: 60 * 60)
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 1)
+        #expect(await transport.quotaRequests.count == 1)
     }
 
     @Test func wakingFromSleepWaitsForThePendingRetry() async {
@@ -323,7 +323,7 @@ struct ProviderFailureTests {
         core.systemWoke()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 1)
+        #expect(await transport.quotaRequests.count == 1)
     }
 
     @Test func actualizarDoesNotWaitForTheRetry() async {
@@ -335,7 +335,7 @@ struct ProviderFailureTests {
         core.refresh()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 2)
+        #expect(await transport.quotaRequests.count == 2)
     }
 
     @Test func anIncompatibleResponseIsNotRetriedBeforeTheCadence() async {
@@ -382,7 +382,7 @@ struct ProviderFailureTests {
         core.panelOpened()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 1)
+        #expect(await transport.quotaRequests.count == 1)
     }
 
     @Test func afterRetryAfterTheOpenPanelQueriesOnItsOwn() async {
@@ -405,7 +405,7 @@ struct ProviderFailureTests {
         core.refresh()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 2)
+        #expect(await transport.quotaRequests.count == 2)
     }
 
     @Test func tooManyQueriesWithoutRetryAfterIsRetriedWithAProgressiveWait() async {
@@ -426,7 +426,7 @@ struct ProviderFailureTests {
             await core.queriesFinished()
         }
 
-        #expect(await transport.requests.count == 1)
+        #expect(await transport.quotaRequests.count == 1)
         #expect(claudeContent() == .failed(.rateLimited(until: nil)))
         #expect(await requestTimes(over: 100) == [30, 90])
     }
@@ -463,10 +463,10 @@ struct ProviderFailureTests {
         clock.advance(by: 3599)
         core.refresh()
         await core.queriesFinished()
-        #expect(await transport.requests.count == 1)
+        #expect(await transport.quotaRequests.count == 1)
         clock.advance(by: 1)
         await core.queriesFinished()
-        #expect(await transport.requests.count == 2)
+        #expect(await transport.quotaRequests.count == 2)
     }
 
     @Test func closingThePanelStopsTheRetriesOfAZeroRetryAfter() async {
@@ -480,7 +480,7 @@ struct ProviderFailureTests {
         clock.advance(by: 1000)
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 1)
+        #expect(await transport.quotaRequests.count == 1)
     }
 
     @Test func tooManyQueriesKeepsThePreviousReadingAsStale() async {
@@ -502,13 +502,13 @@ struct ProviderFailureTests {
     /// each new request arrived, in seconds from now.
     func requestTimes(over duration: TimeInterval) async -> [TimeInterval] {
         let start = clock.now()
-        var seen = await transport.requests.count
+        var seen = await transport.quotaRequests.count
         var times: [TimeInterval] = []
         for _ in 0..<Int((duration / 10).rounded(.up)) {
             let step = min(10, duration - clock.now().timeIntervalSince(start))
             clock.advance(by: step)
             await core.queriesFinished()
-            let count = await transport.requests.count
+            let count = await transport.quotaRequests.count
             times += Array(repeating: clock.now().timeIntervalSince(start), count: count - seen)
             seen = count
         }

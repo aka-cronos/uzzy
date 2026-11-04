@@ -29,7 +29,7 @@ struct AccountChangeTests {
         await sessionReader.answer(with: .session(otherAccount))
         await transport.hold()
         core.refresh()
-        await transport.waitForRequests(2)
+        await transport.waitForQuotaRequests(2)
 
         #expect(claudeContent() == .loadingNewAccount)
         await transport.release()
@@ -43,7 +43,7 @@ struct AccountChangeTests {
         await sessionReader.answer(with: .session(Session(accessToken: "sample-token", accountID: nil)))
         await transport.hold()
         core.refresh()
-        await transport.waitForRequests(2)
+        await transport.waitForQuotaRequests(2)
 
         #expect(claudeContent() == .loading)
         await transport.release()
@@ -61,10 +61,10 @@ struct AccountChangeTests {
         await transport.hold()
         clock.advance(by: 60)
         core.panelOpened()
-        await transport.waitForRequests(2)
+        await transport.waitForQuotaRequests(2)
 
         #expect(claudeContent() == .loadingNewAccount)
-        #expect(await transport.requests.last?.value(forHTTPHeaderField: "Authorization") == "Bearer other-token")
+        #expect(await transport.quotaRequests.last?.value(forHTTPHeaderField: "Authorization") == "Bearer other-token")
         await transport.release()
         await core.queriesFinished()
     }
@@ -79,7 +79,7 @@ struct AccountChangeTests {
         core.panelOpened()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 1)
+        #expect(await transport.quotaRequests.count == 1)
         #expect(claudeReadAt() == Samples.readingMoment)
     }
 
@@ -95,7 +95,7 @@ struct AccountChangeTests {
         clock.advance(by: refreshInterval)
         await core.queriesFinished()
 
-        #expect(await transport.requests.last?.value(forHTTPHeaderField: "Authorization") == "Bearer renewed-token")
+        #expect(await transport.quotaRequests.last?.value(forHTTPHeaderField: "Authorization") == "Bearer renewed-token")
     }
 
     /// With the same session there is nothing new to verify, even when its
@@ -110,7 +110,7 @@ struct AccountChangeTests {
         core.panelOpened()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 1)
+        #expect(await transport.quotaRequests.count == 1)
         #expect(claudeReadAt() == Samples.readingMoment)
     }
 
@@ -171,7 +171,7 @@ struct AccountChangeTests {
         core.systemWoke()
         await core.queriesFinished()
 
-        let tokens = await transport.requests.dropFirst().map { $0.value(forHTTPHeaderField: "Authorization") }
+        let tokens = await transport.quotaRequests.dropFirst().map { $0.value(forHTTPHeaderField: "Authorization") }
         #expect(tokens == Array(repeating: "Bearer other-token", count: 3))
     }
 
@@ -187,7 +187,7 @@ struct AccountChangeTests {
         core.systemWoke()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 1)
+        #expect(await transport.quotaRequests.count == 1)
         #expect(claudeContent() == .failed(.noSession))
     }
 
@@ -208,7 +208,7 @@ struct AccountChangeTests {
         core.refresh()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 3)
+        #expect(await transport.quotaRequests.count == 3)
         #expect(claudeReadAt() == clock.now())
     }
 
@@ -224,7 +224,7 @@ struct AccountChangeTests {
         core.refresh()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 2)
+        #expect(await transport.quotaRequests.count == 2)
     }
 
     /// Without a query to make, the uncertain identity still hides the
@@ -242,7 +242,7 @@ struct AccountChangeTests {
         core.refresh()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 2)
+        #expect(await transport.quotaRequests.count == 2)
         #expect(claudeContent() == .failed(.rateLimited(until: Samples.readingMoment.addingTimeInterval(600))))
     }
 
@@ -261,7 +261,7 @@ struct AccountChangeTests {
         for _ in 1...12 where retriedAfter == nil {
             clock.advance(by: 10)
             await core.queriesFinished()
-            if await transport.requests.count == 4 { retriedAfter = clock.now().timeIntervalSince(start) }
+            if await transport.quotaRequests.count == 4 { retriedAfter = clock.now().timeIntervalSince(start) }
         }
 
         #expect(retriedAfter == 30)

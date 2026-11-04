@@ -18,6 +18,7 @@ public struct SampleSessionReader: SessionReader {
 /// requests it receives.
 public actor SampleTransport: HTTPTransport {
     public private(set) var requests: [URLRequest] = []
+    public var quotaRequests: [URLRequest] { requests.filter { !$0.isOptionalCreditRequest } }
     private let claudeResponse: Data
     private let codexResponse: Data
     private let cursorResponse: Data
@@ -34,6 +35,9 @@ public actor SampleTransport: HTTPTransport {
 
     public func send(_ request: URLRequest) async -> HTTPResult {
         requests.append(request)
+        if request.url?.lastPathComponent == "profile" || request.url?.lastPathComponent == "GetUserPrepaidBilling" {
+            return .json("{}")
+        }
         let body = switch request.url?.host {
         case "chatgpt.com": codexResponse
         case "api2.cursor.sh": request.url?.lastPathComponent == "GetPlanInfo" ? Samples.cursorPlanResponse : cursorResponse
@@ -47,6 +51,7 @@ public actor SampleTransport: HTTPTransport {
 /// and records the requests it receives.
 public actor SingleAnswerTransport: HTTPTransport {
     public private(set) var requests: [URLRequest] = []
+    public var quotaRequests: [URLRequest] { requests.filter { !$0.isOptionalCreditRequest } }
     private var result: HTTPResult
 
     public init(_ result: HTTPResult) {
@@ -197,23 +202,33 @@ public struct NoSessionReader: SessionReader {
 /// test releases them.
 public actor ControlledTransport: HTTPTransport {
     public private(set) var requests: [URLRequest] = []
+    public var quotaRequests: [URLRequest] { requests.filter { !$0.isOptionalCreditRequest } }
     private var results: [Provider: HTTPResult] = [.claude: .claudeSample, .codex: .codexSample, .cursor: .cursorSample]
+    private var credits: [Provider: HTTPResult] = [:]
+    private var profile: HTTPResult = .json("{}")
     private var cursorMetadata: HTTPResult = .json(#"{"planInfo":{"includedUsagePeriod":"INCLUDED_USAGE_PERIOD_MONTHLY"}}"#)
     private var held: Set<Provider> = []
+    private var heldCredits: Set<Provider> = []
     private var heldRequests: [CheckedContinuation<Void, Never>] = []
+    private var quotaRequestWaiters: [(count: Int, continuation: CheckedContinuation<Void, Never>)] = []
     private var requestWaiters: [(count: Int, continuation: CheckedContinuation<Void, Never>)] = []
 
     public init() {}
 
     public func send(_ request: URLRequest) async -> HTTPResult {
         requests.append(request)
+        let quotaArrived = quotaRequestWaiters.filter { $0.count <= quotaRequests.count }
+        quotaRequestWaiters.removeAll { $0.count <= quotaRequests.count }
+        quotaArrived.forEach { $0.continuation.resume() }
         let arrived = requestWaiters.filter { $0.count <= requests.count }
         requestWaiters.removeAll { $0.count <= requests.count }
         arrived.forEach { $0.continuation.resume() }
         guard let provider = Provider(of: request) else { return .networkError }
-        if held.contains(provider) {
+        if held.contains(provider) || (request.isOptionalCreditRequest && heldCredits.contains(provider)) {
             await withCheckedContinuation { heldRequests.append($0) }
         }
+        if request.url?.lastPathComponent == "profile" { return profile }
+        if request.isOptionalCreditRequest { return credits[provider] ?? .json("{}") }
         if request.url?.lastPathComponent == "GetPlanInfo" { return cursorMetadata }
         return results[provider] ?? .networkError
     }
@@ -225,6 +240,14 @@ public actor ControlledTransport: HTTPTransport {
         }
     }
 
+    public func answerCredits(with result: HTTPResult, for provider: Provider) {
+        credits[provider] = result
+    }
+
+    public func answerProfile(with result: HTTPResult) {
+        profile = result
+    }
+
     public func answerCursorMetadata(with result: HTTPResult) {
         cursorMetadata = result
     }
@@ -234,8 +257,13 @@ public actor ControlledTransport: HTTPTransport {
         held.formUnion(provider.map { [$0] } ?? Provider.allCases)
     }
 
+    public func holdCredits(for provider: Provider) {
+        heldCredits.insert(provider)
+    }
+
     public func release() {
         held.removeAll()
+        heldCredits.removeAll()
         heldRequests.forEach { $0.resume() }
         heldRequests.removeAll()
     }
@@ -243,6 +271,15 @@ public actor ControlledTransport: HTTPTransport {
     /// The requests sent to `provider`.
     public func requests(to provider: Provider) -> [URLRequest] {
         requests.filter { Provider(of: $0) == provider }
+    }
+
+    public func quotaRequests(to provider: Provider) -> [URLRequest] {
+        quotaRequests.filter { Provider(of: $0) == provider }
+    }
+
+    public func waitForQuotaRequests(_ count: Int) async {
+        guard quotaRequests.count < count else { return }
+        await withCheckedContinuation { quotaRequestWaiters.append((count, $0)) }
     }
 
     /// Returns once `count` requests have arrived.
@@ -317,6 +354,12 @@ public final class RecordingLog: EventLog {
 
     public func record(_ event: LogEvent) {
         recorded.withLock { $0.append(event) }
+    }
+}
+
+extension URLRequest {
+    var isOptionalCreditRequest: Bool {
+        ["profile", "credits", "GetUserPrepaidBilling"].contains(url?.lastPathComponent ?? "")
     }
 }
 

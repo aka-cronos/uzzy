@@ -54,7 +54,7 @@ struct CursorPanelTests {
     @Test func queriesCursorUsageWithAConnectCallAndTheAccessToken() async {
         await openPanel()
 
-        let requests = await transport.requests(to: .cursor)
+        let requests = await transport.quotaRequests(to: .cursor)
         #expect(requests.count == 2)
         #expect(requests.first?.httpMethod == "POST")
         #expect(requests.first?.url == URL(string: "https://api2.cursor.sh/aiserver.v1.DashboardService/GetCurrentPeriodUsage"))
@@ -78,7 +78,7 @@ struct CursorPanelTests {
         #expect(cursorContent() == .quotas([
             Quota(period: .weekly, value: .percent(percent, calculated: false), reset: .at(cycleEnd), readAt: Samples.readingMoment),
         ]))
-        let request = await transport.requests(to: .cursor).last
+        let request = await transport.quotaRequests(to: .cursor).last
         #expect(request?.url?.lastPathComponent == "GetPlanInfo")
         #expect(request?.value(forHTTPHeaderField: "Authorization") == "Bearer sample-token")
         #expect(request?.httpBody == Data("{}".utf8))

@@ -63,8 +63,16 @@ The state of a session whose account cannot be verified, e.g. because its identi
 _Avoid_: Unknown account (as if it were a distinct account), anonymous session.
 
 **Usage credits**:
-Claude's pay-as-you-go consumption (formerly "extra usage"), billed at API rates after the subscription's included usage runs out, optionally capped by a **monthly spend limit** the person sets. Uzzy shows the amount spent this month and the limit, if any, in the provider's currency, as Claude does: «53,06 US$ de 40 US$ este mes», or «53,06 US$ este mes» without a limit. Spending can pass the limit and is shown as it is. It has no percentage, no used/remaining magnitude and no reset. The prepaid balance is not in the provider's response and is never shown or inferred. It is **not** a subscription quota; it sits among the quota rows as a deliberate exception. In Spanish copy it is «Créditos de uso»; in English copy, «Usage credits», Claude's own wording.
+Claude's pay-as-you-go consumption (formerly "extra usage"), billed at API rates after the subscription's included usage runs out, optionally capped by a **monthly spend limit** the person sets. Uzzy shows the amount spent this month and the limit, if any, in the provider's currency, as Claude does: «53,06 US$ de 40 US$ este mes», or «53,06 US$ este mes» without a limit. Spending can pass the limit and is shown as it is. It has no percentage, no used/remaining magnitude and no reset. Prepaid credit balance is independent of this monthly spending figure. It is **not** a subscription quota; it sits among the quota rows as a deliberate exception. In Spanish copy it is «Créditos de uso»; in English copy, «Usage credits», Claude's own wording.
 _Avoid_: Subscription quota, balance, a percentage of the limit, "extra usage" (as a label); in Spanish, «saldo», «cuota».
+
+**Credit balance**:
+Positive prepaid funds or purchased credit remaining for an account, distinct from monthly spending and subscription limits; money retains its currency, while Codex credits are a quantity. In Spanish copy it is «Saldo de créditos»; in English copy, «Credit balance».
+_Avoid_: Usage credits (monthly spending), subscription quota, cloud-session credit, a guarantee that no separate spending restriction applies.
+
+**Cloud-session credit**:
+Claude credit restricted to cloud sessions and usable only until the provider's expiry, independent of general prepaid funds and monthly spending. In Spanish copy it is «Créditos para sesiones en la nube»; in English copy, «Cloud session credits».
+_Avoid_: General balance, recurring reset, monthly spend, adding the grant to unrestricted funds.
 
 **Disabled provider**:
 A provider the person has switched off in Uzzy. It has no card, and Uzzy does not read its session or query its quotas until the person switches it on again. In Spanish copy it is «desactivado» (the action, «desactivar»); in English copy, «turned off» (the action, «turn off»).

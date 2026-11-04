@@ -207,7 +207,7 @@ struct BankedResetTests {
         await answer(resetCredits: nil)
         await transport.hold()
         core.refresh()
-        await transport.waitForRequests(2)
+        await transport.waitForQuotaRequests(2)
 
         #expect(codexCard()?.content == .loadingNewAccount)
         #expect(codexCard()?.bankedResets == nil)
@@ -226,7 +226,7 @@ struct BankedResetTests {
         await answer(resetCredits: nil)
         await transport.hold()
         core.refresh()
-        await transport.waitForRequests(2)
+        await transport.waitForQuotaRequests(2)
 
         #expect(codexCard()?.content == .loading)
         #expect(codexCard()?.bankedResets == nil)
@@ -258,7 +258,7 @@ struct BankedResetTests {
         await answer(resetCredits: nil)
         await transport.hold()
         core.refresh()
-        await transport.waitForRequests(2)
+        await transport.waitForQuotaRequests(2)
 
         #expect(codexCard()?.bankedResets == nil)
 
@@ -276,7 +276,7 @@ struct BankedResetTests {
         await answer(resetCredits: #"{"available_count": 1}"#)
         await transport.hold()
         core.setEnabled(true, for: .codex)
-        await transport.waitForRequests(2)
+        await transport.waitForQuotaRequests(2)
 
         #expect(codexCard()?.content == .loading)
         #expect(codexCard()?.bankedResets == nil)
@@ -315,7 +315,7 @@ struct BankedResetTests {
     @Test func theCountComesFromTheUsageQueryAlone() async {
         await showThreeBankedResets()
 
-        let requests = await transport.requests(to: .codex)
+        let requests = await transport.quotaRequests(to: .codex)
         #expect(requests.map { $0.url?.absoluteString } == ["https://chatgpt.com/backend-api/wham/usage"])
         #expect(requests.first?.httpMethod == "GET")
         #expect(Set(requests.first?.allHTTPHeaderFields?.keys ?? [:].keys) == ["Authorization", "ChatGPT-Account-Id"])

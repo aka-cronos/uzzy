@@ -41,6 +41,18 @@ final class ProviderRefresh {
     }
 
     private var reading = ProviderReading.loading
+    private(set) var creditBalanceState: CreditState = .absent
+    private(set) var cloudCreditState: CreditState = .absent
+
+    private func clearCredits() {
+        creditBalanceState = .absent
+        cloudCreditState = .absent
+    }
+
+    private func staleCredits() {
+        creditBalanceState = CreditState.failed(keeping: nil).retaining(creditBalanceState, at: clock.now())
+        cloudCreditState = CreditState.failed(keeping: nil).retaining(cloudCreditState, at: clock.now())
+    }
     private var query: Task<Void, Never>?
     @ObservationIgnored private var queryID: UUID?
     /// A cancelled query may still be unwinding after a provider is enabled
@@ -121,6 +133,7 @@ final class ProviderRefresh {
             queryID = nil
             scheduledRetry = nil
             reading = .loading
+            clearCredits()
             session = nil
             wait.keepOnlyActiveRateLimit(at: clock.now())
         }
@@ -151,7 +164,7 @@ final class ProviderRefresh {
     /// The Actualizar button: reads the session and queries even when the
     /// reading is fresh or the session was rejected.
     func refresh() {
-        startQuery(.read(skipping: nil))
+        startQuery(.read(skipping: nil), refreshingCredits: true)
     }
 
     /// Stops scheduling retries. A query in flight still finishes.
@@ -179,13 +192,13 @@ final class ProviderRefresh {
     /// Never two queries of the same provider at once: a repeated request
     /// joins the one in flight. A user action reads the session even while
     /// the provider asks to wait, since the wait may be another account's.
-    private func startQuery(_ source: SessionSource) {
+    private func startQuery(_ source: SessionSource, refreshingCredits: Bool = false) {
         guard isEnabled, query == nil else { return }
         if case .reuse = source, !wait.allowsAnyQuery(at: clock.now()) { return }
         let id = UUID()
         queryID = id
         query = Task {
-            let result = await read(source, queryID: id)
+            let result = await read(source, queryID: id, refreshingCredits: refreshingCredits)
             retiredQueries[id] = nil
             guard queryID == id else { return }
             queryID = nil
@@ -228,7 +241,7 @@ final class ProviderRefresh {
 
     /// `nil` when the card keeps what it shows: the session read is the one
     /// to skip, or no query is allowed yet.
-    private func read(_ source: SessionSource, queryID: UUID) async -> ProviderReading? {
+    private func read(_ source: SessionSource, queryID: UUID, refreshingCredits: Bool) async -> ProviderReading? {
         guard isCurrent(queryID) else { return nil }
         let session: Session
         switch source {
@@ -239,6 +252,7 @@ final class ProviderRefresh {
             guard isCurrent(queryID) else { return nil }
             if let failure = Failure(sessionReading) {
                 self.session = nil
+                clearCredits()
                 return .failed(failure, keeping: nil)
             }
             guard case .session(let read) = sessionReading else { return nil }
@@ -276,9 +290,51 @@ final class ProviderRefresh {
         let failure: Failure
         switch answer(to: result, metadata: metadata, of: session, at: clock.now()) {
         case .quotas(let quotas, let bankedResets, let plan):
-            return .quotas(LastValidReading(quotas: quotas, accountID: session.accountID, bankedResets: bankedResets, plan: plan))
+            let valid = LastValidReading(quotas: quotas, accountID: session.accountID, bankedResets: bankedResets, plan: plan)
+            reading = .quotas(valid)
+            if let accountID = session.accountID, !accountID.isEmpty, case .response(let response) = result {
+                if provider == .claude {
+                    cloudCreditState = Claude.cloudCredit(from: response.body, accountID: accountID, at: clock.now())
+                        .retaining(cloudCreditState, at: clock.now())
+                }
+                if provider == .cursor {
+                    let extra = await transport.send(Cursor.prepaidRequest(for: session, refreshing: refreshingCredits))
+                    guard isCurrent(queryID) else { return nil }
+                    creditBalanceState = successfulBody(extra).map {
+                        Cursor.prepaidBalance(from: $0, accountID: accountID, at: clock.now())
+                    }?.retaining(creditBalanceState, at: clock.now())
+                        ?? CreditState.failed(keeping: nil).retaining(creditBalanceState, at: clock.now())
+                }
+                if provider == .claude {
+                    let profile = await transport.send(Claude.profileRequest(for: session))
+                    guard isCurrent(queryID) else { return nil }
+                    if let profileBody = successfulBody(profile),
+                       let organizationID = Claude.organization(from: profileBody, accountID: accountID) {
+                        if creditBalanceState.visible(at: clock.now())?.organizationID != organizationID {
+                            creditBalanceState = .absent
+                        }
+                        let prepaid = await transport.send(Claude.prepaidRequest(for: session, organizationID: organizationID))
+                        guard isCurrent(queryID) else { return nil }
+                        creditBalanceState = successfulBody(prepaid).map {
+                            Claude.prepaidBalance(from: $0, accountID: accountID, organizationID: organizationID, at: clock.now())
+                        }?.retaining(creditBalanceState, at: clock.now())
+                            ?? CreditState.failed(keeping: nil).retaining(creditBalanceState, at: clock.now())
+                    } else {
+                        // A failed profile lookup leaves the organization uncertain.
+                        creditBalanceState = .failed(keeping: nil)
+                    }
+                }
+                if provider == .codex {
+                    creditBalanceState = Codex.creditBalance(from: response.body, accountID: accountID, at: clock.now())
+                        .retaining(creditBalanceState, at: clock.now())
+                }
+            } else {
+                clearCredits()
+            }
+            return .quotas(valid)
         case .failed(let why): failure = why
         }
+        staleCredits()
         log.record(.queryFailed(provider, failure))
         let kept = reading.lastValidReading(of: session.accountID)
         if failure.isRejection, case .reuse = source {
@@ -300,6 +356,7 @@ final class ProviderRefresh {
     /// either side, goes at once: its figures are never shown as the
     /// session's. While querying, the card says whose quotas are coming.
     private func forgetReading(unlessItBelongsTo session: Session, whileQuerying querying: Bool) {
+        if session.accountID == nil || self.reading.lastValidReading(of: session.accountID) == nil { clearCredits() }
         guard let last = reading.lastValidReadingOfAnyAccount, reading.lastValidReading(of: session.accountID) == nil
         else { return }
         if !querying, case .failed(let failure, _) = reading {
@@ -545,4 +602,9 @@ private func retryAfter(_ headers: [String: String], from moment: Date) -> Date?
     }
     guard let until, until > moment else { return nil }
     return min(until, moment.addingTimeInterval(RetryWait.longestRequested))
+}
+
+private func successfulBody(_ result: HTTPResult) -> Data? {
+    guard case .response(let response) = result, response.status == 200 else { return nil }
+    return response.body
 }

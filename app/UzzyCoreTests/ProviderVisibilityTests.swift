@@ -32,7 +32,7 @@ struct ProviderVisibilityTests {
         #expect(await claudeReader.reads == 1)
         #expect(await codexReader.reads == 1)
         #expect(await cursorReader.reads == 1)
-        #expect(await transport.requests.count == 4)
+        #expect(await transport.quotaRequests.count == 4)
     }
 
     @Test func restoredChoicesHideAndNeverReadDisabledProviders() async {
@@ -50,9 +50,9 @@ struct ProviderVisibilityTests {
         await restored.queriesFinished()
 
         #expect(await codexReader.reads == 0)
-        #expect(await transport.requests(to: .codex).isEmpty)
-        #expect(await transport.requests(to: .claude).count == 1)
-        #expect(await transport.requests(to: .cursor).count == 2)
+        #expect(await transport.quotaRequests(to: .codex).isEmpty)
+        #expect(await transport.quotaRequests(to: .claude).count == 1)
+        #expect(await transport.quotaRequests(to: .cursor).count == 2)
     }
 
     @Test func allDisabledHasNoCardsOrSessionAndNetworkWork() async {
@@ -79,7 +79,7 @@ struct ProviderVisibilityTests {
         #expect(await claudeReader.reads == 0)
         #expect(await codexReader.reads == 0)
         #expect(await cursorReader.reads == 0)
-        #expect(await transport.requests.isEmpty)
+        #expect(await transport.quotaRequests.isEmpty)
     }
 
     @Test func disablingOneProviderSuppressesEveryTriggerAndLeavesOthersWorking() async {
@@ -97,9 +97,9 @@ struct ProviderVisibilityTests {
         await core.queriesFinished()
 
         #expect(await codexReader.reads == 1)
-        #expect(await transport.requests(to: .codex).count == 1)
-        #expect(await transport.requests(to: .claude).count > 1)
-        #expect(await transport.requests(to: .cursor).count > 1)
+        #expect(await transport.quotaRequests(to: .codex).count == 1)
+        #expect(await transport.quotaRequests(to: .claude).count > 1)
+        #expect(await transport.quotaRequests(to: .cursor).count > 1)
         #expect(core.state.cards.map(\.provider) == [.claude, .cursor])
     }
 
@@ -114,7 +114,7 @@ struct ProviderVisibilityTests {
         await core.queriesFinished(of: .claude)
 
         #expect(await claudeReader.reads == 2)
-        #expect(await transport.requests(to: .claude).count == 2)
+        #expect(await transport.quotaRequests(to: .claude).count == 2)
         guard case .quotas = core.state.cards[0].content else {
             Issue.record("Re-enabled provider did not get a fresh reading")
             return
@@ -142,19 +142,19 @@ struct ProviderVisibilityTests {
         core.setEnabled(false, for: provider)
         await reader(of: provider).answer(with: .session(Session(accessToken: "new-token", accountID: "sample-account")))
         core.setEnabled(true, for: provider)
-        let sentBefore = await transport.requests(to: provider).count
+        let sentBefore = await transport.quotaRequests(to: provider).count
         core.systemWoke()
         clock.advance(by: 5 * 60)
         await core.queriesFinished()
 
-        #expect(await transport.requests(to: provider).count == sentBefore)
+        #expect(await transport.quotaRequests(to: provider).count == sentBefore)
         #expect(core.state.cards.first { $0.provider == provider }?.content == .loading)
         #expect(core.state.cards.first { $0.provider == provider }?.plan == nil)
 
         core.panelOpened()
         await core.queriesFinished()
 
-        let sentAfter = await transport.requests(to: provider).dropFirst(sentBefore)
+        let sentAfter = await transport.quotaRequests(to: provider).dropFirst(sentBefore)
         #expect(sentAfter.map { $0.value(forHTTPHeaderField: "Authorization") } == Array(repeating: "Bearer new-token", count: provider == .cursor ? 2 : 1))
     }
 
@@ -167,13 +167,13 @@ struct ProviderVisibilityTests {
 
         #expect(core.state.cards[1].content == .loading)
         #expect(await codexReader.reads == 0)
-        #expect(await transport.requests(to: .codex).isEmpty)
+        #expect(await transport.quotaRequests(to: .codex).isEmpty)
 
         core.panelOpened()
         await core.queriesFinished(of: .codex)
 
         #expect(await codexReader.reads == 1)
-        #expect(await transport.requests(to: .codex).count == 1)
+        #expect(await transport.quotaRequests(to: .codex).count == 1)
     }
 
     @Test func disablingDuringSessionReadCannotStartANetworkRequest() async {
@@ -186,18 +186,18 @@ struct ProviderVisibilityTests {
         await core.queriesFinished(of: .claude)
 
         #expect(!core.enabledProviders.contains(.claude))
-        #expect(await transport.requests(to: .claude).isEmpty)
+        #expect(await transport.quotaRequests(to: .claude).isEmpty)
 
         core.setEnabled(true, for: .claude)
         await core.queriesFinished(of: .claude)
         #expect(await claudeReader.reads == 2)
-        #expect(await transport.requests(to: .claude).count == 1)
+        #expect(await transport.quotaRequests(to: .claude).count == 1)
     }
 
     @Test func disablingDuringNetworkRequestIgnoresItsLateResult() async {
         await transport.hold(.claude)
         core.panelOpened()
-        await transport.waitForRequests(3)
+        await transport.waitForQuotaRequests(3)
         await core.queriesFinished(of: .codex)
         await core.queriesFinished(of: .cursor)
 
@@ -213,7 +213,7 @@ struct ProviderVisibilityTests {
         #expect(core.state.cards[0].content == .loading)
         await core.queriesFinished(of: .claude)
         #expect(await claudeReader.reads == 2)
-        #expect(await transport.requests(to: .claude).count == 2)
+        #expect(await transport.quotaRequests(to: .claude).count == 2)
     }
 
     @Test func disablingInvalidatesAScheduledRetry() async {
@@ -226,7 +226,7 @@ struct ProviderVisibilityTests {
         await core.queriesFinished()
 
         #expect(await claudeReader.reads == 1)
-        #expect(await transport.requests(to: .claude).count == 1)
+        #expect(await transport.quotaRequests(to: .claude).count == 1)
     }
 
     @Test func disablingRetiresTheScheduledRetry() async {
@@ -256,13 +256,13 @@ struct ProviderVisibilityTests {
         await core.queriesFinished(of: .claude)
 
         #expect(core.state.cards[0].content == .failed(.rateLimited(until: until)))
-        #expect(await transport.requests(to: .claude).count == 1)
+        #expect(await transport.quotaRequests(to: .claude).count == 1)
         await transport.answer(with: .claudeSample, for: .claude)
 
         clock.advance(by: 540)
         await core.queriesFinished(of: .claude)
 
-        #expect(await transport.requests(to: .claude).count == 2)
+        #expect(await transport.quotaRequests(to: .claude).count == 2)
         guard case .quotas = core.state.cards[0].content else {
             Issue.record("Provider did not query after Retry-After ended")
             return
