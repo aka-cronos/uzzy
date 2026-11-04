@@ -72,7 +72,7 @@ struct ProviderIsolationTests {
         await transport.hold(.claude)
 
         core.panelOpened()
-        await transport.waitForRequests(2)
+        await transport.waitForQuotaRequests(2)
         await core.queriesFinished(of: .codex)
 
         #expect(showsQuotas(.codex))
@@ -90,8 +90,8 @@ struct ProviderIsolationTests {
         clock.advance(by: refreshInterval)
         await core.queriesFinished()
 
-        #expect(await transport.requests(to: .claude).count == 2)
-        #expect(await transport.requests(to: .codex).count == 1)
+        #expect(await transport.quotaRequests(to: .claude).count == 2)
+        #expect(await transport.quotaRequests(to: .codex).count == 1)
         #expect(content(of: .codex) == .failed(.sessionExpired))
     }
 
@@ -109,8 +109,8 @@ struct ProviderIsolationTests {
             return
         }
         #expect(showsQuotas(.claude))
-        #expect(await transport.requests(to: .claude).count == 3)
-        #expect(await transport.requests(to: .codex).count == 2)
+        #expect(await transport.quotaRequests(to: .claude).count == 3)
+        #expect(await transport.quotaRequests(to: .codex).count == 2)
     }
 
     @Test func aProviderAskingToWaitDoesNotHoldBackTheOther() async {
@@ -126,8 +126,8 @@ struct ProviderIsolationTests {
         core.refresh()
         await core.queriesFinished()
 
-        #expect(await transport.requests(to: .claude).count == 2)
-        #expect(await transport.requests(to: .codex).count == 3)
+        #expect(await transport.quotaRequests(to: .claude).count == 2)
+        #expect(await transport.quotaRequests(to: .codex).count == 3)
     }
 
     @Test func aZeroRetryAfterWaitsOnlyForItsOwnProvider() async {
@@ -140,13 +140,13 @@ struct ProviderIsolationTests {
             clock.advance(by: 0)
             await core.queriesFinished()
         }
-        #expect(await transport.requests(to: .claude).count == 1)
+        #expect(await transport.quotaRequests(to: .claude).count == 1)
 
         clock.advance(by: 30)
         await core.queriesFinished()
 
-        #expect(await transport.requests(to: .claude).count == 2)
-        #expect(await transport.requests(to: .codex).count == 1)
+        #expect(await transport.quotaRequests(to: .claude).count == 2)
+        #expect(await transport.quotaRequests(to: .codex).count == 1)
         #expect(showsQuotas(.codex))
     }
 
@@ -157,7 +157,7 @@ struct ProviderIsolationTests {
         clock.advance(by: 30)
         await core.queriesFinished()
 
-        #expect(await transport.requests(to: .codex).count == 2)
-        #expect(await transport.requests(to: .claude).count == 1)
+        #expect(await transport.quotaRequests(to: .codex).count == 2)
+        #expect(await transport.quotaRequests(to: .claude).count == 1)
     }
 }

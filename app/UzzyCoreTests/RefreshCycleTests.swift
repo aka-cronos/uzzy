@@ -16,7 +16,7 @@ struct RefreshCycleTests {
     }
 
     func requestCount() async -> Int {
-        await transport.requests.count
+        await transport.quotaRequests.count
     }
 
     @Test func openingWithAReadingUnderFiveMinutesOldDoesNotQueryAgain() async {
@@ -126,7 +126,7 @@ struct RefreshCycleTests {
     @Test func aQueryInFlightWhenThePanelClosesStillFinishes() async {
         await transport.hold()
         core.panelOpened()
-        await transport.waitForRequests(1)
+        await transport.waitForQuotaRequests(1)
 
         core.panelClosed()
         await transport.release()
@@ -194,7 +194,7 @@ struct RefreshCycleTests {
     @Test func repeatedRequestsJoinTheQueryInFlight() async {
         await transport.hold()
         core.panelOpened()
-        await transport.waitForRequests(1)
+        await transport.waitForQuotaRequests(1)
 
         core.refresh()
         core.systemWoke()

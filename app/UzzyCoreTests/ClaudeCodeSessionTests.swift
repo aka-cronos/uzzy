@@ -38,7 +38,7 @@ struct ClaudeCodeSessionTests {
 
         await openPanel()
 
-        #expect(await transport.requests(to: .claude).first?.value(forHTTPHeaderField: "Authorization") == "Bearer sample-token")
+        #expect(await transport.quotaRequests(to: .claude).first?.value(forHTTPHeaderField: "Authorization") == "Bearer sample-token")
     }
 
     @Test func asksForTheItemPasswordOfClaudeCodesService() async throws {
@@ -55,7 +55,7 @@ struct ClaudeCodeSessionTests {
         await openPanel()
 
         #expect(claudeContent() == .failed(.noSession))
-        #expect(await transport.requests(to: .claude).isEmpty)
+        #expect(await transport.quotaRequests(to: .claude).isEmpty)
     }
 
     @Test(arguments: [Int32(128), 51])
@@ -65,7 +65,7 @@ struct ClaudeCodeSessionTests {
         await openPanel()
 
         #expect(claudeContent() == .failed(.sessionAccessDenied))
-        #expect(await transport.requests(to: .claude).isEmpty)
+        #expect(await transport.quotaRequests(to: .claude).isEmpty)
     }
 
     @Test func anotherKeychainErrorIsAnUnavailableStore() async throws {
@@ -74,7 +74,7 @@ struct ClaudeCodeSessionTests {
         await openPanel()
 
         #expect(claudeContent() == .failed(.sessionStoreUnavailable))
-        #expect(await transport.requests(to: .claude).isEmpty)
+        #expect(await transport.quotaRequests(to: .claude).isEmpty)
     }
 
     /// The tool is never written, so it cannot run.
@@ -99,7 +99,7 @@ struct ClaudeCodeSessionTests {
         await openPanel()
 
         #expect(claudeContent() == .failed(.noSession))
-        #expect(await transport.requests(to: .claude).isEmpty)
+        #expect(await transport.quotaRequests(to: .claude).isEmpty)
     }
 }
 

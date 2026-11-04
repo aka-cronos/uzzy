@@ -65,7 +65,7 @@ struct CursorEncryptedSessionTests {
     }
 
     func cursorRequests() async -> [URLRequest] {
-        await transport.requests(to: .cursor)
+        await transport.quotaRequests(to: .cursor)
     }
 
     // MARK: Consent

@@ -138,7 +138,7 @@ struct PlanTests {
 
         #expect(showsQuotas(card(.claude, of: core)))
         #expect(card(.claude, of: core)?.plan == nil)
-        #expect(await transport.requests(to: .claude).first?.value(forHTTPHeaderField: "Authorization") == "Bearer sample-token")
+        #expect(await transport.quotaRequests(to: .claude).first?.value(forHTTPHeaderField: "Authorization") == "Bearer sample-token")
     }
 
     /// Claude's usage response names no plan, whatever it holds.
@@ -212,7 +212,7 @@ struct PlanTests {
 
         #expect(showsQuotas(card(.cursor, of: core)))
         #expect(card(.cursor, of: core)?.plan == nil)
-        #expect(await transport.requests(to: .cursor).first?.value(forHTTPHeaderField: "Authorization") == "Bearer \(token)")
+        #expect(await transport.quotaRequests(to: .cursor).first?.value(forHTTPHeaderField: "Authorization") == "Bearer \(token)")
     }
 
     @Test func readingCursorsPlanNeverChangesItsDatabase() async throws {
@@ -246,7 +246,7 @@ struct PlanTests {
         await transport.hold()
 
         core.panelOpened()
-        await transport.waitForRequests(1)
+        await transport.waitForQuotaRequests(1)
 
         #expect(card(.claude, of: core)?.content == .loading)
         #expect(card(.claude, of: core)?.plan == nil)
@@ -303,7 +303,7 @@ struct PlanTests {
         await sessionReader.answer(with: .session(Session(accessToken: "other-token", accountID: "other-account", plan: "pro")))
         await transport.hold()
         core.refresh()
-        await transport.waitForRequests(2)
+        await transport.waitForQuotaRequests(2)
 
         #expect(card(.claude, of: core)?.content == .loadingNewAccount)
         #expect(card(.claude, of: core)?.plan == nil)
@@ -336,7 +336,7 @@ struct PlanTests {
         clock.advance(by: 5 * 60)
         await core.queriesFinished()
 
-        #expect(await transport.requests(to: .claude).count == 2)
+        #expect(await transport.quotaRequests(to: .claude).count == 2)
         #expect(await sessionReader.reads == 1)
         #expect(card(.claude, of: core)?.plan == "Max")
     }

@@ -27,7 +27,7 @@ struct SessionStateTests {
         await core.queriesFinished()
 
         #expect(claudeContent() == .failed(.noSession))
-        #expect(await transport.requests.isEmpty)
+        #expect(await transport.quotaRequests.isEmpty)
     }
 
     @Test func aSessionTheProviderRejectsIsExpired() async {
@@ -55,7 +55,7 @@ struct SessionStateTests {
         await core.queriesFinished()
 
         #expect(claudeContent() == .failed(.sessionAccessDenied))
-        #expect(await transport.requests.isEmpty)
+        #expect(await transport.quotaRequests.isEmpty)
     }
 
     @Test func aSessionInAnUnknownFormatIsIncompatibleAndNothingIsQueried() async {
@@ -66,7 +66,7 @@ struct SessionStateTests {
 
         // The state carries no credential to show.
         #expect(claudeContent() == .failed(.incompatibleSession))
-        #expect(await transport.requests.isEmpty)
+        #expect(await transport.quotaRequests.isEmpty)
     }
 
     @Test func anUnavailableSessionStoreIsNotCalledAnIncompatibleSession() async {
@@ -76,7 +76,7 @@ struct SessionStateTests {
         await core.queriesFinished()
 
         #expect(claudeContent() == .failed(.sessionStoreUnavailable))
-        #expect(await transport.requests.isEmpty)
+        #expect(await transport.quotaRequests.isEmpty)
     }
 
     @Test(arguments: [401, 403])
@@ -87,7 +87,7 @@ struct SessionStateTests {
 
         await runTheCadenceAndWake()
 
-        #expect(await transport.requests.count == 1)
+        #expect(await transport.quotaRequests.count == 1)
         #expect(await sessionReader.reads == 1)
     }
 
@@ -102,7 +102,7 @@ struct SessionStateTests {
         core.panelOpened()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 1)
+        #expect(await transport.quotaRequests.count == 1)
         #expect(claudeContent() == .failed(failure))
     }
 
@@ -118,8 +118,8 @@ struct SessionStateTests {
         core.panelOpened()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 2)
-        #expect(await transport.requests.last?.value(forHTTPHeaderField: "Authorization") == "Bearer renewed-token")
+        #expect(await transport.quotaRequests.count == 2)
+        #expect(await transport.quotaRequests.last?.value(forHTTPHeaderField: "Authorization") == "Bearer renewed-token")
         #expect(claudeReadAt() == Samples.readingMoment)
     }
 
@@ -133,7 +133,7 @@ struct SessionStateTests {
         core.refresh()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 2)
+        #expect(await transport.quotaRequests.count == 2)
         #expect(claudeReadAt() == Samples.readingMoment)
     }
 
@@ -171,7 +171,7 @@ struct SessionStateTests {
 
         await runTheCadenceAndWake()
 
-        #expect(await transport.requests.count == 5)
+        #expect(await transport.quotaRequests.count == 5)
         #expect(await sessionReader.reads == 1)
     }
 
@@ -184,7 +184,7 @@ struct SessionStateTests {
         await runTheCadenceAndWake()
 
         #expect(await sessionReader.reads == 1)
-        #expect(await transport.requests.isEmpty)
+        #expect(await transport.quotaRequests.isEmpty)
     }
 
     /// The official app may have renewed the token since it was read, so a
@@ -198,7 +198,7 @@ struct SessionStateTests {
         await transport.answer(with: .status(status))
         await runTheCadenceAndWake()
 
-        #expect(await transport.requests.count == 2)
+        #expect(await transport.quotaRequests.count == 2)
         #expect(await sessionReader.reads == 1)
         guard case .stale(let quotas, .reusedSessionRejected) = claudeContent() else {
             Issue.record("Not stale: \(String(describing: claudeContent()))")
@@ -214,7 +214,7 @@ struct SessionStateTests {
         await core.queriesFinished()
 
         #expect(await sessionReader.reads == 2)
-        #expect(await transport.requests.last?.value(forHTTPHeaderField: "Authorization") == "Bearer renewed-token")
+        #expect(await transport.quotaRequests.last?.value(forHTTPHeaderField: "Authorization") == "Bearer renewed-token")
         #expect(claudeReadAt() == clock.now())
     }
 
@@ -234,7 +234,7 @@ struct SessionStateTests {
         await core.queriesFinished()
 
         #expect(await sessionReader.reads == 2)
-        #expect(await transport.requests.count == 3)
+        #expect(await transport.quotaRequests.count == 3)
         #expect(claudeReadAt() == clock.now())
     }
 
@@ -251,7 +251,7 @@ struct SessionStateTests {
         await core.queriesFinished()
 
         #expect(await sessionReader.reads == 2)
-        #expect(await transport.requests.count == 3)
+        #expect(await transport.quotaRequests.count == 3)
         #expect(claudeReadAt() == clock.now())
     }
 
@@ -264,7 +264,7 @@ struct SessionStateTests {
         await transport.answer(with: .status(401))
         await runTheCadenceAndWake()
 
-        #expect(await transport.requests.count == 2)
+        #expect(await transport.quotaRequests.count == 2)
         #expect(claudeContent() == .failed(.reusedSessionRejected))
     }
 

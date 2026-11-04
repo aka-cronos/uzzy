@@ -46,7 +46,7 @@ struct CursorSessionTests {
         await openPanel()
 
         #expect(showsQuotas())
-        #expect(await transport.requests(to: .cursor).first?.value(forHTTPHeaderField: "Authorization") == "Bearer \(token)")
+        #expect(await transport.quotaRequests(to: .cursor).first?.value(forHTTPHeaderField: "Authorization") == "Bearer \(token)")
     }
 
     @Test func withoutCursorsDatabaseThereIsNoSessionAndNoQuery() async throws {
@@ -55,7 +55,7 @@ struct CursorSessionTests {
         await openPanel()
 
         #expect(cursorContent() == .failed(.noSession))
-        #expect(await transport.requests(to: .cursor).isEmpty)
+        #expect(await transport.quotaRequests(to: .cursor).isEmpty)
     }
 
     @Test(arguments: [nil, ""])
@@ -65,7 +65,7 @@ struct CursorSessionTests {
         await openPanel()
 
         #expect(cursorContent() == .failed(.noSession))
-        #expect(await transport.requests(to: .cursor).isEmpty)
+        #expect(await transport.quotaRequests(to: .cursor).isEmpty)
     }
 
     @Test func aDatabaseWithoutItsTableIsAnIncompatibleSession() async throws {
@@ -74,7 +74,7 @@ struct CursorSessionTests {
         await openPanel()
 
         #expect(cursorContent() == .failed(.incompatibleSession))
-        #expect(await transport.requests(to: .cursor).isEmpty)
+        #expect(await transport.quotaRequests(to: .cursor).isEmpty)
     }
 
     @Test func anUnreadableDatabaseIsNotCalledAnIncompatibleSession() async throws {
@@ -84,7 +84,7 @@ struct CursorSessionTests {
         await openPanel()
 
         #expect(cursorContent() == .failed(.sessionStoreUnavailable))
-        #expect(await transport.requests(to: .cursor).isEmpty)
+        #expect(await transport.quotaRequests(to: .cursor).isEmpty)
     }
 
     @Test func aLockedDatabaseExplainsThatTheSessionIsBusy() async throws {
@@ -103,7 +103,7 @@ struct CursorSessionTests {
         await openPanel()
 
         #expect(cursorContent() == .failed(.sessionStoreBusy))
-        #expect(await transport.requests(to: .cursor).isEmpty)
+        #expect(await transport.quotaRequests(to: .cursor).isEmpty)
     }
 
     /// Cursor renews its token often; the account behind it stays the same.
@@ -114,7 +114,7 @@ struct CursorSessionTests {
         try database.store(accessToken: SampleCursorDatabase.token(subject: "auth0|sample-user", issuedAt: 2))
         await transport.hold()
         core.refresh()
-        await transport.waitForRequests(3)
+        await transport.waitForQuotaRequests(3)
 
         #expect(showsQuotas())
         await transport.release()
@@ -128,7 +128,7 @@ struct CursorSessionTests {
         try database.store(accessToken: SampleCursorDatabase.token(subject: "auth0|other-user"))
         await transport.hold()
         core.refresh()
-        await transport.waitForRequests(3)
+        await transport.waitForQuotaRequests(3)
 
         #expect(cursorContent() == .loadingNewAccount)
         await transport.release()
@@ -144,7 +144,7 @@ struct CursorSessionTests {
         try database.store(accessToken: token)
         await transport.hold()
         core.refresh()
-        await transport.waitForRequests(3)
+        await transport.waitForQuotaRequests(3)
 
         #expect(cursorContent() == .loading)
         await transport.release()

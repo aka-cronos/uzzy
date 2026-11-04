@@ -111,7 +111,7 @@ struct ProviderOrderTests {
         let core = makeCore()
         await transport.hold(.claude)
         core.panelOpened()
-        await transport.waitForRequests(3)
+        await transport.waitForQuotaRequests(3)
         await core.queriesFinished(of: .codex)
         await core.queriesFinished(of: .cursor)
         let deadlines = clock.scheduledDeadlines
@@ -137,7 +137,7 @@ struct ProviderOrderTests {
         #expect(await claudeReader.reads == 1)
         #expect(await codexReader.reads == 1)
         #expect(await cursorReader.reads == 1)
-        #expect(await transport.requests.count == 4)
+        #expect(await transport.quotaRequests.count == 4)
     }
 
     @Test func reorderingKeepsFreshReadingsFresh() async {
@@ -151,7 +151,7 @@ struct ProviderOrderTests {
         core.panelOpened()
         await core.queriesFinished()
 
-        #expect(await transport.requests.count == 4)
+        #expect(await transport.quotaRequests.count == 4)
         #expect(core.order == [.codex, .claude, .cursor])
     }
 }

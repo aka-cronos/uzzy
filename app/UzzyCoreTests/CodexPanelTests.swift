@@ -313,7 +313,7 @@ struct CodexPanelTests {
         await core.queriesFinished()
 
         #expect(codexContent() == .failed(.sessionWithoutSubscriptionQuotas))
-        #expect(await transport.requests(to: .codex).isEmpty)
+        #expect(await transport.quotaRequests(to: .codex).isEmpty)
     }
 
     @Test func anotherCodexAccountClearsThePreviousReadingAndIsQueriedWithItsOwnAccount() async {
@@ -322,10 +322,10 @@ struct CodexPanelTests {
         await codexSessionReader.answer(with: .session(Session(accessToken: "other-token", accountID: "other-account")))
         await transport.hold(.codex)
         core.refresh()
-        await transport.waitForRequests(4)
+        await transport.waitForQuotaRequests(4)
 
         #expect(codexContent() == .loadingNewAccount)
-        let request = await transport.requests(to: .codex).last
+        let request = await transport.quotaRequests(to: .codex).last
         #expect(request?.value(forHTTPHeaderField: "ChatGPT-Account-Id") == "other-account")
         await transport.release()
         await core.queriesFinished()
@@ -334,7 +334,7 @@ struct CodexPanelTests {
     @Test func queriesCodexUsageWithTheAccessTokenAndTheAccount() async {
         await openPanel()
 
-        let requests = await transport.requests(to: .codex)
+        let requests = await transport.quotaRequests(to: .codex)
         #expect(requests.count == 1)
         #expect(requests.first?.httpMethod == "GET")
         #expect(requests.first?.url == URL(string: "https://chatgpt.com/backend-api/wham/usage"))
