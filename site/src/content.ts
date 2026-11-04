@@ -4,7 +4,7 @@ export const DOWNLOAD_URL =
 export const REPO_URL = "https://github.com/aka-cronos/uzzy";
 export const MAKER = "akacronos";
 export const X_URL = `https://x.com/${MAKER}`;
-export const VERSION = "0.3.1";
+export const VERSION = "0.4.0";
 export const REQUIREMENTS = "macOS 27 · Apple Silicon";
 
 export const hero = {
@@ -25,17 +25,17 @@ export const providers = [
   {
     name: "Claude",
     session: "Claude Code",
-    shows: "5 hours, weekly, weekly per model, usage credits this month",
+    shows: "5 hours, weekly, weekly per model, usage credits this month, credit balance, cloud session credits",
   },
   {
     name: "Codex",
     session: "Codex CLI (ChatGPT sign-in)",
-    shows: "5 hours, weekly, extra limits, banked resets",
+    shows: "5 hours, weekly, extra limits, banked resets, credit balance",
   },
   {
     name: "Cursor",
     session: "Cursor",
-    shows: "Cursor Models and Other Models for the billing cycle",
+    shows: "Weekly usage on unified plans, Cursor Models and Other Models on legacy plans, credit balance",
   },
 ];
 
@@ -50,7 +50,7 @@ export const settings = [
 
 export const privacy = [
   { title: "Read-only access.", body: "Uzzy reuses your existing sessions. It never asks for a password, signs in for you or writes credentials. It reads Cursor’s encrypted session only after you allow access to its key in the Keychain." },
-  { title: "Straight to your providers.", body: "Usage requests go directly to Claude, Codex and Cursor. Once a day Uzzy asks GitHub for the latest version, unless you turn that off. No telemetry. No server of its own." },
+  { title: "Straight to your providers.", body: "Usage and balance requests go directly to Claude, Codex and Cursor. Once a day Uzzy asks GitHub for the latest version, unless you turn that off. No telemetry. No server of its own." },
   { title: "Readings stay in memory.", body: "Uzzy doesn’t save usage readings to disk." },
 ];
 
