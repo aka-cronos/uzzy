@@ -27,7 +27,7 @@ Keep using Claude, Codex and Cursor. Uzzy brings their usage limits together so 
 ## Features
 
 - **Three tools. One quick check.** Open Uzzy from your menu bar to see Claude, Codex and Cursor together, with a separate card for each enabled provider, led by its logo and showing its plan.
-- **Different limits stay different.** Check each usage limit («5 horas», «Semanal», «Cursor Models»…) on its own, with its reset in local time, a countdown and how long ago it was last read. Five-hour and weekly limits are never blended into one number, and usage credits and banked resets are shown next to them.
+- **Different limits stay different.** Check each usage limit («5 horas», «Semanal», «Cursor Models»…) on its own, with its reset in local time, a countdown and how long ago it was last read. Five-hour and weekly limits are never blended into one number, and usage credits, credit balances and banked resets are shown next to them.
 - **Checks while you look.** Uzzy refreshes readings as you open the panel (unless the last reading is under five minutes old), then every five minutes while it stays open, and on demand with the refresh button. Close it and the requests stop.
 - **Missing doesn’t mean zero.** If a session expires or a provider can’t be reached, Uzzy tells you what happened (no session, expired session, offline, incompatible response…) and the other providers keep working. When a refresh fails, the card keeps the last valid reading and marks it as out of date.
 - **Native settings.** Choose whether the cards show how much is used or left, turn each provider on or off or change the order of the cards, pick how detailed the countdown to a reset is and whether the resets available on an account are shown, and turn the daily check for updates on or off. The installed version and build are shown at the bottom.
@@ -43,9 +43,9 @@ Open Settings with ⌘, from the panel; ⌘W closes it and ⌘Q quits. Your choi
 
 | Provider | Session it reuses | What it shows |
 |---|---|---|
-| **Claude** | Claude Code (the Keychain and `~/.claude.json`) | 5 hours, weekly, and weekly per model when the plan has them; also the usage credits spent this month and their monthly limit («Créditos de uso»), when usage credits are on |
-| **Codex** | Codex CLI signed in with ChatGPT (`~/.codex/auth.json` or `$CODEX_HOME`) | 5 hours, weekly, any extra limit the plan has, and the account's banked resets |
-| **Cursor** | Cursor (its local `state.vscdb`, and its safeStorage key in the Keychain once you allow it) | Weekly included usage on unified plans; «Cursor Models» and «Other Models» for the billing cycle on legacy plans |
+| **Claude** | Claude Code (the Keychain and `~/.claude.json`) | 5 hours, weekly, and weekly per model when the plan has them; also the usage credits spent this month and their monthly limit («Créditos de uso»), when usage credits are on; the credit balance («Saldo de créditos») and cloud session credits with their expiry («Créditos para sesiones en la nube»), when the account has any |
+| **Codex** | Codex CLI signed in with ChatGPT (`~/.codex/auth.json` or `$CODEX_HOME`) | 5 hours, weekly, any extra limit the plan has, the account's banked resets, and its credit balance when it has one |
+| **Cursor** | Cursor (its local `state.vscdb`, and its safeStorage key in the Keychain once you allow it) | Weekly included usage on unified plans; «Cursor Models» and «Other Models» for the billing cycle on legacy plans; the credit balance when the account has one |
 
 Each card also shows the account's plan next to its title, e.g. «Claude · Max», when the provider reports a plan Uzzy knows: Claude Code keeps it in its Keychain item, Codex sends it with the usage limits and Cursor keeps it in `state.vscdb`.
 
@@ -63,7 +63,7 @@ Since Cursor 3.27, Cursor encrypts its session in `state.vscdb` with a key it ke
 
 - Reuses, **read-only**, the sessions that already exist in Claude Code, Codex CLI and Cursor. It never asks for passwords, signs in, refreshes tokens or writes credentials. Cursor's encrypted session is read only after you allow it (see above).
 - Turning a provider off drops everything Uzzy held of its session (its token, account and figures) at once; turning it on reads the session again from the official app.
-- Only connects to `api.anthropic.com`, `chatgpt.com` and `api2.cursor.sh` to read usage limits, and to `api.github.com` once a day to ask for the latest version. That check sends no token and nothing about you or your usage, and you can turn it off in Settings. No telemetry and no server of its own.
+- Only connects to `api.anthropic.com`, `chatgpt.com` and `api2.cursor.sh` to read usage limits and credit balances, and to `api.github.com` once a day to ask for the latest version. That check sends no token and nothing about you or your usage, and you can turn it off in Settings. No telemetry and no server of its own.
 - Usage data lives only in memory; nothing is written to disk.
 - Display magnitude, which providers are turned on, provider order, whether to check for updates and whether you allowed access to Cursor's key are stored in local `UserDefaults`; they contain no usage data, token, email or account identifier.
 
