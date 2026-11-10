@@ -348,7 +348,7 @@
       }
     },
     "%lld resets available" : {
-      "comment" : "The banked resets of a Codex account.",
+      "comment" : "The banked resets of a Claude or Codex account.",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -1307,6 +1307,17 @@
         }
       }
     },
+    "Use it in Claude." : {
+      "comment" : "Where banked resets of a Claude account are used.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se usa desde Claude."
+          }
+        }
+      }
+    },
     "Use it in Codex." : {
       "comment" : "Where one banked reset is used.",
       "localizations" : {
@@ -1314,6 +1325,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Se usa desde Codex."
+          }
+        }
+      }
+    },
+    "Use them in Claude." : {
+      "comment" : "Where banked resets of a Claude account are used.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se usan desde Claude."
           }
         }
       }

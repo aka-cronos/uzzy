@@ -6,8 +6,11 @@ enum Claude: ProviderAdapter {
     static let provider = Provider.claude
 
     static func request(for session: Session) -> URLRequest {
-        var request = URLRequest(url: URL(string: "https://api.anthropic.com/api/oauth/usage")!)
+        var request = URLRequest(url: URL(string: "https://api.anthropic.com/api/oauth/usage?cedar_ember=1")!)
         request.httpMethod = "GET"
+        request.setValue("oauth-2025-04-20", forHTTPHeaderField: "anthropic-beta")
+        // The OAuth endpoint withholds reset grants from a generic User-Agent.
+        request.setValue("claude-cli/2.1.322 (external, cli)", forHTTPHeaderField: "User-Agent")
         request.setValue("Bearer \(session.accessToken)", forHTTPHeaderField: "Authorization")
         return request
     }
@@ -123,19 +126,19 @@ enum Claude: ProviderAdapter {
             (spent, limit) = Self.amounts(decoder) ?? (nil, nil)
         }
 
-        /// Both amounts are whole minor units of `currency`, e.g. cents. A
+        /// Both amounts are minor units of `currency`, e.g. cents. A
         /// limit that is sent but malformed is not taken as no limit, and a
         /// zero limit shows no row.
         private static func amounts(_ decoder: any Decoder) -> (Money, Money?)? {
             guard let values = try? decoder.container(keyedBy: CodingKeys.self),
                   (try? values.decodeIfPresent(Bool.self, forKey: .is_enabled)) == true,
                   let currency = try? values.decodeIfPresent(String.self, forKey: .currency),
-                  let used = try? values.decodeIfPresent(Int.self, forKey: .used_credits),
+                  let used = try? values.decodeIfPresent(Decimal.self, forKey: .used_credits),
                   let spent = Money(minorUnits: used, currency: currency)
             else { return nil }
-            let limitUnits: Int?
+            let limitUnits: Decimal?
             do {
-                limitUnits = try values.decodeIfPresent(Int.self, forKey: .monthly_limit)
+                limitUnits = try values.decodeIfPresent(Decimal.self, forKey: .monthly_limit)
             } catch {
                 return nil
             }

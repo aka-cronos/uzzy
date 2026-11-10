@@ -179,12 +179,19 @@ public struct Money: Sendable, Equatable {
 }
 
 extension Money {
-    /// `minorUnits` of `currency`, e.g. 5306 cents of "USD", using the
+    /// `minorUnits` of `currency`, including fractional cents, using the
     /// currency's own number of minor-unit digits. Nil for a negative amount
     /// or a code that is not a current ISO 4217 currency, so no currency is
     /// ever guessed.
-    init?(minorUnits: Int, currency: String) {
-        self.init(exactMinorUnits: Decimal(minorUnits), currency: currency)
+    init?(minorUnits: Decimal, currency: String) {
+        guard !minorUnits.isNaN, minorUnits >= 0, Locale.commonISOCurrencyCodes.contains(currency) else { return nil }
+        let format = NumberFormatter()
+        format.locale = Locale(identifier: "en_US_POSIX")
+        format.numberStyle = .currency
+        format.currencyCode = currency
+        let amount = minorUnits / pow(Decimal(10), format.maximumFractionDigits)
+        guard !amount.isNaN, minorUnits == 0 || amount > 0 else { return nil }
+        self.init(amount: amount, currency: currency)
     }
 }
 
