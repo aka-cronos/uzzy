@@ -140,6 +140,12 @@ struct UsageCreditsTests {
         ))
     }
 
+    @Test func fractionalMinorUnitsPreserveTheReportedSpendAndLimit() async {
+        let extraUsage = #"{"is_enabled": true, "monthly_limit": 4000.5, "used_credits": 5306.125, "currency": "USD"}"#
+
+        #expect(await usageCredits(extraUsage: extraUsage) == .spend(usd("53.06125"), limit: usd("40.005")))
+    }
+
     @Test func utilizationIsNeverRead() async {
         let extraUsage = #"{"is_enabled": true, "monthly_limit": 4000, "used_credits": 5306, "utilization": "not a number", "currency": "USD"}"#
 
@@ -171,7 +177,6 @@ struct UsageCreditsTests {
         #"{"is_enabled": true, "monthly_limit": 4000, "currency": "USD"}"#,
         #"{"is_enabled": true, "monthly_limit": 4000, "used_credits": null, "currency": "USD"}"#,
         #"{"is_enabled": true, "monthly_limit": 4000, "used_credits": -1, "currency": "USD"}"#,
-        #"{"is_enabled": true, "monthly_limit": 4000, "used_credits": 5306.5, "currency": "USD"}"#,
         #"{"is_enabled": true, "monthly_limit": 4000, "used_credits": "5306", "currency": "USD"}"#,
         #"{"is_enabled": true, "monthly_limit": 4000, "used_credits": true, "currency": "USD"}"#,
         #"{"is_enabled": true, "monthly_limit": 4000, "used_credits": 1e400, "currency": "USD"}"#,
@@ -182,7 +187,6 @@ struct UsageCreditsTests {
 
     @Test(arguments: [
         #"{"is_enabled": true, "monthly_limit": -4000, "used_credits": 5306, "currency": "USD"}"#,
-        #"{"is_enabled": true, "monthly_limit": 4000.5, "used_credits": 5306, "currency": "USD"}"#,
         #"{"is_enabled": true, "monthly_limit": "4000", "used_credits": 5306, "currency": "USD"}"#,
         #"{"is_enabled": true, "monthly_limit": [4000], "used_credits": 5306, "currency": "USD"}"#,
         #"{"is_enabled": true, "monthly_limit": 1e400, "used_credits": 5306, "currency": "USD"}"#,

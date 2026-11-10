@@ -174,7 +174,7 @@ private struct CardView: View {
             HStack(alignment: .firstTextBaseline) {
                 CardTitle(provider: card.provider, plan: card.plan)
                 if showBankedResets, let bankedResets = card.bankedResets {
-                    BankedResetsButton(count: bankedResets)
+                    BankedResetsButton(count: bankedResets, provider: card.provider)
                 }
                 Spacer()
                 if let lastReadAt {
@@ -289,6 +289,7 @@ private struct CardTitle: View {
 /// percentage and no reset date.
 private struct BankedResetsButton: View {
     let count: Int
+    let provider: Provider
     @State private var isShowingDetail = false
 
     /// A gauge with a backward arrow: a limit set back.
@@ -319,7 +320,7 @@ private struct BankedResetsButton: View {
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 3) {
                     Text(Format.current.bankedResets(count)).font(.headline)
-                    Text(Format.current.bankedResetsNote(count))
+                    Text(Format.current.bankedResetsNote(count, provider: provider))
                         .font(.callout)
                         .foregroundStyle(.secondary)
                 }

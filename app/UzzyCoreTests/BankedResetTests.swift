@@ -131,7 +131,7 @@ struct BankedResetTests {
         #expect(codexCard()?.bankedResets == nil)
     }
 
-    @Test func claudeAndCursorCardsShowNoBankedResets() async {
+    @Test func otherProvidersDoNotReadTheCodexResetField() async {
         let core = UsageCore(
             claudeSessionReader: ControlledSessionReader(),
             codexSessionReader: ControlledSessionReader(),

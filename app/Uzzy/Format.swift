@@ -173,11 +173,15 @@ struct Format {
         text("\(count) resets available")
     }
 
-    /// Where banked resets are used. Uzzy only shows them. Two strings, not a
+    /// Where banked resets are used. Uzzy only shows them. Separate strings, not a
     /// plural variation: the catalog allows one only when the text shows the
     /// number.
-    func bankedResetsNote(_ count: Int) -> String {
-        count == 1 ? text("Use it in Codex.") : text("Use them in Codex.")
+    func bankedResetsNote(_ count: Int, provider: Provider) -> String {
+        switch provider {
+        case .claude: count == 1 ? text("Use it in Claude.") : text("Use them in Claude.")
+        case .codex: count == 1 ? text("Use it in Codex.") : text("Use them in Codex.")
+        case .cursor: ""
+        }
     }
 
     /// E.g. "today, 14:42", so a moment on another day is not mistaken for

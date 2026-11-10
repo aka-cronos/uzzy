@@ -48,10 +48,10 @@ enum Codex: ProviderAdapter {
     /// `rate_limit_reset_credits.available_count`, the total the account
     /// holds. Read on its own, so a bad value hides the count and never the
     /// quotas. `applicable_available_count` and every other field are ignored.
-    static func bankedResets(from body: Data) -> Int? {
-        guard let count = (try? JSONDecoder().decode(BankedResets.self, from: body))?.availableCount, count > 0
+    static func bankedResets(from body: Data, readAt moment: Date) -> BankedResets? {
+        guard let count = (try? JSONDecoder().decode(ResetCredits.self, from: body))?.availableCount, count > 0
         else { return nil }
-        return count
+        return BankedResets(grants: [.init(count: count, expiresAt: nil)])
     }
 
     /// `plan_type`, by ChatGPT's name. Read on its own, like the banked
@@ -99,7 +99,7 @@ enum Codex: ProviderAdapter {
     /// Only an integer count is kept: fractional, overflowing or non-numeric
     /// values, and a `rate_limit_reset_credits` that is not an object, give
     /// none.
-    private struct BankedResets: Decodable {
+    private struct ResetCredits: Decodable {
         let availableCount: Int?
 
         private enum CodingKeys: String, CodingKey {

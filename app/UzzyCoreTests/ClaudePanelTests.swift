@@ -51,7 +51,7 @@ struct ClaudePanelTests {
         ]))
     }
 
-    @Test func queriesClaudeUsageWithOnlyTheAccessToken() async {
+    @Test func queriesClaudeUsageAndResetsWithTheExistingSession() async {
         let transport = SampleTransport()
         let core = core(transport: transport)
 
@@ -61,7 +61,9 @@ struct ClaudePanelTests {
         let requests = await transport.quotaRequests
         #expect(requests.count == 1)
         #expect(requests.first?.httpMethod == "GET")
-        #expect(requests.first?.url == URL(string: "https://api.anthropic.com/api/oauth/usage"))
-        #expect(requests.first?.allHTTPHeaderFields == ["Authorization": "Bearer sample-token"])
+        #expect(requests.first?.url == URL(string: "https://api.anthropic.com/api/oauth/usage?cedar_ember=1"))
+        #expect(requests.first?.value(forHTTPHeaderField: "Authorization") == "Bearer sample-token")
+        #expect(requests.first?.value(forHTTPHeaderField: "anthropic-beta") == "oauth-2025-04-20")
+        #expect(requests.first?.value(forHTTPHeaderField: "User-Agent") == "claude-cli/2.1.322 (external, cli)")
     }
 }

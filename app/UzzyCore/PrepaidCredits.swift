@@ -122,10 +122,6 @@ extension Money {
         var whole = Decimal()
         NSDecimalRound(&whole, &original, 0, .plain)
         guard whole == amount else { return nil }
-        let format = NumberFormatter()
-        format.locale = Locale(identifier: "en_US_POSIX")
-        format.numberStyle = .currency
-        format.currencyCode = currency
-        self.init(amount: amount / pow(Decimal(10), format.maximumFractionDigits), currency: currency)
+        self.init(minorUnits: amount, currency: currency)
     }
 }

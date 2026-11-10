@@ -12,7 +12,7 @@ protocol ProviderAdapter {
     static func quotas(from body: Data, metadata: Data?, readAt moment: Date) -> Result<[QuotaReading], Failure>
     /// The banked resets in a response whose quotas were read, if it holds
     /// a positive count. Never fails the reading.
-    static func bankedResets(from body: Data) -> Int?
+    static func bankedResets(from body: Data, readAt moment: Date) -> BankedResets?
     /// The name of the account's plan, from the session a query used or the
     /// response whose quotas were read. `nil` when they report no plan the
     /// adapter knows. Never fails the reading.
@@ -22,7 +22,7 @@ protocol ProviderAdapter {
 extension ProviderAdapter {
     static func metadataRequest(for session: Session) -> URLRequest? { nil }
 
-    static func bankedResets(from body: Data) -> Int? {
+    static func bankedResets(from body: Data, readAt moment: Date) -> BankedResets? {
         nil
     }
 }
@@ -101,7 +101,7 @@ final class ProviderRefresh {
     /// same account's quotas are shown stale.
     var bankedResets: Int? {
         guard case .quotas(let reading) = reading else { return nil }
-        return reading.bankedResets
+        return reading.bankedResets?.count(at: clock.now())
     }
 
     /// With any quotas the card shows, fresh or stale: the plan tells whose
@@ -382,7 +382,7 @@ final class ProviderRefresh {
             case .success(let quotas):
                 return .quotas(
                     quotas,
-                    bankedResets: adapter.bankedResets(from: response.body),
+                    bankedResets: adapter.bankedResets(from: response.body, readAt: moment),
                     plan: adapter.plan(of: session, response: response.body)
                 )
             case .failure(let failure): return .failed(failure)
@@ -465,7 +465,7 @@ private struct RetryWait {
 
 /// What a provider's answer to a query says.
 private enum Answer {
-    case quotas([QuotaReading], bankedResets: Int?, plan: String?)
+    case quotas([QuotaReading], bankedResets: BankedResets?, plan: String?)
     case failed(Failure)
 }
 
@@ -579,7 +579,7 @@ private enum ProviderReading {
 private struct LastValidReading {
     let quotas: [QuotaReading]
     let accountID: String?
-    let bankedResets: Int?
+    let bankedResets: BankedResets?
     let plan: String?
 }
 
