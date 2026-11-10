@@ -43,7 +43,7 @@ Open Settings with ⌘, from the panel; ⌘W closes it and ⌘Q quits. Your choi
 
 | Provider | Session it reuses | What it shows |
 |---|---|---|
-| **Claude** | Claude Code (the Keychain and `~/.claude.json`) | 5 hours, weekly, and weekly per model when the plan has them; also the usage credits spent this month and their monthly limit («Créditos de uso»), when usage credits are on; the credit balance («Saldo de créditos») and cloud session credits with their expiry («Créditos para sesiones en la nube»), when the account has any |
+| **Claude** | Claude Code (the Keychain and `~/.claude.json`) | 5 hours, weekly, and weekly per model when the plan has them; the account’s banked resets; also the usage credits spent this month and their monthly limit («Créditos de uso»), when usage credits are on; the credit balance («Saldo de créditos») and cloud session credits with their expiry («Créditos para sesiones en la nube»), when the account has any |
 | **Codex** | Codex CLI signed in with ChatGPT (`~/.codex/auth.json` or `$CODEX_HOME`) | 5 hours, weekly, any extra limit the plan has, the account's banked resets, and its credit balance when it has one |
 | **Cursor** | Cursor (its local `state.vscdb`, and its safeStorage key in the Keychain once you allow it) | Weekly included usage on unified plans; «Cursor Models» and «Other Models» for the billing cycle on legacy plans; the credit balance when the account has one |
 
