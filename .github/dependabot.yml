@@ -1,0 +1,34 @@
+# Dependabot opens update pull requests for the three places this repo pins
+# third-party code. The macOS app has no third-party packages.
+version: 2
+updates:
+  # The landing page.
+  - package-ecosystem: npm
+    directory: /site
+    schedule:
+      interval: weekly
+    labels: []
+    commit-message:
+      prefix: "chore(site)"
+    groups:
+      site:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  # The actions the workflows pin by commit SHA.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels: []
+    commit-message:
+      prefix: "chore(ci)"
+
+  # dmgbuild and its dependencies, pinned by hash for the release workflow.
+  - package-ecosystem: pip
+    directory: /.github/dmg
+    schedule:
+      interval: weekly
+    labels: []
+    commit-message:
+      prefix: "chore(release)"
