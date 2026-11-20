@@ -41,6 +41,8 @@ public actor SampleTransport: HTTPTransport {
         let body = switch request.url?.host {
         case "chatgpt.com": codexResponse
         case "api2.cursor.sh": request.url?.lastPathComponent == "GetPlanInfo" ? Samples.cursorPlanResponse : cursorResponse
+        case "cloudcode-pa.googleapis.com": request.url?.lastPathComponent == "v1internal:loadCodeAssist"
+            ? Samples.antigravityAccountResponse : Samples.antigravityQuotaResponse
         default: claudeResponse
         }
         return .response(HTTPResponse(status: 200, headers: ["Content-Type": "application/json"], body: body))
@@ -203,10 +205,13 @@ public struct NoSessionReader: SessionReader {
 public actor ControlledTransport: HTTPTransport {
     public private(set) var requests: [URLRequest] = []
     public var quotaRequests: [URLRequest] { requests.filter { !$0.isOptionalCreditRequest } }
-    private var results: [Provider: HTTPResult] = [.claude: .claudeSample, .codex: .codexSample, .cursor: .cursorSample]
+    private var results: [Provider: HTTPResult] = [
+        .claude: .claudeSample, .codex: .codexSample, .cursor: .cursorSample, .antigravity: .antigravitySample,
+    ]
     private var credits: [Provider: HTTPResult] = [:]
     private var profile: HTTPResult = .json("{}")
     private var cursorMetadata: HTTPResult = .json(#"{"planInfo":{"includedUsagePeriod":"INCLUDED_USAGE_PERIOD_MONTHLY"}}"#)
+    private var antigravityAccount: HTTPResult = .antigravityAccountSample
     private var held: Set<Provider> = []
     private var heldCredits: Set<Provider> = []
     private var heldRequests: [CheckedContinuation<Void, Never>] = []
@@ -230,6 +235,7 @@ public actor ControlledTransport: HTTPTransport {
         if request.url?.lastPathComponent == "profile" { return profile }
         if request.isOptionalCreditRequest { return credits[provider] ?? .json("{}") }
         if request.url?.lastPathComponent == "GetPlanInfo" { return cursorMetadata }
+        if request.url?.lastPathComponent == "v1internal:loadCodeAssist" { return antigravityAccount }
         return results[provider] ?? .networkError
     }
 
@@ -250,6 +256,12 @@ public actor ControlledTransport: HTTPTransport {
 
     public func answerCursorMetadata(with result: HTTPResult) {
         cursorMetadata = result
+    }
+
+    /// Answers Antigravity's account query (`loadCodeAssist`), which comes
+    /// before its quota summary. The summary answers with `answer(with:for:)`.
+    public func answerAntigravityAccount(with result: HTTPResult) {
+        antigravityAccount = result
     }
 
     /// Holds the requests of `provider`, or of every provider.
@@ -296,6 +308,7 @@ extension Provider {
         case "api.anthropic.com": self = .claude
         case "chatgpt.com": self = .codex
         case "api2.cursor.sh": self = .cursor
+        case "cloudcode-pa.googleapis.com": self = .antigravity
         default: return nil
         }
     }
@@ -315,6 +328,16 @@ extension HTTPResult {
     /// The sample Cursor response, answered with a 200.
     public static let cursorSample = HTTPResult.response(
         HTTPResponse(status: 200, headers: ["Content-Type": "application/json"], body: Samples.cursorUsageResponse)
+    )
+
+    /// Antigravity's sample quota summary, answered with a 200.
+    public static let antigravitySample = HTTPResult.response(
+        HTTPResponse(status: 200, headers: ["Content-Type": "application/json"], body: Samples.antigravityQuotaResponse)
+    )
+
+    /// Antigravity's sample account (`loadCodeAssist`), answered with a 200.
+    public static let antigravityAccountSample = HTTPResult.response(
+        HTTPResponse(status: 200, headers: ["Content-Type": "application/json"], body: Samples.antigravityAccountResponse)
     )
 
     /// A response of any provider, answered with a 200, with the given body.

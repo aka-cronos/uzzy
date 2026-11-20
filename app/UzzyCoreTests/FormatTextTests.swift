@@ -227,17 +227,22 @@ struct FormatTextTests {
         #expect(Format.english.duration(seconds: 45) == "45 s")
     }
 
+    /// A limit the provider names goes by that name first, so rows of the
+    /// same period still read apart: «Gemini · Weekly», «Gemini 4 Argon ·
+    /// Weekly».
     @Test func aQuotaIsNamedByItsPeriod() {
         let periods: [QuotaPeriod] = [
             .fiveHours, .weekly, .billingCycle, .usageCredits, .lasting(seconds: 86_400),
-            .limit("Sonnet", .weekly), .limit("Cursor Models", .billingCycle),
+            .limit("Sonnet", .weekly), .limit("Gemini", .fiveHours), .limit("Cursor Models", .billingCycle),
         ]
 
         #expect(periods.map(Format.spanish.name(of:)) == [
-            "5 horas", "Semanal", "Ciclo de facturación", "Créditos de uso", "1 día", "Semanal · Sonnet", "Cursor Models",
+            "5 horas", "Semanal", "Ciclo de facturación", "Créditos de uso", "1 día", "Sonnet · Semanal", "Gemini · 5 horas",
+            "Cursor Models",
         ])
         #expect(periods.map(Format.english.name(of:)) == [
-            "5 hours", "Weekly", "Billing cycle", "Usage credits", "1 day", "Weekly · Sonnet", "Cursor Models",
+            "5 hours", "Weekly", "Billing cycle", "Usage credits", "1 day", "Sonnet · Weekly", "Gemini · 5 hours",
+            "Cursor Models",
         ])
     }
 

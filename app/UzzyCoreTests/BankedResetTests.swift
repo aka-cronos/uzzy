@@ -20,6 +20,7 @@ struct BankedResetTests {
             claudeSessionReader: NoSessionReader(),
             codexSessionReader: codexSessionReader,
             cursorSessionReader: NoSessionReader(),
+            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog()
@@ -136,6 +137,7 @@ struct BankedResetTests {
             claudeSessionReader: ControlledSessionReader(),
             codexSessionReader: ControlledSessionReader(),
             cursorSessionReader: ControlledSessionReader(),
+            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog()
@@ -149,7 +151,7 @@ struct BankedResetTests {
         core.panelOpened()
         await core.queriesFinished()
 
-        #expect(core.state.cards.filter { $0.provider != .codex }.map(\.bankedResets) == [nil, nil])
+        #expect(core.state.cards.filter { $0.provider != .codex }.map(\.bankedResets) == [nil, nil, nil])
     }
 
     // MARK: Account-bound lifetime

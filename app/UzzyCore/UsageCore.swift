@@ -57,6 +57,7 @@ public final class UsageCore {
         claudeSessionReader: any SessionReader,
         codexSessionReader: any SessionReader,
         cursorSessionReader: any SessionReader,
+        antigravitySessionReader: any SessionReader,
         cursorAccess: any AccessConsent = MemoryAccessConsent(),
         transport: any HTTPTransport,
         clock: any WallClock,
@@ -76,6 +77,8 @@ public final class UsageCore {
                             isEnabled: initialEnabledProviders.contains(.codex)),
             ProviderRefresh(Cursor.self, sessionReader: cursorSessionReader, transport: transport, clock: clock, log: log,
                             isEnabled: initialEnabledProviders.contains(.cursor)),
+            ProviderRefresh(Antigravity.self, sessionReader: antigravitySessionReader, transport: transport, clock: clock, log: log,
+                            isEnabled: initialEnabledProviders.contains(.antigravity)),
         ]
         // A provider turned off while the app was not running keeps no consent.
         if !initialEnabledProviders.contains(.cursor) {

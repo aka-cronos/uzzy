@@ -44,6 +44,7 @@ struct UsageCreditsTests {
             claudeSessionReader: SampleSessionReader(),
             codexSessionReader: NoSessionReader(),
             cursorSessionReader: NoSessionReader(),
+            antigravitySessionReader: NoSessionReader(),
             transport: SampleTransport(claudeResponse: Data(claudeResponse.utf8)),
             clock: FixedClock(readingMoment),
             initialMagnitude: magnitude
@@ -80,6 +81,7 @@ struct UsageCreditsTests {
             claudeSessionReader: SampleSessionReader(),
             codexSessionReader: NoSessionReader(),
             cursorSessionReader: NoSessionReader(),
+            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock
         )

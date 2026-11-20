@@ -7,6 +7,7 @@ enum ProviderPreferences {
     static let claudeKey = "showClaude"
     static let codexKey = "showCodex"
     static let cursorKey = "showCursor"
+    static let antigravityKey = "showAntigravity"
     static let orderKey = "providerOrder"
 
     static func enabledProviders(in defaults: UserDefaults) -> Set<Provider> {
@@ -15,6 +16,7 @@ enum ProviderPreferences {
             case .claude: claudeKey
             case .codex: codexKey
             case .cursor: cursorKey
+            case .antigravity: antigravityKey
             }
             return defaults.object(forKey: key) == nil || defaults.bool(forKey: key)
         })

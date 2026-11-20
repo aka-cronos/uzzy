@@ -6,8 +6,10 @@ import Observation
 protocol ProviderAdapter {
     static var provider: Provider { get }
     static func request(for session: Session) -> URLRequest
-    /// Additional plan metadata required to interpret the usage response.
-    static func metadataRequest(for session: Session) -> URLRequest?
+    /// A second query whose answer is needed to interpret the usage
+    /// response, made only after that response arrives with a 200. It may
+    /// depend on that response, e.g. on an ID it holds.
+    static func metadataRequest(for session: Session, after response: Data) -> URLRequest?
     /// Returns a specific failure when the response cannot be translated.
     static func quotas(from body: Data, metadata: Data?, readAt moment: Date) -> Result<[QuotaReading], Failure>
     /// The banked resets in a response whose quotas were read, if it holds
@@ -20,7 +22,7 @@ protocol ProviderAdapter {
 }
 
 extension ProviderAdapter {
-    static func metadataRequest(for session: Session) -> URLRequest? { nil }
+    static func metadataRequest(for session: Session, after response: Data) -> URLRequest? { nil }
 
     static func bankedResets(from body: Data, readAt moment: Date) -> BankedResets? {
         nil
@@ -277,7 +279,7 @@ final class ProviderRefresh {
         guard isCurrent(queryID) else { return nil }
         var metadata: Data?
         if case .response(let response) = result, response.status == 200,
-           let request = adapter.metadataRequest(for: session) {
+           let request = adapter.metadataRequest(for: session, after: response.body) {
             let extra = await transport.send(request)
             guard isCurrent(queryID) else { return nil }
             if case .response(let response) = extra, response.status == 200 {

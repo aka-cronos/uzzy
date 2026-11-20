@@ -38,6 +38,7 @@ struct CursorEncryptedSessionTests {
             claudeSessionReader: NoSessionReader(),
             codexSessionReader: NoSessionReader(),
             cursorSessionReader: CursorSessionReader(databaseFile: database.file, consent: consent, keychain: keychain),
+            antigravitySessionReader: NoSessionReader(),
             cursorAccess: consent,
             transport: transport,
             clock: clock,

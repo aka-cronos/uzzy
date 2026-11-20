@@ -18,6 +18,7 @@ struct ClaudeCodeSessionTests {
             claudeSessionReader: ClaudeCodeSessionReader(home: tool.directory, securityTool: tool.file),
             codexSessionReader: NoSessionReader(),
             cursorSessionReader: NoSessionReader(),
+            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: ManualClock(Samples.readingMoment),
             log: RecordingLog()

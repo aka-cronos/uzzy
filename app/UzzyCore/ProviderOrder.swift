@@ -6,6 +6,7 @@ extension Provider {
         case .claude: "claude"
         case .codex: "codex"
         case .cursor: "cursor"
+        case .antigravity: "antigravity"
         }
     }
 

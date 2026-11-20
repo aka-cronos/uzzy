@@ -1,6 +1,6 @@
 # Security policy
 
-Uzzy reads the sessions of Claude Code, Codex CLI and Cursor on your Mac, so a bug that leaks a token, writes a credential or sends data anywhere other than the providers' own endpoints is a security issue.
+Uzzy reads the sessions of Claude Code, Codex CLI, Cursor and Antigravity on your Mac, so a bug that leaks a token, writes a credential or sends data anywhere other than the providers' own endpoints is a security issue.
 
 ## Reporting a vulnerability
 

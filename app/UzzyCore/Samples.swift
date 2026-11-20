@@ -101,6 +101,64 @@ public enum Samples {
       "autoBucketModels": ["sample-model"]
     }
     """#.utf8)
+
+    /// Antigravity's `POST /v1internal:loadCodeAssist`: the generic current
+    /// tier, the paid tier that names the plan (Google AI Pro) and the
+    /// project the quota summary is asked for. Fictional project ID.
+    public static let antigravityAccountResponse = Data(#"""
+    {
+      "currentTier": {"id": "free-tier", "name": "Antigravity", "description": "Sample tier"},
+      "allowedTiers": [{"id": "free-tier", "name": "Antigravity", "isDefault": true}],
+      "cloudaicompanionProject": "sample-project",
+      "gcpManaged": false,
+      "paidTier": {
+        "id": "g1-pro-tier",
+        "name": "Google AI Pro",
+        "availableCredits": [{"creditType": "GOOGLE_ONE_AI", "minimumCreditAmountForUsage": "50"}]
+      }
+    }
+    """#.utf8)
+
+    /// Antigravity's `POST /v1internal:retrieveUserQuotaSummary`, read at
+    /// 2026-09-23T14:32:00Z. Each group sends its weekly bucket before its
+    /// 5-hour one. Gemini is in use; Claude and GPT is untouched, so its
+    /// resets are the reading moment plus each window's length; Gemini 4
+    /// Argon has only a weekly limit.
+    public static let antigravityQuotaResponse = Data(#"""
+    {
+      "groups": [
+        {
+          "displayName": "Gemini Models",
+          "description": "Models within this group: Gemini Flash, Gemini Pro",
+          "buckets": [
+            {"bucketId": "gemini-weekly", "displayName": "Weekly Limit Remaining", "window": "weekly",
+             "resetTime": "2026-09-28T12:32:00Z", "remainingFraction": 0.64},
+            {"bucketId": "gemini-5h", "displayName": "Five Hour Limit Remaining", "window": "5h",
+             "resetTime": "2026-09-23T18:17:00Z", "remainingFraction": 0.96}
+          ]
+        },
+        {
+          "displayName": "Claude and GPT models",
+          "description": "Models within this group: Claude Opus, Claude Sonnet, GPT-OSS",
+          "buckets": [
+            {"bucketId": "3p-weekly", "displayName": "Weekly Limit Remaining", "window": "weekly",
+             "resetTime": "2026-09-30T14:32:00Z", "remainingFraction": 1},
+            {"bucketId": "3p-5h", "displayName": "Five Hour Limit Remaining", "window": "5h",
+             "resetTime": "2026-09-23T19:32:00Z", "remainingFraction": 1}
+          ]
+        },
+        {
+          "displayName": "Gemini 4 Argon",
+          "description": "Sample description",
+          "buckets": [
+            {"bucketId": "gemini-argon-wtu-weekly", "displayName": "Gemini 4 Argon Weekly Limit", "window": "weekly",
+             "resetTime": "2026-09-29T08:00:00Z", "remainingFraction": 0.88}
+          ]
+        }
+      ],
+      "description": "Sample description"
+    }
+    """#.utf8)
 }
 
 #endif

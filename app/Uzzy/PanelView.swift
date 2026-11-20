@@ -395,15 +395,29 @@ private struct QuotaView: View {
     }
 }
 
-/// A quota's name, marked when its figure is stale.
+/// A quota's name, marked when its figure is stale. A limit the provider
+/// names shows its period in secondary color, so the names stand out.
 private struct QuotaName: View {
     let quota: Quota
 
     var body: some View {
-        Text(Format.current.name(of: quota.period))
+        switch quota.period {
+        case .limit(let name, let period) where period != .billingCycle:
+            Text(Self.name(name, period: period))
+        default:
+            Text(Format.current.name(of: quota.period))
+        }
         if quota.isStale {
             Text("Out of date").font(.caption.weight(.semibold)).foregroundStyle(.orange)
         }
+    }
+
+    /// «Gemini · Weekly», the period in secondary color. Built from the same
+    /// text as `Format.name(of:)`, which VoiceOver reads.
+    private static func name(_ name: String, period: QuotaPeriod) -> AttributedString {
+        var periodText = AttributedString("· \(Format.current.name(of: period))")
+        periodText.foregroundColor = .secondary
+        return AttributedString("\(name) ") + periodText
     }
 }
 
@@ -501,6 +515,11 @@ private struct FailureMessage: View {
                     title: "Keychain unavailable",
                     detail: "Couldn't read the Claude Code session in the keychain. Check that it's unlocked and click Refresh."
                 )
+            } else if provider == .antigravity {
+                Message(
+                    title: "Keychain unavailable",
+                    detail: "Couldn't read the Antigravity session in the keychain. Check that it's unlocked and click Refresh."
+                )
             } else if provider == .cursor {
                 Message(
                     title: "Couldn't read the session",
@@ -587,6 +606,7 @@ extension Provider {
         case .claude: "Claude"
         case .codex: "Codex"
         case .cursor: "Cursor"
+        case .antigravity: "Antigravity"
         }
     }
 
@@ -595,6 +615,7 @@ extension Provider {
         case .claude: .providerLogoClaude
         case .codex: .providerLogoCodex
         case .cursor: .providerLogoCursor
+        case .antigravity: .providerLogoAntigravity
         }
     }
 
@@ -604,6 +625,7 @@ extension Provider {
         case .claude: "Claude Code"
         case .codex: "Codex CLI"
         case .cursor: "Cursor"
+        case .antigravity: "Antigravity"
         }
     }
 }

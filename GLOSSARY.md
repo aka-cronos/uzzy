@@ -6,7 +6,7 @@ Uzzy shows the subscription quotas of AI services and when they reset.
 
 **Copy**:
 Any text a person reads about Uzzy: the app, the uzzy.app site, the README and the social images. The Spanish and English terms below apply to all of it.
-Marketing copy (the site, the README, the social images and the repo description) says «AI usage limits», without «subscription». While the list of providers is closed, no copy claims coverage beyond it with «every» or «all» about providers or usage limits; it names Claude, Codex and Cursor instead. Counting the closed list is fine, e.g. «one, two or all three».
+Marketing copy (the site, the README, the social images and the repo description) says «AI usage limits», without «subscription». While the list of providers is closed, no copy claims coverage beyond it with «every» or «all» about providers or usage limits; it names Claude, Codex, Cursor and Antigravity instead. Counting the closed list is fine, e.g. «one, two or all four».
 _Avoid_: Treating marketing text as exempt from the glossary; «subscription» in marketing copy; «every provider», «every usage limit», «all your limits».
 
 **Subscription quota**:
@@ -40,7 +40,7 @@ The interval a quota's usage and limit belong to. Quotas with different periods 
 _Avoid_: Calendar month (when it is a billing cycle), combined period.
 
 **Quota bag**:
-A share of a subscription the provider names and limits on its own, e.g. Cursor's «Cursor Models» and «Other Models» within one billing cycle. Bags of the same period are still separate quotas.
+A share of a subscription the provider names and limits on its own, e.g. Cursor's «Cursor Models» and «Other Models» within one billing cycle, or Antigravity's model groups («Gemini», «Claude and GPT»), each with its own 5-hour and weekly limit. Bags of the same period are still separate quotas.
 _Avoid_: Total, combined quota.
 
 **Calculated value**:
@@ -48,7 +48,7 @@ A quota value derived from other valid data of that same quota, account, unit an
 _Avoid_: Provider-reported value (when it is calculated), estimate (for an exact calculation).
 
 **Session**:
-The sign-in an official app (Claude Code, Codex CLI, Cursor) keeps on this Mac, which Uzzy reuses read-only to query quotas. It can be missing, expired (rejected by the provider), inaccessible (access denied by the user), in an unknown format, or without subscription quotas (e.g. Codex CLI signed in with an API key).
+The sign-in an official app (Claude Code, Codex CLI, Cursor, Antigravity) keeps on this Mac, which Uzzy reuses read-only to query quotas. It can be missing, expired (rejected by the provider), inaccessible (access denied by the user), in an unknown format, or without subscription quotas (e.g. Codex CLI signed in with an API key).
 _Avoid_: Login, account (the account is the identity behind a session), the 5-hour quota period.
 
 **Account**:
@@ -56,7 +56,7 @@ The provider identity behind a session, e.g. Claude Code's account UUID. Every l
 _Avoid_: User, profile, session (the session is how Uzzy reaches the account).
 
 **Plan**:
-The subscription an account is on, by the provider's own name, e.g. Claude's «Max», ChatGPT's «Plus» or Cursor's «Pro+». It belongs to the account, not to a quota, and gives context to the quotas: Uzzy shows it next to the card's title with the last valid reading it came with. Uzzy shows only plans the provider reports and Uzzy knows by name; it never guesses a plan, infers it from the quotas or shows the provider's raw identifier. In Spanish and English copy it is «plan».
+The subscription an account is on, by the provider's own name, e.g. Claude's «Max», ChatGPT's «Plus», Cursor's «Pro+» or Google's «Google AI Pro» for Antigravity. It belongs to the account, not to a quota, and gives context to the quotas: Uzzy shows it next to the card's title with the last valid reading it came with. Uzzy shows only plans the provider reports and Uzzy knows by name; it never guesses a plan, infers it from the quotas or shows the provider's raw identifier. In Spanish and English copy it is «plan».
 _Avoid_: Tier, membership, subscription type (the providers' field names), account type.
 
 **Uncertain identity**:
