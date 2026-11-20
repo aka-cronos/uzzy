@@ -208,6 +208,45 @@ struct CodexPanelTests {
         ]))
     }
 
+    /// An untouched window has not started: the provider reports the reading
+    /// moment plus the window's length, a date that moves with every query.
+    @Test func anUntouchedWindowHasNoReset() async {
+        // The reading moment, 2026-09-23T14:32:00Z, plus 5 hours and 7 days.
+        await transport.answer(with: .codex(rateLimit: """
+            {
+              "primary_window": {"used_percent": 0, "limit_window_seconds": 18000, "reset_at": 1790191920},
+              "secondary_window": {"used_percent": 0, "limit_window_seconds": 604800, "reset_at": 1790778720}
+            }
+            """), for: .codex)
+
+        await openPanel()
+
+        #expect(codexContent() == .quotas([
+            Quota(period: .fiveHours, value: .percent(0, calculated: false), reset: nil, readAt: Samples.readingMoment),
+            Quota(period: .weekly, value: .percent(0, calculated: false), reset: nil, readAt: Samples.readingMoment),
+        ]))
+    }
+
+    /// A window in use, or an unused one whose reset is not the reading
+    /// moment plus its length, has a real reset.
+    @Test(arguments: [(0.5, 1790191920), (0, 1790186400), (0, 1790192400)])
+    func aStartedWindowKeepsItsReset(usedPercent: Double, resetAt: Int) async {
+        await transport.answer(with: .codex(rateLimit: """
+            {"primary_window": {"used_percent": \(usedPercent), "limit_window_seconds": 18000, "reset_at": \(resetAt)}}
+            """), for: .codex)
+
+        await openPanel()
+
+        #expect(codexContent() == .quotas([
+            Quota(
+                period: .fiveHours,
+                value: .percent(usedPercent, calculated: false),
+                reset: .at(Date(timeIntervalSince1970: TimeInterval(resetAt))),
+                readAt: Samples.readingMoment
+            ),
+        ]))
+    }
+
     /// A reset more than a year away from the reading, ahead or behind,
     /// cannot be the quota's reset. The figure is kept.
     @Test(arguments: ["1e30", "-1e30", "1.7976931348623157e308", "0", "1853882000", "1726000000"])

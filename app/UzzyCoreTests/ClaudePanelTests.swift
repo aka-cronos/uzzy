@@ -51,6 +51,27 @@ struct ClaudePanelTests {
         ]))
     }
 
+    /// An untouched window has not started, so the date Claude reports for it
+    /// is the reading moment plus the window's length, not a reset. The
+    /// query's latency puts it a few seconds off.
+    @Test func anUntouchedWindowHasNoReset() async {
+        // The reading moment, 2026-09-23T14:32:00Z, plus 5 hours and 7 days.
+        let core = core(transport: SampleTransport(claudeResponse: Data(#"""
+            {
+              "five_hour": {"utilization": 0.0, "resets_at": "2026-09-23T19:32:00.412000+00:00"},
+              "seven_day": {"utilization": 0.0, "resets_at": "2026-09-30T14:32:30.000000+00:00"}
+            }
+            """#.utf8)))
+
+        core.panelOpened()
+        await core.queriesFinished()
+
+        #expect(claudeContent(core) == .quotas([
+            Quota(period: .fiveHours, value: .percent(0, calculated: false), reset: nil, readAt: readingMoment),
+            Quota(period: .weekly, value: .percent(0, calculated: false), reset: nil, readAt: readingMoment),
+        ]))
+    }
+
     @Test func queriesClaudeUsageAndResetsWithTheExistingSession() async {
         let transport = SampleTransport()
         let core = core(transport: transport)
