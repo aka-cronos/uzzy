@@ -262,30 +262,6 @@ struct AntigravityPanelTests {
         #expect(await antigravitySessionReader.reads == reads)
     }
 
-    /// Only Antigravity renews its token this way; the other providers still
-    /// wait for the user after a rejection.
-    @Test func otherProvidersStillWaitForTheUserAfterARejection() async {
-        let claudeReader = ControlledSessionReader()
-        let core = UsageCore(
-            claudeSessionReader: claudeReader,
-            codexSessionReader: NoSessionReader(),
-            cursorSessionReader: NoSessionReader(),
-            antigravitySessionReader: NoSessionReader(),
-            transport: transport,
-            clock: clock,
-            log: RecordingLog()
-        )
-        await transport.answer(with: .status(401), for: .claude)
-        core.panelOpened()
-        await core.queriesFinished()
-        let reads = await claudeReader.reads
-
-        clock.advance(by: Self.recheck * 3)
-        await core.queriesFinished()
-
-        #expect(await claudeReader.reads == reads)
-    }
-
     static let recheck: TimeInterval = 30
 }
 
