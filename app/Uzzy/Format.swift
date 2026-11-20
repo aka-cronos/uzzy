@@ -128,9 +128,10 @@ struct Format {
         }
     }
 
-    /// A quota's name, by its period: e.g. "Weekly", or "Weekly · Sonnet" for
-    /// a limit the provider names. A limit over the billing cycle, e.g.
-    /// "Cursor Models", goes by its name alone.
+    /// A quota's name, by its period: e.g. "Weekly", or "Gemini · Weekly"
+    /// for a limit the provider names, name first so rows of the same period
+    /// read apart. A limit over the billing cycle, e.g. "Cursor Models", goes
+    /// by its name alone.
     func name(of period: QuotaPeriod) -> String {
         switch period {
         case .fiveHours: text("5 hours")
@@ -139,7 +140,7 @@ struct Format {
         case .billingCycle: text("Billing cycle")
         case .usageCredits: text("Usage credits")
         case .limit(let name, .billingCycle): name
-        case .limit(let name, let period): "\(self.name(of: period)) · \(name)"
+        case .limit(let name, let period): "\(name) · \(self.name(of: period))"
         }
     }
 
