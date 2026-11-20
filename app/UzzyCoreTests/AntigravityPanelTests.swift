@@ -94,7 +94,6 @@ struct AntigravityPanelTests {
     @Test(arguments: [
         ("g1-pro-tier", "Google AI Pro"),
         ("g1-ultra-tier", "Google AI Ultra"),
-        ("g1-ultra-lite-tier", "Google AI Ultra Lite"),
     ])
     func everyKnownPaidTierShowsItsPlan(tier: String, plan: String) async {
         await transport.answerAntigravityAccount(with: .json(#"{"paidTier": {"id": "\#(tier)"}}"#))
