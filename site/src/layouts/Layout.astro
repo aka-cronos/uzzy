@@ -9,7 +9,7 @@ interface Props {
   noindex?: boolean;
 }
 // <title> and og:title share this string, so they can't drift apart.
-const { title = "Uzzy — AI usage limits for Claude, Codex and Cursor", noindex = false } = Astro.props;
+const { title = "Uzzy — AI usage limits for Claude, Codex, Cursor and Antigravity", noindex = false } = Astro.props;
 const canonical = new URL("/", Astro.site).href;
 const ogImage = new URL("/og.jpg", Astro.site).href;
 // slate-50, the page background
