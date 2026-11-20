@@ -91,6 +91,107 @@ struct AntigravityPanelTests {
         #expect(antigravityCard()?.plan == "Google AI Pro")
     }
 
+    @Test(arguments: [
+        (#"{"paidTier": {"id": "g1-pro-tier", "name": "Google AI Pro"}}"#, "Google AI Pro"),
+        (#"{"paidTier": {"id": "g1-ultra-tier", "name": "Google AI Ultra"}}"#, "Google AI Ultra"),
+        (#"{"paidTier": {"id": "g1-ultra-lite-tier", "name": "Google AI Ultra Lite"}}"#, "Google AI Ultra Lite"),
+        (#"{"currentTier": {"id": "g1-ultra-tier", "name": "Google AI Ultra"}}"#, "Google AI Ultra"),
+    ])
+    func knownGoogleAIPaidAndCurrentTiersShowTheirPlanName(account: String, expectedPlan: String) async {
+        await transport.answerAntigravityAccount(with: .json(account))
+
+        await openPanel()
+
+        #expect(antigravityCard()?.plan == expectedPlan)
+    }
+
+    @Test func disabledBucketsAreIgnoredWithoutBreakingValidUltraQuotas() async {
+        await transport.answer(with: .json(#"""
+            {"groups": [
+              {"displayName": "Gemini Models", "buckets": [
+                {"bucketId": "gemini-5h", "window": "5h", "resetTime": "2026-09-23T18:17:00Z", "remainingFraction": 0.9},
+                {"bucketId": "gemini-weekly", "window": "weekly", "resetTime": "2026-09-28T12:32:00Z", "remainingFraction": 0.8}
+              ]},
+              {"displayName": "Claude and GPT models", "buckets": [
+                {"bucketId": "3p-5h", "window": "5h", "resetTime": "2026-09-23T19:32:00Z", "remainingFraction": 1},
+                {"bucketId": "3p-weekly", "window": "weekly", "resetTime": "2026-09-30T14:32:00Z", "remainingFraction": 0.75}
+              ]},
+              {"displayName": "Gemini 4 Argon", "buckets": [
+                {"bucketId": "gemini-argon-wtu-weekly", "window": "weekly", "remainingFraction": 0.5, "disabled": true},
+                {"bucketId": "gemini-argon-bad", "window": "weekly", "remainingFraction": 0.5, "disabled": "true"}
+              ]}
+            ]}
+            """#), for: .antigravity)
+
+        await openPanel()
+
+        #expect(antigravityCard()?.content == .quotas([
+            Quota(period: .limit("Gemini", .fiveHours), value: .percent(10, calculated: false),
+                  reset: .at(Date(timeIntervalSince1970: 1_790_187_420)), readAt: Samples.readingMoment),
+            Quota(period: .limit("Gemini", .weekly), value: .percent(20, calculated: false),
+                  reset: .at(Date(timeIntervalSince1970: 1_790_598_720)), readAt: Samples.readingMoment),
+            Quota(period: .limit("Claude and GPT", .fiveHours), value: .percent(0, calculated: false),
+                  reset: nil, readAt: Samples.readingMoment),
+            Quota(period: .limit("Claude and GPT", .weekly), value: .percent(25, calculated: false),
+                  reset: .at(Date(timeIntervalSince1970: 1_790_778_720)), readAt: Samples.readingMoment),
+        ]))
+    }
+
+    @Test func nestedRemainingValuesEnvelopesAndInferredBucketWindowsAreSupported() async {
+        await transport.answer(with: .json(#"""
+            {"summary": {"groups": [
+              {"displayName": "Gemini Models", "buckets": [
+                {"bucketId": "gemini-5h", "resetTime": "2026-09-23T18:17:00Z", "remaining": {"remainingFraction": 0.75}},
+                {"bucketId": "gemini-weekly", "resetTime": "2026-09-28T12:32:00Z", "remaining": {"case": "remainingFraction", "value": 0.5}}
+              ]}
+            ]}}
+            """#), for: .antigravity)
+
+        await openPanel()
+
+        #expect(antigravityCard()?.content == .quotas([
+            Quota(period: .limit("Gemini", .fiveHours), value: .percent(25, calculated: false),
+                  reset: .at(Date(timeIntervalSince1970: 1_790_187_420)), readAt: Samples.readingMoment),
+            Quota(period: .limit("Gemini", .weekly), value: .percent(50, calculated: false),
+                  reset: .at(Date(timeIntervalSince1970: 1_790_598_720)), readAt: Samples.readingMoment),
+        ]))
+    }
+
+    @Test func localDaemonSessionReadsUltraTierIgnoringGenericPlanInfoName() async throws {
+        let endpoint = try #require(URL(string: "http://127.0.0.1:50631"))
+        await antigravitySessionReader.answer(with: .session(
+            Session(accessToken: "sample-csrf", accountID: nil, localEndpoint: endpoint)
+        ))
+        await transport.answerAntigravityAccount(with: HTTPResult.response(
+            HTTPResponse(status: 200, headers: ["Content-Type": "application/json"], body: Samples.antigravityLocalUserStatusResponse)
+        ))
+        await transport.answer(with: .json(#"""
+            {"response": {"groups": [
+              {"displayName": "Gemini Models", "buckets": [
+                {"bucketId": "gemini-weekly", "window": "weekly", "resetTime": "2026-09-28T12:32:00Z", "remainingFraction": 0.6},
+                {"bucketId": "gemini-5h", "window": "5h", "resetTime": "2026-09-23T18:17:00Z", "remainingFraction": 0.9}
+              ]}
+            ]}}
+            """#), for: .antigravity)
+
+        await openPanel()
+
+        #expect(antigravityCard()?.plan == "Google AI Ultra")
+        #expect(antigravityCard()?.content == .quotas([
+            Quota(period: .limit("Gemini", .fiveHours), value: .percent(10, calculated: false),
+                  reset: .at(Date(timeIntervalSince1970: 1_790_187_420)), readAt: Samples.readingMoment),
+            Quota(period: .limit("Gemini", .weekly), value: .percent(40, calculated: false),
+                  reset: .at(Date(timeIntervalSince1970: 1_790_598_720)), readAt: Samples.readingMoment),
+        ]))
+        let requests = await transport.quotaRequests(to: .antigravity)
+        #expect(requests.map(\.url) == [
+            URL(string: "http://127.0.0.1:50631/exa.language_server_pb.LanguageServerService/GetUserStatus"),
+            URL(string: "http://127.0.0.1:50631/exa.language_server_pb.LanguageServerService/RetrieveUserQuotaSummary"),
+        ])
+        #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "Connect-Protocol-Version") == "1" })
+        #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "x-codeium-csrf-token") == "sample-csrf" })
+    }
+
     /// The current tier is generic, and a paid tier Uzzy does not know is
     /// never shown by its identifier.
     @Test(arguments: [
