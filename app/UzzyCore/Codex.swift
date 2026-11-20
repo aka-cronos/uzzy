@@ -83,7 +83,8 @@ enum Codex: ProviderAdapter {
                 period: name(period(lasting: length)),
                 usedPercents: copies.compactMap(\.used_percent),
                 resets: copies.compactMap(\.reset_at).map { Date(timeIntervalSince1970: $0) },
-                readAt: moment
+                readAt: moment,
+                startsOnFirstUse: true
             )
         }
     }

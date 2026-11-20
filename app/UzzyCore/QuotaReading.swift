@@ -8,6 +8,9 @@ struct QuotaReading: Sendable, Equatable {
     let period: QuotaPeriod
     private let figures: Figures
     let readAt: Date
+    /// The window starts on its first use, as the provider runs it, rather
+    /// than on a schedule. Only then can an unused window have no reset.
+    private let startsOnFirstUse: Bool
 
     /// What the provider reported for the quota.
     private enum Figures: Sendable, Equatable {
@@ -19,10 +22,11 @@ struct QuotaReading: Sendable, Equatable {
         case spend(Money, limit: Money?)
     }
 
-    init(period: QuotaPeriod, usedPercents: [Double], resets: [Date], readAt: Date) {
+    init(period: QuotaPeriod, usedPercents: [Double], resets: [Date], readAt: Date, startsOnFirstUse: Bool = false) {
         self.period = period
         figures = .usedPercents(usedPercents, resets: resets)
         self.readAt = readAt
+        self.startsOnFirstUse = startsOnFirstUse
     }
 
     /// Claude's usage credits spent this month, and their monthly limit.
@@ -30,6 +34,7 @@ struct QuotaReading: Sendable, Equatable {
         period = .usageCredits
         figures = .spend(spent, limit: limit)
         self.readAt = readAt
+        startsOnFirstUse = false
     }
 
     /// Copies of a figure that differ by more than this contradict each other.
@@ -70,13 +75,13 @@ struct QuotaReading: Sendable, Equatable {
         return reset > now ? .at(reset) : .pendingConfirmation
     }
 
-    /// A window starts on its first use. Until then it is unused, and the
+    /// A window that starts on its first use is unused until then, and the
     /// provider reports the reading moment plus the window's length as its
     /// reset: a date that moves with every query, so it is not a reset.
-    /// Only periods of a fixed length can tell; a billing cycle's reset is
-    /// always real.
+    /// Only periods of a fixed length can tell. A scheduled window, such as
+    /// a billing cycle or Cursor's included week, always has a real reset.
     private func hasNotStarted(usedPercents: [Double], resets: [Date]) -> Bool {
-        guard let length = period.length, !usedPercents.isEmpty, usedPercents.allSatisfy({ $0 == 0 }), !resets.isEmpty
+        guard startsOnFirstUse, let length = period.length, !usedPercents.isEmpty, usedPercents.allSatisfy({ $0 == 0 }), !resets.isEmpty
         else { return false }
         let movingReset = readAt.addingTimeInterval(length)
         return resets.allSatisfy { abs($0.timeIntervalSince(movingReset)) <= Self.unstartedWindowAgreement }

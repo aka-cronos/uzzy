@@ -68,6 +68,25 @@ struct CursorPanelTests {
         ]))
     }
 
+    /// Cursor's included week is scheduled, not started by the first use:
+    /// right after a week begins, at 0%, its end is still real.
+    @Test func anUnusedScheduledWeekKeepsItsReset() async {
+        // The reading moment, 2026-09-23T14:32:00Z, plus 7 days.
+        await transport.answer(with: .json("""
+            {"billingCycleEnd":"1792195200000","planUsage":{"totalPercentUsed":0}}
+            """), for: .cursor)
+        await transport.answerCursorMetadata(with: .json("""
+            {"isMerged":true,"planInfo":{"includedUsagePeriod":"INCLUDED_USAGE_PERIOD_WEEKLY","includedUsageResetsAt":"1790778720000"}}
+            """))
+
+        await openPanel()
+
+        #expect(cursorContent() == .quotas([
+            Quota(period: .weekly, value: .percent(0, calculated: false),
+                  reset: .at(Date(timeIntervalSince1970: 1_790_778_720)), readAt: Samples.readingMoment),
+        ]))
+    }
+
     @Test func queriesCursorUsageWithAConnectCallAndTheAccessToken() async {
         await openPanel()
 
