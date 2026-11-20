@@ -59,8 +59,8 @@ struct AntigravityPanelTests {
 
         let requests = await transport.quotaRequests(to: .antigravity)
         #expect(requests.map(\.url) == [
-            URL(string: "https://cloudcode-pa.googleapis.com/v1internal:loadCodeAssist"),
-            URL(string: "https://cloudcode-pa.googleapis.com/v1internal:retrieveUserQuotaSummary"),
+            URL(string: "https://daily-cloudcode-pa.sandbox.googleapis.com/v1internal:loadCodeAssist"),
+            URL(string: "https://daily-cloudcode-pa.sandbox.googleapis.com/v1internal:retrieveUserQuotaSummary"),
         ])
         #expect(requests.allSatisfy { $0.httpMethod == "POST" })
         #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "Authorization") == "Bearer sample-token" })
