@@ -85,7 +85,6 @@ enum Antigravity: ProviderAdapter {
     private static let planNames = [
         "g1-pro-tier": "Google AI Pro",
         "g1-ultra-tier": "Google AI Ultra",
-        "g1-ultra-lite-tier": "Google AI Ultra Lite",
     ]
 
     /// The groups Antigravity's own quota screen shows go by a short name;
