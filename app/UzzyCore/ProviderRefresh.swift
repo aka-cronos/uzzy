@@ -86,6 +86,9 @@ final class ProviderRefresh {
 
     /// How often a rejected session is read again while the panel is open.
     nonisolated static let recheckInterval: TimeInterval = 30
+    /// The session the provider last rejected, which reading it again on
+    /// its own never queries. `nil` once a query succeeds.
+    @ObservationIgnored private var rejectedSession: Session?
 
     private let adapter: any ProviderAdapter.Type
     private let sessionReader: any SessionReader
@@ -150,6 +153,7 @@ final class ProviderRefresh {
             queryID = nil
             scheduledRetry = nil
             scheduledRecheck = nil
+            rejectedSession = nil
             reading = .loading
             clearCredits()
             session = nil
@@ -233,7 +237,8 @@ final class ProviderRefresh {
 
     /// While the panel is open and the provider rejected the session, reads
     /// it again after a while, for adapters that reread it. The read skips
-    /// the query while the session is still the rejected one.
+    /// the query while the session is still the rejected one, even when an
+    /// automatic query was rejected: only a user action checks that one.
     private func planRecheck() {
         guard adapter.rereadsRejectedSession, isEnabled, isPanelOpen,
               case .failed(let failure, _) = reading, failure.isRejection
@@ -243,7 +248,7 @@ final class ProviderRefresh {
         }
         scheduledRecheck = clock.schedule(at: clock.now().addingTimeInterval(Self.recheckInterval)) { [weak self] in
             guard let self, isEnabled, isPanelOpen else { return }
-            startQuery(.read(skipping: session))
+            startQuery(.read(skipping: rejectedSession))
         }
     }
 
@@ -328,6 +333,7 @@ final class ProviderRefresh {
         case .quotas(let quotas, let bankedResets, let plan):
             let valid = LastValidReading(quotas: quotas, accountID: session.accountID, bankedResets: bankedResets, plan: plan)
             reading = .quotas(valid)
+            rejectedSession = nil
             if let accountID = session.accountID, !accountID.isEmpty, case .response(let response) = result {
                 if provider == .claude {
                     cloudCreditState = Claude.cloudCredit(from: response.body, accountID: accountID, at: clock.now())
@@ -373,6 +379,7 @@ final class ProviderRefresh {
         staleCredits()
         log.record(.queryFailed(provider, failure))
         let kept = reading.lastValidReading(of: session.accountID)
+        if failure.isRejection { rejectedSession = session }
         if failure.isRejection, case .reuse = source {
             // The official app may have renewed the token since it was
             // read, so the session is not called expired: the figures go

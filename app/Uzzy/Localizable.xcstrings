@@ -943,6 +943,17 @@
         }
       }
     },
+    "Renew the session in %@. %@ updates on its own." : {
+      "comment" : "The first %@ is the official app, the second the app's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renueva la sesión en %1$@. %2$@ se actualiza solo."
+          }
+        }
+      }
+    },
     "Renew the session in %@ and click Refresh." : {
       "comment" : "%@ is the official app.",
       "localizations" : {

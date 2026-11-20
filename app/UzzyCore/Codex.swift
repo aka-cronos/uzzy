@@ -5,6 +5,9 @@ import Foundation
 enum Codex: ProviderAdapter {
     static let provider = Provider.codex
 
+    /// Codex CLI renews its token while it runs; its session is a file.
+    static let rereadsRejectedSession = true
+
     static func request(for session: Session) -> URLRequest {
         var request = URLRequest(url: URL(string: "https://chatgpt.com/backend-api/wham/usage")!)
         request.httpMethod = "GET"

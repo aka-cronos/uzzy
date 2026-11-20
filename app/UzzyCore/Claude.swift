@@ -5,6 +5,10 @@ import Foundation
 enum Claude: ProviderAdapter {
     static let provider = Provider.claude
 
+    /// Claude Code renews its token while it runs; reading it through
+    /// `security` shows no prompt.
+    static let rereadsRejectedSession = true
+
     static func request(for session: Session) -> URLRequest {
         var request = URLRequest(url: URL(string: "https://api.anthropic.com/api/oauth/usage?cedar_ember=1")!)
         request.httpMethod = "GET"

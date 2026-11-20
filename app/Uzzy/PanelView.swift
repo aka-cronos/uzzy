@@ -545,6 +545,10 @@ private struct FailureMessage: View {
             // Antigravity renews the token when it runs, and the card reads
             // it again on its own while the panel is open.
             Message(title: "Session expired", detail: "Open Antigravity to renew the session. \(Format.appName) updates on its own.")
+        case .sessionExpired where provider == .claude || provider == .codex:
+            // The card reads the session again on its own while the panel
+            // is open; Cursor's key is read only on a user action.
+            Message(title: "Session expired", detail: "Renew the session in \(provider.officialApp). \(Format.appName) updates on its own.")
         case .sessionExpired:
             Message(title: "Session expired", detail: "Renew the session in \(provider.officialApp) and click Refresh.")
         case .accessRefused:
