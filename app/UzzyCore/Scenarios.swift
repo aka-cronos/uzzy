@@ -46,7 +46,7 @@ extension Scenario {
     /// Every scenario, in the order to review them. Together they show every
     /// visible state of the panel.
     public static let all: [Scenario] = [
-        quotas, cursorWeekly, creditBalances, staleCreditBalances, hiddenCreditBalances, usageCredits, uncappedUsageCredits, loading, newAccount, stale, pendingConfirmation, unknownReset, unavailable, withoutSubscriptionQuotas,
+        quotas, cursorWeekly, creditBalances, staleCreditBalances, hiddenCreditBalances, usageCredits, uncappedUsageCredits, loading, newAccount, stale, pendingConfirmation, unknownReset, unusedWindows, unavailable, withoutSubscriptionQuotas,
         uninterpretable, noSession, sessionExpired, reusedSessionRejected, sessionAccessDenied, cursorNeedsAccess, unavailableSessionStores,
         incompatibleSession, incompatibleResponse, incompatibleCursorReset,
         networkFailures, refused, longContent, bankedResets,
@@ -144,6 +144,19 @@ extension Scenario {
           "seven_day": {"utilization": 62.0, "resets_at": null}
         }
         """#), for: .claude)
+        await stage.openPanel()
+    }
+
+    /// Codex has not been used: both windows are at 0%, and the dates it
+    /// reports are the reading moment plus each window's length, so neither
+    /// shows a reset.
+    public static let unusedWindows = Scenario("unusedWindows", "Unused windows") { stage in
+        await stage.transport.answer(with: .codex(rateLimit: #"""
+        {
+          "primary_window": {"used_percent": 0, "limit_window_seconds": 18000, "reset_at": 1790191920},
+          "secondary_window": {"used_percent": 0, "limit_window_seconds": 604800, "reset_at": 1790778720}
+        }
+        """#), for: .codex)
         await stage.openPanel()
     }
 
