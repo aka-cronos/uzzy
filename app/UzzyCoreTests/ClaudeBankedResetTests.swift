@@ -12,7 +12,7 @@ struct ClaudeBankedResetTests {
 
     init() {
         core = UsageCore(
-            claudeSessionReader: session, codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(),
+            claudeSessionReader: session, codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(),
             transport: transport, clock: clock, log: RecordingLog()
         )
     }

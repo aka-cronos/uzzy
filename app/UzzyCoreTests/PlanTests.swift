@@ -30,6 +30,7 @@ struct PlanTests {
             claudeSessionReader: NoSessionReader(),
             codexSessionReader: ControlledSessionReader(),
             cursorSessionReader: NoSessionReader(),
+            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog()
@@ -84,6 +85,7 @@ struct PlanTests {
             claudeSessionReader: NoSessionReader(),
             codexSessionReader: ControlledSessionReader(session: Samples.claudeSession),
             cursorSessionReader: NoSessionReader(),
+            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog()
@@ -102,6 +104,7 @@ struct PlanTests {
             claudeSessionReader: ClaudeCodeSessionReader(home: tool.directory, securityTool: tool.file),
             codexSessionReader: NoSessionReader(),
             cursorSessionReader: NoSessionReader(),
+            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog()
@@ -163,6 +166,7 @@ struct PlanTests {
             claudeSessionReader: NoSessionReader(),
             codexSessionReader: NoSessionReader(),
             cursorSessionReader: CursorSessionReader(databaseFile: database.file),
+            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog()
@@ -235,6 +239,7 @@ struct PlanTests {
             claudeSessionReader: sessionReader,
             codexSessionReader: NoSessionReader(),
             cursorSessionReader: NoSessionReader(),
+            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog()

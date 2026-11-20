@@ -38,7 +38,7 @@ struct CloudCreditTests {
         await transport.answer(with: .json("""
             {"five_hour":{"utilization":35},"iguana_necktie":{"remaining_dollars":90,"resets_at":"\(expiry.ISO8601Format())"}}
             """), for: .claude)
-        let core = UsageCore(claudeSessionReader: SampleSessionReader(), codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), transport: transport, clock: clock)
+        let core = UsageCore(claudeSessionReader: SampleSessionReader(), codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(), transport: transport, clock: clock)
         core.panelOpened()
         await core.queriesFinished()
         await transport.answer(with: .timeout, for: .claude)
@@ -60,7 +60,7 @@ struct CloudCreditTests {
         let quota = withQuotas ? #""five_hour":{"utilization":35},"# : ""
         let body = "{\(quota)\"iguana_necktie\":\(grant),\"harbor_lantern\":null}"
         let core = UsageCore(
-            claudeSessionReader: SampleSessionReader(), codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(),
+            claudeSessionReader: SampleSessionReader(), codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(),
             transport: SampleTransport(claudeResponse: Data(body.utf8)), clock: FixedClock(Samples.readingMoment),
             initialEnabledProviders: [.claude]
         )
@@ -73,7 +73,7 @@ struct CloudCreditTests {
         let body = """
             {"limits":[\(limit)],"iguana_necktie":{"remaining_dollars":90,"resets_at":"2030-01-02T12:00:00Z"}}
             """
-        let core = UsageCore(claudeSessionReader: SampleSessionReader(), codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), transport: SampleTransport(claudeResponse: Data(body.utf8)), clock: FixedClock(Samples.readingMoment), initialEnabledProviders: [.claude])
+        let core = UsageCore(claudeSessionReader: SampleSessionReader(), codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(), transport: SampleTransport(claudeResponse: Data(body.utf8)), clock: FixedClock(Samples.readingMoment), initialEnabledProviders: [.claude])
         core.panelOpened()
         await core.queriesFinished()
         #expect(core.state.cards.first?.content == .failed(.incompatibleResponse))

@@ -9,6 +9,7 @@ struct ProviderVisibilityTests {
     let claudeReader = ControlledSessionReader()
     let codexReader = ControlledSessionReader()
     let cursorReader = ControlledSessionReader()
+    let antigravityReader = ControlledSessionReader()
     let transport = ControlledTransport()
     let core: UsageCore
 
@@ -17,6 +18,7 @@ struct ProviderVisibilityTests {
             claudeSessionReader: claudeReader,
             codexSessionReader: codexReader,
             cursorSessionReader: cursorReader,
+            antigravitySessionReader: antigravityReader,
             transport: transport,
             clock: clock
         )
@@ -32,7 +34,9 @@ struct ProviderVisibilityTests {
         #expect(await claudeReader.reads == 1)
         #expect(await codexReader.reads == 1)
         #expect(await cursorReader.reads == 1)
-        #expect(await transport.quotaRequests.count == 4)
+        #expect(await antigravityReader.reads == 1)
+        // Cursor and Antigravity each make two quota queries.
+        #expect(await transport.quotaRequests.count == 6)
     }
 
     @Test func restoredChoicesHideAndNeverReadDisabledProviders() async {
@@ -40,6 +44,7 @@ struct ProviderVisibilityTests {
             claudeSessionReader: claudeReader,
             codexSessionReader: codexReader,
             cursorSessionReader: cursorReader,
+            antigravitySessionReader: antigravityReader,
             transport: transport,
             clock: clock,
             initialEnabledProviders: [.claude, .cursor]
@@ -60,6 +65,7 @@ struct ProviderVisibilityTests {
             claudeSessionReader: claudeReader,
             codexSessionReader: codexReader,
             cursorSessionReader: cursorReader,
+            antigravitySessionReader: antigravityReader,
             transport: transport,
             clock: clock,
             initialEnabledProviders: []
@@ -87,7 +93,7 @@ struct ProviderVisibilityTests {
         await core.queriesFinished()
         core.setEnabled(false, for: .codex)
 
-        #expect(core.state.cards.map(\.provider) == [.claude, .cursor])
+        #expect(core.state.cards.map(\.provider) == [.claude, .cursor, .antigravity])
         core.refresh()
         core.systemWoke()
         clock.advance(by: 5 * 60)
@@ -100,7 +106,8 @@ struct ProviderVisibilityTests {
         #expect(await transport.quotaRequests(to: .codex).count == 1)
         #expect(await transport.quotaRequests(to: .claude).count > 1)
         #expect(await transport.quotaRequests(to: .cursor).count > 1)
-        #expect(core.state.cards.map(\.provider) == [.claude, .cursor])
+        #expect(await transport.quotaRequests(to: .antigravity).count > 2)
+        #expect(core.state.cards.map(\.provider) == [.claude, .cursor, .antigravity])
     }
 
     @Test func enablingWhileOpenStartsFreshAndNeverRestoresTheOldReading() async {
@@ -126,6 +133,7 @@ struct ProviderVisibilityTests {
         case .claude: claudeReader
         case .codex: codexReader
         case .cursor: cursorReader
+        case .antigravity: antigravityReader
         }
     }
 
@@ -155,7 +163,7 @@ struct ProviderVisibilityTests {
         await core.queriesFinished()
 
         let sentAfter = await transport.quotaRequests(to: provider).dropFirst(sentBefore)
-        #expect(sentAfter.map { $0.value(forHTTPHeaderField: "Authorization") } == Array(repeating: "Bearer new-token", count: provider == .cursor ? 2 : 1))
+        #expect(sentAfter.map { $0.value(forHTTPHeaderField: "Authorization") } == Array(repeating: "Bearer new-token", count: [.cursor, .antigravity].contains(provider) ? 2 : 1))
     }
 
     @Test func enablingWhileClosedWaitsForTheNextPanelOpening() async {
@@ -200,14 +208,15 @@ struct ProviderVisibilityTests {
         await transport.waitForQuotaRequests(3)
         await core.queriesFinished(of: .codex)
         await core.queriesFinished(of: .cursor)
+        await core.queriesFinished(of: .antigravity)
 
         core.setEnabled(false, for: .claude)
-        #expect(core.state.cards.map(\.provider) == [.codex, .cursor])
+        #expect(core.state.cards.map(\.provider) == [.codex, .cursor, .antigravity])
         #expect(!core.state.isQuerying)
 
         await transport.release()
         await core.queriesFinished()
-        #expect(core.state.cards.map(\.provider) == [.codex, .cursor])
+        #expect(core.state.cards.map(\.provider) == [.codex, .cursor, .antigravity])
 
         core.setEnabled(true, for: .claude)
         #expect(core.state.cards[0].content == .loading)
