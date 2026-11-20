@@ -48,7 +48,7 @@ Open Settings with ⌘, from the panel; ⌘W closes it and ⌘Q quits. Your choi
 | **Cursor** | Cursor (its local `state.vscdb`, and its safeStorage key in the Keychain once you allow it) | Weekly included usage on unified plans; «Cursor Models» and «Other Models» for the billing cycle on legacy plans; the credit balance when the account has one |
 | **Antigravity** | Antigravity, the app or the `agy` CLI (the Keychain) | 5 hours and weekly for each model group Google reports: «Gemini», «Claude and GPT», and any group a plan keeps apart, such as «Gemini 4 Argon» |
 
-Each card also shows the account's plan next to its title, e.g. «Claude · Max», when the provider reports a plan Uzzy knows: Claude Code keeps it in its Keychain item, Codex sends it with the usage limits, Cursor keeps it in `state.vscdb` and Google reports it for Antigravity («Google AI Pro», «Google AI Ultra» or «Google AI Ultra Lite»).
+Each card also shows the account's plan next to its title, e.g. «Claude · Max», when the provider reports a plan Uzzy knows: Claude Code keeps it in its Keychain item, Codex sends it with the usage limits, Cursor keeps it in `state.vscdb` and Google reports it for Antigravity («Google AI Pro» or «Google AI Ultra»).
 
 Uzzy reads Claude Code's Keychain item through `/usr/bin/security`, the tool Claude Code writes it with. The item already trusts that tool, so macOS shows no Keychain prompt, even after Claude Code refreshes its token.
 
