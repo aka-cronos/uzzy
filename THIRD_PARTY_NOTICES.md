@@ -4,7 +4,7 @@ Uzzy's own code is under the [MIT license](LICENSE). The providers' logos and th
 
 ## Provider logos
 
-The Claude, Codex, Cursor and Antigravity logos are trademarks of Anthropic, OpenAI, Anysphere and Google. They are not under Uzzy's MIT license. Uzzy shows them only to identify each provider: next to its name in the panel and in Settings (`app/Uzzy/Assets.xcassets/ProviderLogo*.imageset`) and on the uzzy.app site (`site/public/cover/claude.svg`, `codex.svg` and `cursor.svg`). Uzzy is not affiliated with, endorsed by or sponsored by any of them.
+The Claude, Codex, Cursor and Antigravity logos are trademarks of Anthropic, OpenAI, Anysphere and Google. They are not under Uzzy's MIT license. Uzzy shows them only to identify each provider: next to its name in the panel and in Settings (`app/Uzzy/Assets.xcassets/ProviderLogo*.imageset`) and on the uzzy.app site (`site/public/cover/claude.svg`, `codex.svg`, `cursor.svg` and `antigravity.svg`). Uzzy is not affiliated with, endorsed by or sponsored by any of them.
 
 ## Background photo
 
