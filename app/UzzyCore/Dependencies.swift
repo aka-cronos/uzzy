@@ -12,11 +12,15 @@ public struct Session: Sendable, Equatable {
     /// provider's own identifier, not a name to show. `nil` when the session
     /// holds none, or the provider reports it elsewhere.
     public let plan: String?
+    /// Where the provider answers for this session; `nil` uses the adapter's
+    /// default host.
+    public let endpoint: URL?
 
-    public init(accessToken: String, accountID: String?, plan: String? = nil) {
+    public init(accessToken: String, accountID: String?, plan: String? = nil, endpoint: URL? = nil) {
         self.accessToken = accessToken
         self.accountID = accountID
         self.plan = plan
+        self.endpoint = endpoint
     }
 }
 

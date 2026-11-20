@@ -12,13 +12,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
     /// Shared by Cursor's session reader and the core, which withdraws it
     /// when Cursor is turned off.
     private static let cursorAccess = DefaultsAccessConsent(key: "cursorKeychainAccess")
+    private static let transport = URLSessionTransport()
     private let realCore = UsageCore(
         claudeSessionReader: ClaudeCodeSessionReader(),
         codexSessionReader: CodexCLISessionReader(),
         cursorSessionReader: CursorSessionReader(consent: AppDelegate.cursorAccess),
-        antigravitySessionReader: AntigravitySessionReader(),
+        antigravitySessionReader: AntigravitySessionReader(transport: AppDelegate.transport),
         cursorAccess: AppDelegate.cursorAccess,
-        transport: URLSessionTransport(),
+        transport: AppDelegate.transport,
         clock: SystemClock(),
         initialMagnitude: QuotaMagnitude(
             rawValue: UserDefaults.standard.string(forKey: "displayMagnitude") ?? ""

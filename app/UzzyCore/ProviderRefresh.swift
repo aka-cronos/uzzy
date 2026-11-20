@@ -24,12 +24,17 @@ protocol ProviderAdapter {
     /// again every `ProviderRefresh.recheckInterval` and queried once it
     /// changes. Reading it must show no prompt and cost no query.
     static var rereadsRejectedSession: Bool { get }
+    /// The failure to report when `session`'s endpoint cannot be reached;
+    /// `nil` keeps `.offline`.
+    static func failure(whenUnreachable session: Session) -> Failure?
 }
 
 extension ProviderAdapter {
     static func metadataRequest(for session: Session, after response: Data) -> URLRequest? { nil }
 
     static var rereadsRejectedSession: Bool { false }
+
+    static func failure(whenUnreachable session: Session) -> Failure? { nil }
 
     static func bankedResets(from body: Data, readAt moment: Date) -> BankedResets? {
         nil
@@ -415,7 +420,7 @@ final class ProviderRefresh {
         let response: HTTPResponse
         switch result {
         case .response(let received): response = received
-        case .networkError: return .failed(.offline)
+        case .networkError: return .failed(adapter.failure(whenUnreachable: session) ?? .offline)
         case .timeout: return .failed(.timedOut)
         case .responseTooLarge: return .failed(.responseTooLarge)
         }

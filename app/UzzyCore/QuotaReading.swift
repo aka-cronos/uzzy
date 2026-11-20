@@ -11,6 +11,9 @@ struct QuotaReading: Sendable, Equatable {
     /// The window starts on its first use, as the provider runs it, rather
     /// than on a schedule. Only then can an unused window have no reset.
     private let startsOnFirstUse: Bool
+    /// How far an unused window's moving reset may be from the reading moment
+    /// plus the period's length.
+    private let unstartedWindowAgreement: TimeInterval
 
     /// What the provider reported for the quota.
     private enum Figures: Sendable, Equatable {
@@ -22,11 +25,19 @@ struct QuotaReading: Sendable, Equatable {
         case spend(Money, limit: Money?)
     }
 
-    init(period: QuotaPeriod, usedPercents: [Double], resets: [Date], readAt: Date, startsOnFirstUse: Bool = false) {
+    init(
+        period: QuotaPeriod,
+        usedPercents: [Double],
+        resets: [Date],
+        readAt: Date,
+        startsOnFirstUse: Bool = false,
+        unstartedWindowAgreement: TimeInterval = QuotaReading.unstartedWindowAgreement
+    ) {
         self.period = period
         figures = .usedPercents(usedPercents, resets: resets)
         self.readAt = readAt
         self.startsOnFirstUse = startsOnFirstUse
+        self.unstartedWindowAgreement = unstartedWindowAgreement
     }
 
     /// Claude's usage credits spent this month, and their monthly limit.
@@ -35,6 +46,7 @@ struct QuotaReading: Sendable, Equatable {
         figures = .spend(spent, limit: limit)
         self.readAt = readAt
         startsOnFirstUse = false
+        unstartedWindowAgreement = Self.unstartedWindowAgreement
     }
 
     /// Copies of a figure that differ by more than this contradict each other.
@@ -60,7 +72,8 @@ struct QuotaReading: Sendable, Equatable {
 
     /// How far a reported reset may be from the reading moment plus the
     /// period's length and still be that moving date. It covers the query's
-    /// latency and a clock slightly out of step with the provider's.
+    /// latency, a summary the provider cached and a clock slightly out of
+    /// step with the provider's.
     static let unstartedWindowAgreement: TimeInterval = 5 * 60
 
     /// Nil for money spent, which has no reset at all, and for a window that
@@ -84,7 +97,7 @@ struct QuotaReading: Sendable, Equatable {
         guard startsOnFirstUse, let length = period.length, !usedPercents.isEmpty, usedPercents.allSatisfy({ $0 == 0 }), !resets.isEmpty
         else { return false }
         let movingReset = readAt.addingTimeInterval(length)
-        return resets.allSatisfy { abs($0.timeIntervalSince(movingReset)) <= Self.unstartedWindowAgreement }
+        return resets.allSatisfy { abs($0.timeIntervalSince(movingReset)) <= unstartedWindowAgreement }
     }
 
     private func value(in magnitude: QuotaMagnitude) -> QuotaValue {

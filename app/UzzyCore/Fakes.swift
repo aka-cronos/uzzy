@@ -43,6 +43,8 @@ public actor SampleTransport: HTTPTransport {
         case "api2.cursor.sh": request.url?.lastPathComponent == "GetPlanInfo" ? Samples.cursorPlanResponse : cursorResponse
         case "daily-cloudcode-pa.sandbox.googleapis.com": request.url?.lastPathComponent == "v1internal:loadCodeAssist"
             ? Samples.antigravityAccountResponse : Samples.antigravityQuotaResponse
+        case "127.0.0.1": request.url?.lastPathComponent == "GetUserStatus"
+            ? Samples.antigravityDaemonStatusResponse : Samples.antigravityDaemonQuotaResponse
         default: claudeResponse
         }
         return .response(HTTPResponse(status: 200, headers: ["Content-Type": "application/json"], body: body))
@@ -212,6 +214,9 @@ public actor ControlledTransport: HTTPTransport {
     private var profile: HTTPResult = .json("{}")
     private var cursorMetadata: HTTPResult = .json(#"{"planInfo":{"includedUsagePeriod":"INCLUDED_USAGE_PERIOD_MONTHLY"}}"#)
     private var antigravityAccount: HTTPResult = .antigravityAccountSample
+    private var antigravityDaemonStatus: HTTPResult = .antigravityDaemonStatusSample
+    private var antigravityDaemonStatusByPort: [Int: HTTPResult] = [:]
+    private var antigravityDaemonQuota: HTTPResult = .antigravityDaemonQuotaSample
     private var held: Set<Provider> = []
     private var heldCredits: Set<Provider> = []
     private var heldRequests: [CheckedContinuation<Void, Never>] = []
@@ -236,6 +241,10 @@ public actor ControlledTransport: HTTPTransport {
         if request.isOptionalCreditRequest { return credits[provider] ?? .json("{}") }
         if request.url?.lastPathComponent == "GetPlanInfo" { return cursorMetadata }
         if request.url?.lastPathComponent == "v1internal:loadCodeAssist" { return antigravityAccount }
+        if request.url?.lastPathComponent == "GetUserStatus" {
+            return request.url?.port.flatMap { antigravityDaemonStatusByPort[$0] } ?? antigravityDaemonStatus
+        }
+        if request.url?.lastPathComponent == "RetrieveUserQuotaSummary" { return antigravityDaemonQuota }
         return results[provider] ?? .networkError
     }
 
@@ -262,6 +271,21 @@ public actor ControlledTransport: HTTPTransport {
     /// before its quota summary. The summary answers with `answer(with:for:)`.
     public func answerAntigravityAccount(with result: HTTPResult) {
         antigravityAccount = result
+    }
+
+    /// Answers Antigravity's local daemon `GetUserStatus` query, optionally
+    /// scoped to a specific loopback port.
+    public func answerAntigravityDaemonStatus(with result: HTTPResult, port: Int? = nil) {
+        if let port {
+            antigravityDaemonStatusByPort[port] = result
+        } else {
+            antigravityDaemonStatus = result
+        }
+    }
+
+    /// Answers Antigravity's local daemon `RetrieveUserQuotaSummary` query.
+    public func answerAntigravityDaemonQuota(with result: HTTPResult) {
+        antigravityDaemonQuota = result
     }
 
     /// Holds the requests of `provider`, or of every provider.
@@ -308,7 +332,7 @@ extension Provider {
         case "api.anthropic.com": self = .claude
         case "chatgpt.com": self = .codex
         case "api2.cursor.sh": self = .cursor
-        case "daily-cloudcode-pa.sandbox.googleapis.com": self = .antigravity
+        case "daily-cloudcode-pa.sandbox.googleapis.com", "127.0.0.1": self = .antigravity
         default: return nil
         }
     }
@@ -338,6 +362,16 @@ extension HTTPResult {
     /// Antigravity's sample account (`loadCodeAssist`), answered with a 200.
     public static let antigravityAccountSample = HTTPResult.response(
         HTTPResponse(status: 200, headers: ["Content-Type": "application/json"], body: Samples.antigravityAccountResponse)
+    )
+
+    /// Antigravity's sample local daemon status (`GetUserStatus`), answered with a 200.
+    public static let antigravityDaemonStatusSample = HTTPResult.response(
+        HTTPResponse(status: 200, headers: ["Content-Type": "application/json"], body: Samples.antigravityDaemonStatusResponse)
+    )
+
+    /// Antigravity's sample local daemon quota summary (`RetrieveUserQuotaSummary`), answered with a 200.
+    public static let antigravityDaemonQuotaSample = HTTPResult.response(
+        HTTPResponse(status: 200, headers: ["Content-Type": "application/json"], body: Samples.antigravityDaemonQuotaResponse)
     )
 
     /// A response of any provider, answered with a 200, with the given body.
