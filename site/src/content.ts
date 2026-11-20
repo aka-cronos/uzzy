@@ -16,7 +16,7 @@ export const why = "Keep using Claude, Codex, Cursor and Antigravity. Uzzy bring
 
 export const features = [
   { title: "Four tools. One quick check.", body: "Open Uzzy from your menu bar to see Claude, Codex, Cursor and Antigravity together, with a separate card for each provider, led by its logo and showing its plan." },
-  { title: "Different limits stay different.", body: "Check each usage limit on its own, with its reset time, countdown and last reading. Five-hour and weekly limits are never blended into one number." },
+  { title: "Different limits stay different.", body: "Check each usage limit on its own, with its reset time, countdown and last reading. Five-hour and weekly limits are never blended into one number, and a limit you haven’t used yet shows no reset until its period starts." },
   { title: "Checks while you look.", body: "Uzzy refreshes readings when needed as you open the panel, then every five minutes while it stays open. Close it and the requests stop." },
   { title: "Missing doesn’t mean zero.", body: "If a session expires or a provider can’t be reached, Uzzy tells you what happened. The other providers keep working." },
 ];
@@ -25,7 +25,7 @@ export const providers = [
   {
     name: "Claude",
     session: "Claude Code",
-    shows: "5 hours, weekly, weekly per model, usage credits this month, credit balance, cloud session credits",
+    shows: "5 hours, weekly, weekly per model, banked resets, usage credits this month, credit balance, cloud session credits",
   },
   {
     name: "Codex",
