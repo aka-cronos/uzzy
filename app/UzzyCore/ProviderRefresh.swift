@@ -297,6 +297,19 @@ final class ProviderRefresh {
             let sessionReading = await sessionReader.read()
             guard isCurrent(queryID) else { return nil }
             if let failure = Failure(sessionReading) {
+                // When a local-endpoint session (such as a running app's local
+                // service) disappears, treat it as an unreachable session
+                // rather than no session so stale readings stay visible and
+                // the recheck picks the app up again when it relaunches.
+                if failure == .noSession,
+                   let previous = self.session ?? self.rejectedSession,
+                   let unreachableFailure = adapter.failure(whenUnreachable: previous) {
+                    let kept = reading.lastValidReading(of: previous.accountID)
+                    self.session = nil
+                    if unreachableFailure.isRejection { rejectedSession = previous }
+                    staleCredits()
+                    return .failed(unreachableFailure, keeping: kept)
+                }
                 self.session = nil
                 clearCredits()
                 return .failed(failure, keeping: nil)
