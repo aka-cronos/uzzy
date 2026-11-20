@@ -91,6 +91,19 @@ struct AntigravityPanelTests {
         #expect(antigravityCard()?.plan == "Google AI Pro")
     }
 
+    @Test(arguments: [
+        ("g1-pro-tier", "Google AI Pro"),
+        ("g1-ultra-tier", "Google AI Ultra"),
+        ("g1-ultra-lite-tier", "Google AI Ultra Lite"),
+    ])
+    func everyKnownPaidTierShowsItsPlan(tier: String, plan: String) async {
+        await transport.answerAntigravityAccount(with: .json(#"{"paidTier": {"id": "\#(tier)"}}"#))
+
+        await openPanel()
+
+        #expect(antigravityCard()?.plan == plan)
+    }
+
     /// The current tier is generic, and a paid tier Uzzy does not know is
     /// never shown by its identifier.
     @Test(arguments: [
@@ -150,6 +163,40 @@ struct AntigravityPanelTests {
         #expect(antigravityCard()?.content == .quotas([
             Quota(period: .limit("Gemini", .weekly), value: .unavailable,
                   reset: .at(Date(timeIntervalSince1970: 1_790_598_720)), readAt: Samples.readingMoment),
+        ]))
+    }
+
+    /// A limit the plan turns off is left out, and a group left with none
+    /// shows nothing. Only `true` turns a limit off.
+    @Test func disabledLimitsAreLeftOut() async {
+        await transport.answer(with: .json(#"""
+            {"groups": [
+              {"displayName": "Gemini Models", "buckets": [
+                {"bucketId": "gemini-5h", "window": "5h", "resetTime": "2026-09-23T18:17:00Z", "remainingFraction": 0.9, "disabled": false},
+                {"bucketId": "gemini-weekly", "window": "weekly", "resetTime": "2026-09-28T12:32:00Z", "remainingFraction": 0.8, "disabled": "true"}
+              ]},
+              {"displayName": "Claude and GPT models", "buckets": [
+                {"bucketId": "3p-5h", "window": "5h", "resetTime": "2026-09-23T19:32:00Z", "remainingFraction": 0.5, "disabled": true},
+                {"bucketId": "3p-weekly", "window": "weekly", "resetTime": "2026-09-30T14:32:00Z", "remainingFraction": 0.75}
+              ]},
+              {"displayName": "Gemini 4 Argon", "buckets": [
+                {"bucketId": "gemini-argon-wtu-weekly", "window": "weekly", "resetTime": "2026-09-29T08:00:00Z", "remainingFraction": 1, "disabled": true}
+              ]}
+            ]}
+            """#), for: .antigravity)
+
+        await openPanel()
+
+        #expect(antigravityCard()?.content == .quotas([
+            // 2026-09-23T18:17:00Z
+            Quota(period: .limit("Gemini", .fiveHours), value: .percent(10, calculated: false),
+                  reset: .at(Date(timeIntervalSince1970: 1_790_187_420)), readAt: Samples.readingMoment),
+            // 2026-09-28T12:32:00Z
+            Quota(period: .limit("Gemini", .weekly), value: .percent(20, calculated: false),
+                  reset: .at(Date(timeIntervalSince1970: 1_790_598_720)), readAt: Samples.readingMoment),
+            // 2026-09-30T14:32:00Z
+            Quota(period: .limit("Claude and GPT", .weekly), value: .percent(25, calculated: false),
+                  reset: .at(Date(timeIntervalSince1970: 1_790_778_720)), readAt: Samples.readingMoment),
         ]))
     }
 
