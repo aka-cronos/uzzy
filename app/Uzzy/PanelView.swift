@@ -541,6 +541,10 @@ private struct FailureMessage: View {
                 title: "Incompatible session",
                 detail: "The \(provider.officialApp) session is in a format \(Format.appName) doesn't recognize."
             )
+        case .sessionExpired where provider == .antigravity:
+            // Antigravity renews the token when it runs, and the card reads
+            // it again on its own while the panel is open.
+            Message(title: "Session expired", detail: "Open Antigravity to renew the session. \(Format.appName) updates on its own.")
         case .sessionExpired:
             Message(title: "Session expired", detail: "Renew the session in \(provider.officialApp) and click Refresh.")
         case .accessRefused:

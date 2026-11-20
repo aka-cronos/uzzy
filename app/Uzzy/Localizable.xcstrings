@@ -823,6 +823,17 @@
         }
       }
     },
+    "Open Antigravity to renew the session. %@ updates on its own." : {
+      "comment" : "Antigravity's expired session. %@ is the app's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abre Antigravity para renovar la sesión. %@ se actualiza solo."
+          }
+        }
+      }
+    },
     "Open Settings" : {
       "localizations" : {
         "es" : {

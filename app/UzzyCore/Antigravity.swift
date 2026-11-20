@@ -6,6 +6,10 @@ import Foundation
 enum Antigravity: ProviderAdapter {
     static let provider = Provider.antigravity
 
+    /// Antigravity renews its token only while it runs, so the session is
+    /// often expired; reading it through `security` shows no prompt.
+    static let rereadsRejectedSession = true
+
     /// Cloud Code leaves the plan out and refuses the quota summary (403)
     /// unless the client presents itself as Antigravity, and leaves out the
     /// groups a plan keeps apart (Gemini 4 Argon on Google AI Pro) unless it
