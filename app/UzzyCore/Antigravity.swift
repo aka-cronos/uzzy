@@ -59,7 +59,9 @@ enum Antigravity: ProviderAdapter {
                 period: period,
                 usedPercents: buckets.compactMap(\.usedPercent),
                 resets: buckets.compactMap { reset($0.resetTime) },
-                readAt: moment
+                readAt: moment,
+                // An untouched bucket's reset is the reading plus its window.
+                startsOnFirstUse: true
             )
         })
     }
