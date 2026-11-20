@@ -8,6 +8,9 @@ struct QuotaReading: Sendable, Equatable {
     let period: QuotaPeriod
     private let figures: Figures
     let readAt: Date
+    /// The window starts on its first use, as the provider runs it, rather
+    /// than on a schedule. Only then can an unused window have no reset.
+    private let startsOnFirstUse: Bool
 
     /// What the provider reported for the quota.
     private enum Figures: Sendable, Equatable {
@@ -19,10 +22,11 @@ struct QuotaReading: Sendable, Equatable {
         case spend(Money, limit: Money?)
     }
 
-    init(period: QuotaPeriod, usedPercents: [Double], resets: [Date], readAt: Date) {
+    init(period: QuotaPeriod, usedPercents: [Double], resets: [Date], readAt: Date, startsOnFirstUse: Bool = false) {
         self.period = period
         figures = .usedPercents(usedPercents, resets: resets)
         self.readAt = readAt
+        self.startsOnFirstUse = startsOnFirstUse
     }
 
     /// Claude's usage credits spent this month, and their monthly limit.
@@ -30,6 +34,7 @@ struct QuotaReading: Sendable, Equatable {
         period = .usageCredits
         figures = .spend(spent, limit: limit)
         self.readAt = readAt
+        startsOnFirstUse = false
     }
 
     /// Copies of a figure that differ by more than this contradict each other.
@@ -53,14 +58,33 @@ struct QuotaReading: Sendable, Equatable {
         )
     }
 
-    /// Nil for money spent, which has no reset at all.
+    /// How far a reported reset may be from the reading moment plus the
+    /// period's length and still be that moving date. It covers the query's
+    /// latency and a clock slightly out of step with the provider's.
+    static let unstartedWindowAgreement: TimeInterval = 5 * 60
+
+    /// Nil for money spent, which has no reset at all, and for a window that
+    /// has not started.
     private func reset(at now: Date) -> Reset? {
-        guard case .usedPercents(_, let resets) = figures else { return nil }
+        guard case .usedPercents(let usedPercents, let resets) = figures else { return nil }
+        if hasNotStarted(usedPercents: usedPercents, resets: resets) { return nil }
         guard let reset = resets.first,
               resets.allSatisfy({ abs($0.timeIntervalSince(readAt)) <= Self.maxResetDistance }),
               resets.allSatisfy({ abs($0.timeIntervalSince(reset)) <= Self.resetAgreement })
         else { return .unknown }
         return reset > now ? .at(reset) : .pendingConfirmation
+    }
+
+    /// A window that starts on its first use is unused until then, and the
+    /// provider reports the reading moment plus the window's length as its
+    /// reset: a date that moves with every query, so it is not a reset.
+    /// Only periods of a fixed length can tell. A scheduled window, such as
+    /// a billing cycle or Cursor's included week, always has a real reset.
+    private func hasNotStarted(usedPercents: [Double], resets: [Date]) -> Bool {
+        guard startsOnFirstUse, let length = period.length, !usedPercents.isEmpty, usedPercents.allSatisfy({ $0 == 0 }), !resets.isEmpty
+        else { return false }
+        let movingReset = readAt.addingTimeInterval(length)
+        return resets.allSatisfy { abs($0.timeIntervalSince(movingReset)) <= Self.unstartedWindowAgreement }
     }
 
     private func value(in magnitude: QuotaMagnitude) -> QuotaValue {
@@ -76,6 +100,20 @@ struct QuotaReading: Sendable, Equatable {
         return switch magnitude {
         case .used: .percent(usedPercent, calculated: false)
         case .remaining: .percent(100 - usedPercent, calculated: true)
+        }
+    }
+}
+
+extension QuotaPeriod {
+    /// The period's fixed length. Nil for a billing cycle, whose length the
+    /// provider decides, and for usage credits, which have no period.
+    var length: TimeInterval? {
+        switch self {
+        case .fiveHours: 5 * 3_600
+        case .weekly: 7 * 86_400
+        case .lasting(let seconds): TimeInterval(seconds)
+        case .limit(_, let period): period.length
+        case .billingCycle, .usageCredits: nil
         }
     }
 }

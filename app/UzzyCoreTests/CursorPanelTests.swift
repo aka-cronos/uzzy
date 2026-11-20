@@ -51,6 +51,42 @@ struct CursorPanelTests {
         ]))
     }
 
+    /// A billing cycle has no fixed length, so an unused bag's reset is the
+    /// cycle's real end, even when it falls a week after the reading.
+    @Test func anUnusedBagKeepsTheEndOfTheBillingCycle() async {
+        // The reading moment, 2026-09-23T14:32:00Z, plus 7 days.
+        await transport.answer(with: .json("""
+            {"billingCycleEnd":"1790778720000","planUsage":{"autoPercentUsed":0,"apiPercentUsed":0}}
+            """), for: .cursor)
+
+        await openPanel()
+
+        let cycleEnd = Date(timeIntervalSince1970: 1_790_778_720)
+        #expect(cursorContent() == .quotas([
+            Quota(period: .limit("Cursor Models", .billingCycle), value: .percent(0, calculated: false), reset: .at(cycleEnd), readAt: Samples.readingMoment),
+            Quota(period: .limit("Other Models", .billingCycle), value: .percent(0, calculated: false), reset: .at(cycleEnd), readAt: Samples.readingMoment),
+        ]))
+    }
+
+    /// Cursor's included week is scheduled, not started by the first use:
+    /// right after a week begins, at 0%, its end is still real.
+    @Test func anUnusedScheduledWeekKeepsItsReset() async {
+        // The reading moment, 2026-09-23T14:32:00Z, plus 7 days.
+        await transport.answer(with: .json("""
+            {"billingCycleEnd":"1792195200000","planUsage":{"totalPercentUsed":0}}
+            """), for: .cursor)
+        await transport.answerCursorMetadata(with: .json("""
+            {"isMerged":true,"planInfo":{"includedUsagePeriod":"INCLUDED_USAGE_PERIOD_WEEKLY","includedUsageResetsAt":"1790778720000"}}
+            """))
+
+        await openPanel()
+
+        #expect(cursorContent() == .quotas([
+            Quota(period: .weekly, value: .percent(0, calculated: false),
+                  reset: .at(Date(timeIntervalSince1970: 1_790_778_720)), readAt: Samples.readingMoment),
+        ]))
+    }
+
     @Test func queriesCursorUsageWithAConnectCallAndTheAccessToken() async {
         await openPanel()
 

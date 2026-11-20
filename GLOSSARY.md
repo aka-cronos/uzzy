@@ -24,7 +24,8 @@ _Avoid_: Available money, balance; in English, «remaining»; in Spanish, «disp
 
 **Reset**:
 The moment, given by the provider, when a subscription quota renews. In Spanish copy it is «reinicio»; in English copy, «resets», e.g. «Resets today, 14:42».
-_Avoid_: Top-up, session renewal.
+A window the provider starts on its first use, such as Claude's and Codex's 5-hour and weekly windows, has no reset while unused: the date the provider reports for it is the reading moment plus the window's length, which moves with every query. Uzzy shows no reset for it. A scheduled window, such as a billing cycle or Cursor's included week, always has a real reset, used or not.
+_Avoid_: Top-up, session renewal; showing an unused window's moving date as its reset.
 
 **Banked reset**:
 A reset the provider grants an account, which the person can redeem in the provider's app to refill quota windows. It belongs to the account, not to a quota. In Spanish copy it is a «restablecimiento disponible»; in English copy, a «reset available», Codex's own wording.

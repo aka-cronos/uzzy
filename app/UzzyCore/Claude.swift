@@ -74,7 +74,8 @@ enum Claude: ProviderAdapter {
             period: period,
             usedPercents: windows.compactMap(\.utilization),
             resets: windows.compactMap { reset($0.resets_at) },
-            readAt: moment
+            readAt: moment,
+            startsOnFirstUse: true
         )
     }
 

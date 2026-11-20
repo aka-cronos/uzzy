@@ -131,6 +131,14 @@ struct ScenarioTests {
         #expect(quotas(contents(of: core)[.claude]).map(\.reset) == [.at(claudeFiveHourReset), .unknown])
     }
 
+    @Test func unusedWindowsShowNoReset() async {
+        let core = await Scenario.unusedWindows.start()
+        let codex = quotas(contents(of: core)[.codex])
+
+        #expect(codex.map(\.value) == [.percent(0, calculated: false), .percent(0, calculated: false)])
+        #expect(codex.map(\.reset) == [nil, nil])
+    }
+
     @Test func unavailableShowsAMissingQuotaNextToTheValidOne() async {
         let core = await Scenario.unavailable.start()
 
