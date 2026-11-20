@@ -541,12 +541,27 @@ private struct FailureMessage: View {
                 title: "Incompatible session",
                 detail: "The \(provider.officialApp) session is in a format \(Format.appName) doesn't recognize."
             )
+        case .sessionExpired where provider == .antigravity:
+            // Antigravity renews the token when it runs, and the card reads
+            // it again on its own while the panel is open.
+            Message(title: "Session expired", detail: "Open Antigravity to renew the session. \(Format.appName) updates on its own.")
+        case .sessionExpired where provider == .claude || provider == .codex:
+            // The card reads the session again on its own while the panel
+            // is open; Cursor's key is read only on a user action.
+            Message(title: "Session expired", detail: "Renew the session in \(provider.officialApp). \(Format.appName) updates on its own.")
         case .sessionExpired:
             Message(title: "Session expired", detail: "Renew the session in \(provider.officialApp) and click Refresh.")
         case .accessRefused:
             Message(
                 title: "Access refused",
                 detail: "\(provider.name) refused the query. It may be an account restriction; check it in \(provider.officialApp) and click Refresh."
+            )
+        case .reusedSessionRejected where provider != .cursor:
+            // The card reads the session again on its own while the panel
+            // is open, and queries it once its app renews it.
+            Message(
+                title: "Unconfirmed",
+                detail: "\(provider.name) didn't accept the saved session. \(Format.appName) updates on its own once it's renewed, or click Refresh to check it now."
             )
         case .reusedSessionRejected:
             Message(

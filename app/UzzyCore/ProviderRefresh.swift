@@ -19,10 +19,17 @@ protocol ProviderAdapter {
     /// response whose quotas were read. `nil` when they report no plan the
     /// adapter knows. Never fails the reading.
     static func plan(of session: Session, response body: Data) -> String?
+    /// The official app renews the session on its own, often after the
+    /// provider rejected it, so while the panel is open the session is read
+    /// again every `ProviderRefresh.recheckInterval` and queried once it
+    /// changes. Reading it must show no prompt and cost no query.
+    static var rereadsRejectedSession: Bool { get }
 }
 
 extension ProviderAdapter {
     static func metadataRequest(for session: Session, after response: Data) -> URLRequest? { nil }
+
+    static var rereadsRejectedSession: Bool { false }
 
     static func bankedResets(from body: Data, readAt moment: Date) -> BankedResets? {
         nil
@@ -71,6 +78,17 @@ final class ProviderRefresh {
     @ObservationIgnored private var scheduledRetry: ScheduledWork? {
         didSet { oldValue?.cancel() }
     }
+    /// The only scheduled read of a rejected session, for adapters that
+    /// reread it. `nil` while the panel is closed or nothing was rejected.
+    @ObservationIgnored private var scheduledRecheck: ScheduledWork? {
+        didSet { oldValue?.cancel() }
+    }
+
+    /// How often a rejected session is read again while the panel is open.
+    nonisolated static let recheckInterval: TimeInterval = 30
+    /// The session the provider last rejected, which reading it again on
+    /// its own never queries. `nil` once a query succeeds.
+    @ObservationIgnored private var rejectedSession: Session?
 
     private let adapter: any ProviderAdapter.Type
     private let sessionReader: any SessionReader
@@ -134,6 +152,8 @@ final class ProviderRefresh {
             query = nil
             queryID = nil
             scheduledRetry = nil
+            scheduledRecheck = nil
+            rejectedSession = nil
             reading = .loading
             clearCredits()
             session = nil
@@ -173,6 +193,7 @@ final class ProviderRefresh {
     func panelClosed() {
         isPanelOpen = false
         scheduledRetry = nil
+        scheduledRecheck = nil
     }
 
     /// Returns once no query is in flight.
@@ -210,6 +231,24 @@ final class ProviderRefresh {
                 reading = result
                 planRetry(after: result)
             }
+            planRecheck()
+        }
+    }
+
+    /// While the panel is open and the provider rejected the session, reads
+    /// it again after a while, for adapters that reread it. The read skips
+    /// the query while the session is still the rejected one, even when an
+    /// automatic query was rejected: only a user action checks that one.
+    private func planRecheck() {
+        guard adapter.rereadsRejectedSession, isEnabled, isPanelOpen,
+              case .failed(let failure, _) = reading, failure.isRejection
+        else {
+            scheduledRecheck = nil
+            return
+        }
+        scheduledRecheck = clock.schedule(at: clock.now().addingTimeInterval(Self.recheckInterval)) { [weak self] in
+            guard let self, isEnabled, isPanelOpen else { return }
+            startQuery(.read(skipping: rejectedSession))
         }
     }
 
@@ -294,6 +333,7 @@ final class ProviderRefresh {
         case .quotas(let quotas, let bankedResets, let plan):
             let valid = LastValidReading(quotas: quotas, accountID: session.accountID, bankedResets: bankedResets, plan: plan)
             reading = .quotas(valid)
+            rejectedSession = nil
             if let accountID = session.accountID, !accountID.isEmpty, case .response(let response) = result {
                 if provider == .claude {
                     cloudCreditState = Claude.cloudCredit(from: response.body, accountID: accountID, at: clock.now())
@@ -339,6 +379,7 @@ final class ProviderRefresh {
         staleCredits()
         log.record(.queryFailed(provider, failure))
         let kept = reading.lastValidReading(of: session.accountID)
+        if failure.isRejection { rejectedSession = session }
         if failure.isRejection, case .reuse = source {
             // The official app may have renewed the token since it was
             // read, so the session is not called expired: the figures go

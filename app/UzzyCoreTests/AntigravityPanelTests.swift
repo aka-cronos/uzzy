@@ -64,8 +64,10 @@ struct AntigravityPanelTests {
         ])
         #expect(requests.allSatisfy { $0.httpMethod == "POST" })
         #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "Authorization") == "Bearer sample-token" })
-        // Cloud Code refuses the summary to a client that is not Antigravity.
-        #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "User-Agent")?.hasPrefix("antigravity/") == true })
+        // Cloud Code refuses the summary to a client that is not Antigravity,
+        // and leaves out the groups a plan keeps apart (Gemini 4 Argon) unless
+        // it presents itself as Antigravity's app ("hub").
+        #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "User-Agent")?.hasPrefix("antigravity/hub/") == true })
         let summaryBody = try #require(requests.last?.httpBody)
         #expect(try JSONSerialization.jsonObject(with: summaryBody) as? [String: String] == ["project": "sample-project"])
     }
@@ -208,4 +210,58 @@ struct AntigravityPanelTests {
             }
         }
     }
+
+    // MARK: Renewal while the panel is open
+
+    /// Antigravity renews its token only while it runs, so an expired
+    /// session is common. While the panel is open, the card reads the
+    /// session again on its own and queries once Antigravity has renewed it.
+    @Test func anExpiredSessionRenewedByAntigravityIsQueriedOnItsOwn() async {
+        await transport.answer(with: .status(401), for: .antigravity)
+        await openPanel()
+        #expect(antigravityCard()?.content == .failed(.sessionExpired))
+
+        await antigravitySessionReader.answer(with: .session(Session(accessToken: "renewed-token", accountID: "sample-account")))
+        await transport.answer(with: .antigravitySample, for: .antigravity)
+        clock.advance(by: Self.recheck)
+        await core.queriesFinished()
+
+        guard case .quotas = antigravityCard()?.content else {
+            Issue.record("The renewed session was not queried")
+            return
+        }
+        #expect(await transport.quotaRequests(to: .antigravity).last?.value(forHTTPHeaderField: "Authorization") == "Bearer renewed-token")
+    }
+
+    /// Reading the session again costs no query while it is the one rejected.
+    @Test func anUnrenewedSessionIsReadAgainButNeverQueriedAgain() async {
+        await transport.answer(with: .status(401), for: .antigravity)
+        await openPanel()
+        let sent = await transport.quotaRequests(to: .antigravity).count
+        let reads = await antigravitySessionReader.reads
+
+        for _ in 0 ..< 3 {
+            clock.advance(by: Self.recheck)
+            await core.queriesFinished()
+        }
+
+        #expect(await antigravitySessionReader.reads == reads + 3)
+        #expect(await transport.quotaRequests(to: .antigravity).count == sent)
+        #expect(antigravityCard()?.content == .failed(.sessionExpired))
+    }
+
+    @Test func aClosedPanelNeverReadsTheSessionOnItsOwn() async {
+        await transport.answer(with: .status(401), for: .antigravity)
+        await openPanel()
+        core.panelClosed()
+        let reads = await antigravitySessionReader.reads
+
+        clock.advance(by: Self.recheck * 3)
+        await core.queriesFinished()
+
+        #expect(await antigravitySessionReader.reads == reads)
+    }
+
+    static let recheck: TimeInterval = 30
 }
+

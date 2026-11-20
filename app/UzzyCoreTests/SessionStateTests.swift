@@ -87,8 +87,10 @@ struct SessionStateTests {
 
         await runTheCadenceAndWake()
 
+        // The session is read again on its own while the panel is open, but
+        // the rejected one is never queried again.
         #expect(await transport.quotaRequests.count == 1)
-        #expect(await sessionReader.reads == 1)
+        #expect(await sessionReader.reads > 1)
     }
 
     @Test(arguments: [(401, Failure.sessionExpired), (403, .accessRefused)])
@@ -191,15 +193,15 @@ struct SessionStateTests {
     /// query no user action asked for does not claim the session expired:
     /// it marks the figures stale and leaves the next query to the user.
     @Test(arguments: [401, 403])
-    func aRejectionOfAReusedSessionMarksTheCardStaleAndWaitsForTheUser(status: Int) async {
+    func aRejectionOfAReusedSessionMarksTheCardStaleUntilTheSessionIsRenewed(status: Int) async {
         core.panelOpened()
         await core.queriesFinished()
 
         await transport.answer(with: .status(status))
         await runTheCadenceAndWake()
 
+        // Reading the session again on its own never queries the rejected one.
         #expect(await transport.quotaRequests.count == 2)
-        #expect(await sessionReader.reads == 1)
         guard case .stale(let quotas, .reusedSessionRejected) = claudeContent() else {
             Issue.record("Not stale: \(String(describing: claudeContent()))")
             return
@@ -209,11 +211,10 @@ struct SessionStateTests {
 
         await sessionReader.answer(with: .session(Session(accessToken: "renewed-token", accountID: "sample-account")))
         await transport.answer(with: .claudeSample)
-        core.panelClosed()
-        core.panelOpened()
+        clock.advance(by: 30)
         await core.queriesFinished()
 
-        #expect(await sessionReader.reads == 2)
+        #expect(await transport.quotaRequests.count == 3)
         #expect(await transport.quotaRequests.last?.value(forHTTPHeaderField: "Authorization") == "Bearer renewed-token")
         #expect(claudeReadAt() == clock.now())
     }
