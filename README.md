@@ -2,7 +2,7 @@
 
 <p align="center">
   <strong>Your AI tools have limits. Checking them shouldn’t be a task.</strong><br>
-  See how much you’ve used, how much is left and when your usage limits reset—for Claude, Codex and Cursor, in one menu bar panel.
+  See how much you’ve used, how much is left and when your usage limits reset—for Claude, Codex, Cursor and Antigravity, in one menu bar panel.
 </p>
 
 <p align="center">
@@ -22,12 +22,12 @@
 
 ## Why Uzzy
 
-Keep using Claude, Codex and Cursor. Uzzy brings their usage limits together so you can stop checking each one separately. It reuses the sessions Claude Code, Codex CLI and Cursor already keep on your Mac: no extra sign-in, no API key to paste.
+Keep using Claude, Codex, Cursor and Antigravity. Uzzy brings their usage limits together so you can stop checking each one separately. It reuses the sessions Claude Code, Codex CLI, Cursor and Antigravity already keep on your Mac: no extra sign-in, no API key to paste.
 
 ## Features
 
-- **Three tools. One quick check.** Open Uzzy from your menu bar to see Claude, Codex and Cursor together, with a separate card for each enabled provider, led by its logo and showing its plan.
-- **Different limits stay different.** Check each usage limit («5 horas», «Semanal», «Cursor Models»…) on its own, with its reset in local time, a countdown and how long ago it was last read. Five-hour and weekly limits are never blended into one number, and usage credits, credit balances and banked resets are shown next to them.
+- **Four tools. One quick check.** Open Uzzy from your menu bar to see Claude, Codex, Cursor and Antigravity together, with a separate card for each enabled provider, led by its logo and showing its plan.
+- **Different limits stay different.** Check each usage limit («5 horas», «Semanal», «Cursor Models», «Gemini · Semanal»…) on its own, with its reset in local time, a countdown and how long ago it was last read. Five-hour and weekly limits are never blended into one number, and usage credits, credit balances and banked resets are shown next to them.
 - **Checks while you look.** Uzzy refreshes readings as you open the panel (unless the last reading is under five minutes old), then every five minutes while it stays open, and on demand with the refresh button. Close it and the requests stop.
 - **Missing doesn’t mean zero.** If a session expires or a provider can’t be reached, Uzzy tells you what happened (no session, expired session, offline, incompatible response…) and the other providers keep working. When a refresh fails, the card keeps the last valid reading and marks it as out of date.
 - **Native settings.** Choose whether the cards show how much is used or left, turn each provider on or off or change the order of the cards, pick how detailed the countdown to a reset is and whether the resets available on an account are shown, and turn the daily check for updates on or off. The installed version and build are shown at the bottom.
@@ -46,10 +46,13 @@ Open Settings with ⌘, from the panel; ⌘W closes it and ⌘Q quits. Your choi
 | **Claude** | Claude Code (the Keychain and `~/.claude.json`) | 5 hours, weekly, and weekly per model when the plan has them; the account’s banked resets; also the usage credits spent this month and their monthly limit («Créditos de uso»), when usage credits are on; the credit balance («Saldo de créditos») and cloud session credits with their expiry («Créditos para sesiones en la nube»), when the account has any |
 | **Codex** | Codex CLI signed in with ChatGPT (`~/.codex/auth.json` or `$CODEX_HOME`) | 5 hours, weekly, any extra limit the plan has, the account's banked resets, and its credit balance when it has one |
 | **Cursor** | Cursor (its local `state.vscdb`, and its safeStorage key in the Keychain once you allow it) | Weekly included usage on unified plans; «Cursor Models» and «Other Models» for the billing cycle on legacy plans; the credit balance when the account has one |
+| **Antigravity** | Antigravity, the app or the `agy` CLI (the Keychain) | 5 hours and weekly for each model group Google reports: «Gemini», «Claude and GPT», and any group a plan keeps apart, such as «Gemini 4 Argon» |
 
-Each card also shows the account's plan next to its title, e.g. «Claude · Max», when the provider reports a plan Uzzy knows: Claude Code keeps it in its Keychain item, Codex sends it with the usage limits and Cursor keeps it in `state.vscdb`.
+Each card also shows the account's plan next to its title, e.g. «Claude · Max», when the provider reports a plan Uzzy knows: Claude Code keeps it in its Keychain item, Codex sends it with the usage limits, Cursor keeps it in `state.vscdb` and Google reports it for Antigravity («Google AI Pro»).
 
 Uzzy reads Claude Code's Keychain item through `/usr/bin/security`, the tool Claude Code writes it with. The item already trusts that tool, so macOS shows no Keychain prompt, even after Claude Code refreshes its token.
+
+Antigravity keeps its Google sign-in in the Keychain too (service `gemini`, account `antigravity`), shared by the app and the `agy` CLI. Uzzy reads it the same way, through `/usr/bin/security`, and keeps only the access token and the account's email. Antigravity renews that token while it runs; when it has been closed for a while the token expires and the card keeps its last reading, marked as out of date, until you open Antigravity and click Refresh. A usage limit you haven't touched in its period shows no reset: its period starts with your first use.
 
 Since Cursor 3.27, Cursor encrypts its session in `state.vscdb` with a key it keeps in the Keychain (`Cursor Safe Storage`, account `Cursor`). That key also protects Cursor's other secrets, such as its MCP sign-ins, so Uzzy never reads it on its own:
 
@@ -61,9 +64,9 @@ Since Cursor 3.27, Cursor encrypts its session in `state.vscdb` with a key it ke
 
 ## Privacy
 
-- Reuses, **read-only**, the sessions that already exist in Claude Code, Codex CLI and Cursor. It never asks for passwords, signs in, refreshes tokens or writes credentials. Cursor's encrypted session is read only after you allow it (see above).
+- Reuses, **read-only**, the sessions that already exist in Claude Code, Codex CLI, Cursor and Antigravity. It never asks for passwords, signs in, refreshes tokens or writes credentials. Cursor's encrypted session is read only after you allow it (see above).
 - Turning a provider off drops everything Uzzy held of its session (its token, account and figures) at once; turning it on reads the session again from the official app.
-- Only connects to `api.anthropic.com`, `chatgpt.com` and `api2.cursor.sh` to read usage limits and credit balances, and to `api.github.com` once a day to ask for the latest version. That check sends no token and nothing about you or your usage, and you can turn it off in Settings. No telemetry and no server of its own.
+- Only connects to `api.anthropic.com`, `chatgpt.com`, `api2.cursor.sh` and `cloudcode-pa.googleapis.com` to read usage limits, plans and credit balances, and to `api.github.com` once a day to ask for the latest version. That check sends no token and nothing about you or your usage, and you can turn it off in Settings. No telemetry and no server of its own.
 - Usage data lives only in memory; nothing is written to disk.
 - Display magnitude, which providers are turned on, provider order, whether to check for updates and whether you allowed access to Cursor's key are stored in local `UserDefaults`; they contain no usage data, token, email or account identifier.
 
@@ -72,7 +75,7 @@ Since Cursor 3.27, Cursor encrypts its session in `state.vscdb` with a key it ke
 Download `Uzzy.dmg` from [uzzy.app](https://uzzy.app) or [GitHub Releases](https://github.com/aka-cronos/uzzy/releases/latest), open it and drag Uzzy to Applications. It is signed with Developer ID and notarized by Apple, so it opens like any other app.
 
 - Requires macOS 27.0 or later on Apple Silicon.
-- Requires a signed-in session in Claude Code, Codex CLI (ChatGPT mode) and/or Cursor.
+- Requires a signed-in session in Claude Code, Codex CLI (ChatGPT mode), Cursor and/or Antigravity.
 
 To open it at login, add it under System Settings → General → Login Items.
 
@@ -88,7 +91,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). To report a vulnerability, see [SECURITY
 
 The endpoints the app uses to read usage data are **internal and undocumented** by the providers. They may change or stop working without notice, and each person is responsible for using them within their provider's terms.
 
-Uzzy is an independent project, not affiliated with, endorsed by or sponsored by the makers of Claude, Codex, ChatGPT or Cursor. All product names and trademarks belong to their respective owners.
+Uzzy is an independent project, not affiliated with, endorsed by or sponsored by the makers of Claude, Codex, ChatGPT, Cursor or Antigravity. All product names and trademarks belong to their respective owners.
 
 ## Acknowledgements
 
