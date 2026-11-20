@@ -105,8 +105,10 @@ enum Antigravity: ProviderAdapter {
             ?? (try? Date.ISO8601FormatStyle().parse(text))
     }
 
+    /// Antigravity tracks usage on Cloud Code's daily host; `cloudcode-pa.googleapis.com`
+    /// answers with 200 and unused (`remainingFraction: 1`) buckets.
     private static func cloudCodeRequest(_ method: String, session: Session, body: Data) -> URLRequest {
-        var request = URLRequest(url: URL(string: "https://cloudcode-pa.googleapis.com/v1internal:\(method)")!)
+        var request = URLRequest(url: URL(string: "https://daily-cloudcode-pa.sandbox.googleapis.com/v1internal:\(method)")!)
         request.httpMethod = "POST"
         request.setValue("Bearer \(session.accessToken)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
