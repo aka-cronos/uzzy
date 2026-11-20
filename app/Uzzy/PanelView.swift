@@ -556,6 +556,13 @@ private struct FailureMessage: View {
                 title: "Access refused",
                 detail: "\(provider.name) refused the query. It may be an account restriction; check it in \(provider.officialApp) and click Refresh."
             )
+        case .reusedSessionRejected where provider != .cursor:
+            // The card reads the session again on its own while the panel
+            // is open, and queries it once its app renews it.
+            Message(
+                title: "Unconfirmed",
+                detail: "\(provider.name) didn't accept the saved session. \(Format.appName) updates on its own once it's renewed, or click Refresh to check it now."
+            )
         case .reusedSessionRejected:
             Message(
                 title: "Unconfirmed",

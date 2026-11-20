@@ -100,6 +100,17 @@
         }
       }
     },
+    "%@ didn't accept the saved session. %@ updates on its own once it's renewed, or click Refresh to check it now." : {
+      "comment" : "The first %@ is the provider, the second the app's name.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ no aceptó la sesión guardada. %2$@ se actualiza solo cuando se renueve, o pulsa Actualizar para comprobarla ahora."
+          }
+        }
+      }
+    },
     "%@ didn't accept the saved session. Click Refresh to check it again." : {
       "comment" : "%@ is the provider.",
       "localizations" : {
