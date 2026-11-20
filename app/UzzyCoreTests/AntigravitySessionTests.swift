@@ -588,6 +588,87 @@ struct AntigravitySessionTests {
         }
         #expect(antigravityCard()?.plan == "Google AI Ultra")
     }
+
+    /// An Insiders-only user (no Keychain item, no T3 Code file) keeps stale
+    /// readings with «Session expired» after closing the app, and the 30-second
+    /// recheck recovers automatically once Antigravity relaunches.
+    @Test func aDaemonOnlySessionKeepsStaleReadingsWhenAppClosesAndRecoversOnRelaunch() async throws {
+        try tool.answer(exitStatus: 44)
+        let hub1 = try writeHubFile(
+            variant: "antigravity-insiders",
+            name: "hub_50001.json",
+            content: #"{"pid":4242,"httpPort":50001,"csrfToken":"csrf-1"}"#
+        )
+        await openPanel()
+        guard case .quotas = antigravityContent() else {
+            Issue.record("Expected initial quotas from local daemon")
+            return
+        }
+
+        // App closes and removes its hub file before the 5-minute refresh.
+        alive.set([])
+        try FileManager.default.removeItem(at: hub1)
+        await transport.answerAntigravityDaemonStatus(with: .networkError, port: 50001)
+        clock.advance(by: 5 * 60)
+        await core.queriesFinished()
+
+        guard case .stale(_, failure: .reusedSessionRejected) = antigravityContent() else {
+            Issue.record("Expected stale reusedSessionRejected, got \(String(describing: antigravityContent()))")
+            return
+        }
+
+        // First 30-second recheck while the app is still closed: stale readings
+        // stay visible as `.sessionExpired` instead of dropping to `.noSession`,
+        // and the recheck stays scheduled.
+        clock.advance(by: 30)
+        await core.queriesFinished()
+
+        guard case .stale(_, failure: .sessionExpired) = antigravityContent() else {
+            Issue.record("Expected stale sessionExpired while app is closed, got \(String(describing: antigravityContent()))")
+            return
+        }
+
+        // App relaunches on a new port while the panel is still open: the next
+        // 30-second recheck picks it up automatically without clicking Refresh.
+        alive.set([4243])
+        try writeHubFile(
+            variant: "antigravity-insiders",
+            name: "hub_50002.json",
+            content: #"{"pid":4243,"httpPort":50002,"csrfToken":"csrf-2"}"#
+        )
+        clock.advance(by: 30)
+        await core.queriesFinished()
+
+        guard case .quotas = antigravityContent() else {
+            Issue.record("Expected automatic recovery after app relaunched, got \(String(describing: antigravityContent()))")
+            return
+        }
+        #expect(await transport.quotaRequests(to: .antigravity).last?.url?.port == 50002)
+    }
+
+    /// Turning Antigravity off drops the remembered daemon session, so turning
+    /// it back on while the app is closed reports `.noSession`.
+    @Test func disablingAntigravityClearsTheRememberedDaemonSession() async throws {
+        try tool.answer(exitStatus: 44)
+        let hub = try writeHubFile(
+            variant: "antigravity-insiders",
+            name: "hub_50001.json",
+            content: #"{"pid":4242,"httpPort":50001,"csrfToken":"csrf-1"}"#
+        )
+        await openPanel()
+        guard case .quotas = antigravityContent() else {
+            Issue.record("Expected initial quotas from local daemon")
+            return
+        }
+
+        alive.set([])
+        try FileManager.default.removeItem(at: hub)
+        core.setEnabled(false, for: .antigravity)
+        core.setEnabled(true, for: .antigravity)
+        await core.queriesFinished()
+
+        #expect(antigravityContent() == .failed(.noSession))
+    }
 }
 
 final class AliveProcesses: Sendable {
