@@ -41,7 +41,7 @@ public actor SampleTransport: HTTPTransport {
         let body = switch request.url?.host {
         case "chatgpt.com": codexResponse
         case "api2.cursor.sh": request.url?.lastPathComponent == "GetPlanInfo" ? Samples.cursorPlanResponse : cursorResponse
-        case "cloudcode-pa.googleapis.com": request.url?.lastPathComponent == "v1internal:loadCodeAssist"
+        case "daily-cloudcode-pa.sandbox.googleapis.com": request.url?.lastPathComponent == "v1internal:loadCodeAssist"
             ? Samples.antigravityAccountResponse : Samples.antigravityQuotaResponse
         default: claudeResponse
         }
@@ -308,7 +308,7 @@ extension Provider {
         case "api.anthropic.com": self = .claude
         case "chatgpt.com": self = .codex
         case "api2.cursor.sh": self = .cursor
-        case "cloudcode-pa.googleapis.com": self = .antigravity
+        case "daily-cloudcode-pa.sandbox.googleapis.com": self = .antigravity
         default: return nil
         }
     }

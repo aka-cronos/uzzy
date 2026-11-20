@@ -59,6 +59,6 @@ export const privacy = [
   { title: "Readings stay in memory.", body: "Uzzy doesn’t save usage readings to disk." },
 ];
 
-export const hosts = ["api.anthropic.com", "chatgpt.com", "api2.cursor.sh", "cloudcode-pa.googleapis.com", "api.github.com"];
+export const hosts = ["api.anthropic.com", "chatgpt.com", "api2.cursor.sh", "daily-cloudcode-pa.sandbox.googleapis.com", "api.github.com"];
 
 export const disclaimer = "Uzzy is an independent project, not affiliated with, endorsed or sponsored by Anthropic, OpenAI, Anysphere or Google. It reads usage limits through undocumented endpoints that may change without notice.";
