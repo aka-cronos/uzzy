@@ -571,6 +571,16 @@
         }
       }
     },
+    "Couldn't read the Antigravity session in the keychain. Check that it's unlocked and click Refresh." : {
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo leer la sesión de Antigravity en el llavero. Comprueba que esté desbloqueado y pulsa Actualizar."
+          }
+        }
+      }
+    },
     "Couldn't read the Claude Code session in the keychain. Check that it's unlocked and click Refresh." : {
       "localizations" : {
         "es" : {

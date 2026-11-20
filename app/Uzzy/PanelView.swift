@@ -501,6 +501,11 @@ private struct FailureMessage: View {
                     title: "Keychain unavailable",
                     detail: "Couldn't read the Claude Code session in the keychain. Check that it's unlocked and click Refresh."
                 )
+            } else if provider == .antigravity {
+                Message(
+                    title: "Keychain unavailable",
+                    detail: "Couldn't read the Antigravity session in the keychain. Check that it's unlocked and click Refresh."
+                )
             } else if provider == .cursor {
                 Message(
                     title: "Couldn't read the session",
@@ -587,6 +592,7 @@ extension Provider {
         case .claude: "Claude"
         case .codex: "Codex"
         case .cursor: "Cursor"
+        case .antigravity: "Antigravity"
         }
     }
 
@@ -595,6 +601,7 @@ extension Provider {
         case .claude: .providerLogoClaude
         case .codex: .providerLogoCodex
         case .cursor: .providerLogoCursor
+        case .antigravity: .providerLogoAntigravity
         }
     }
 
@@ -604,6 +611,7 @@ extension Provider {
         case .claude: "Claude Code"
         case .codex: "Codex CLI"
         case .cursor: "Cursor"
+        case .antigravity: "Antigravity"
         }
     }
 }

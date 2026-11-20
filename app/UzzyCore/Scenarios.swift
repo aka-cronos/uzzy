@@ -109,8 +109,9 @@ extension Scenario {
         await stage.openPanel()
         await stage.answerEverySession(with: .session(Session(accessToken: "other-token", accountID: "other-account")))
         await stage.transport.hold()
+        let sent = await stage.transport.quotaRequests.count
         stage.core.refresh()
-        await stage.transport.waitForQuotaRequests(stage.core.enabledProviders.count * 2)
+        await stage.transport.waitForQuotaRequests(sent + stage.core.enabledProviders.count)
     }
 
     /// «Out of date»: a later query of every card failed, so each keeps
@@ -122,6 +123,7 @@ extension Scenario {
         await stage.transport.answer(with: .networkError, for: .claude)
         await stage.transport.answer(with: .status(503), for: .codex)
         await stage.transport.answer(with: .timeout, for: .cursor)
+        await stage.transport.answer(with: .status(500), for: .antigravity)
         await stage.openPanel()
     }
 
@@ -218,8 +220,9 @@ extension Scenario {
         await stage.core.queriesFinished()
         stage.core.panelClosed()
         await stage.transport.hold()
+        let sent = await stage.transport.quotaRequests.count
         stage.core.panelOpened()
-        await stage.transport.waitForQuotaRequests(stage.core.enabledProviders.count * 3)
+        await stage.transport.waitForQuotaRequests(sent + stage.core.enabledProviders.count)
     }
 
     /// «No access to the session»: the user denied the Keychain prompt for
@@ -255,6 +258,7 @@ extension Scenario {
         await stage.transport.answer(with: .json("<html>Sample maintenance page</html>"), for: .claude)
         await stage.transport.answer(with: .codex(rateLimit: "null"), for: .codex)
         await stage.transport.answer(with: .json("{}"), for: .cursor)
+        await stage.transport.answer(with: .json(#"{"groups": []}"#), for: .antigravity)
         await stage.openPanel()
     }
 
@@ -267,22 +271,24 @@ extension Scenario {
     }
 
     /// Network and server failures with no previous reading: no connection,
-    /// no answer in time and a server error.
+    /// no answer in time and server errors.
     public static let networkFailures = Scenario("networkFailures", "Network or server failures") { stage in
         await stage.transport.answer(with: .networkError, for: .claude)
         await stage.transport.answer(with: .timeout, for: .codex)
         await stage.transport.answer(with: .status(503), for: .cursor)
+        await stage.transport.answer(with: .status(502), for: .antigravity)
         await stage.openPanel()
     }
 
-    /// Claude refuses the query (403); Codex asks to wait 10 minutes and
-    /// Cursor asks to wait without saying how long (429).
+    /// Claude and Antigravity refuse the query (403); Codex asks to wait 10
+    /// minutes and Cursor asks to wait without saying how long (429).
     public static let refused = Scenario("refused", "Access refused and too many queries") { stage in
         await stage.transport.answer(with: .status(403), for: .claude)
         await stage.transport.answer(
             with: .response(HTTPResponse(status: 429, headers: ["Retry-After": "600"], body: Data())), for: .codex
         )
         await stage.transport.answer(with: .status(429), for: .cursor)
+        await stage.transport.answer(with: .status(403), for: .antigravity)
         await stage.openPanel()
     }
 }
@@ -358,6 +364,7 @@ final class Stage {
         .claude: ControlledSessionReader(session: Samples.claudeSession),
         .codex: ControlledSessionReader(),
         .cursor: ControlledSessionReader(session: Samples.cursorSession),
+        .antigravity: ControlledSessionReader(),
     ]
     let core: UsageCore
 
@@ -366,6 +373,7 @@ final class Stage {
             claudeSessionReader: sessionReaders[.claude]!,
             codexSessionReader: sessionReaders[.codex]!,
             cursorSessionReader: sessionReaders[.cursor]!,
+            antigravitySessionReader: sessionReaders[.antigravity]!,
             transport: transport,
             clock: clock,
             // Keeps the scenarios' failures out of the system log.
