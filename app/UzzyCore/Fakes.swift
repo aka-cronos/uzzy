@@ -43,9 +43,6 @@ public actor SampleTransport: HTTPTransport {
         case "api2.cursor.sh": request.url?.lastPathComponent == "GetPlanInfo" ? Samples.cursorPlanResponse : cursorResponse
         case "daily-cloudcode-pa.sandbox.googleapis.com": request.url?.lastPathComponent == "v1internal:loadCodeAssist"
             ? Samples.antigravityAccountResponse : Samples.antigravityQuotaResponse
-        case "127.0.0.1" where request.url?.path.hasPrefix("/exa.language_server_pb.LanguageServerService/") == true:
-            request.url?.lastPathComponent == "GetUserStatus"
-                ? Samples.antigravityLocalUserStatusResponse : Samples.antigravityQuotaResponse
         default: claudeResponse
         }
         return .response(HTTPResponse(status: 200, headers: ["Content-Type": "application/json"], body: body))
@@ -238,8 +235,7 @@ public actor ControlledTransport: HTTPTransport {
         if request.url?.lastPathComponent == "profile" { return profile }
         if request.isOptionalCreditRequest { return credits[provider] ?? .json("{}") }
         if request.url?.lastPathComponent == "GetPlanInfo" { return cursorMetadata }
-        if request.url?.lastPathComponent == "v1internal:loadCodeAssist"
-            || request.url?.lastPathComponent == "GetUserStatus" { return antigravityAccount }
+        if request.url?.lastPathComponent == "v1internal:loadCodeAssist" { return antigravityAccount }
         return results[provider] ?? .networkError
     }
 
@@ -313,8 +309,6 @@ extension Provider {
         case "chatgpt.com": self = .codex
         case "api2.cursor.sh": self = .cursor
         case "daily-cloudcode-pa.sandbox.googleapis.com": self = .antigravity
-        case "127.0.0.1" where request.url?.path.hasPrefix("/exa.language_server_pb.LanguageServerService/") == true:
-            self = .antigravity
         default: return nil
         }
     }

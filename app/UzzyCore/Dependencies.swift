@@ -12,22 +12,11 @@ public struct Session: Sendable, Equatable {
     /// provider's own identifier, not a name to show. `nil` when the session
     /// holds none, or the provider reports it elsewhere.
     public let plan: String?
-    /// Loopback endpoint of a local daemon when the official app exposes its
-    /// session locally rather than through a cloud bearer token, e.g.
-    /// Antigravity Insiders' `language_server` on `127.0.0.1`. `nil` for
-    /// standard cloud sessions.
-    public let localEndpoint: URL?
 
-    public init(
-        accessToken: String,
-        accountID: String?,
-        plan: String? = nil,
-        localEndpoint: URL? = nil
-    ) {
+    public init(accessToken: String, accountID: String?, plan: String? = nil) {
         self.accessToken = accessToken
         self.accountID = accountID
         self.plan = plan
-        self.localEndpoint = localEndpoint
     }
 }
 

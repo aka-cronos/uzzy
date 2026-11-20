@@ -119,18 +119,6 @@ public enum Samples {
     }
     """#.utf8)
 
-    /// Antigravity's local `POST /exa.language_server_pb.LanguageServerService/GetUserStatus`
-    /// for a Google AI Ultra account.
-    public static let antigravityLocalUserStatusResponse = Data(#"""
-    {
-      "userStatus": {
-        "email": "sample@example.com",
-        "userTier": {"id": "g1-ultra-tier", "name": "Google AI Ultra"},
-        "planStatus": {"planInfo": {"planName": "Pro"}}
-      }
-    }
-    """#.utf8)
-
     /// Antigravity's `POST /v1internal:retrieveUserQuotaSummary`, read at
     /// 2026-09-23T14:32:00Z. Each group sends its weekly bucket before its
     /// 5-hour one. Gemini is in use; Claude and GPT is untouched, so its
