@@ -26,9 +26,9 @@ import {
 } from "@phosphor-icons/react";
 import * as c from "@/content";
 
-const logos = { Claude: "/cover/claude.svg", Codex: "/cover/codex.svg", Cursor: "/cover/cursor.svg" };
+const logos = { Claude: "/cover/claude.svg", Codex: "/cover/codex.svg", Cursor: "/cover/cursor.svg", Antigravity: "/cover/antigravity.svg" };
 const logo = (name: string) => logos[name as keyof typeof logos];
-// the Codex and Cursor logos are white; invert them on light surfaces
+// the Codex, Cursor and Antigravity logos are white; invert them on light surfaces
 const onLight = (name: string) => (name === "Claude" ? "" : "invert");
 // hero + header fill one viewport, capped at a 14" MacBook Pro viewport
 const heroHeight = "clamp(620px, calc(100vh - 72px), 788px)";
@@ -130,7 +130,7 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
 
       <section id="providers" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
         <h2 class="text-3xl font-semibold tracking-tight text-balance">Your tools already know you.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-slate-600 text-pretty">Uzzy reuses the sessions Claude Code, Codex CLI and Cursor already keep on your Mac. No extra sign-in. No API key to paste. Use one, two or all three.</p>
+        <p class="mt-5 text-lg leading-relaxed text-slate-600 text-pretty">Uzzy reuses the sessions Claude Code, Codex CLI, Cursor and Antigravity already keep on your Mac. No extra sign-in. No API key to paste. Use one, two or all four.</p>
         <ul class={rowList}>
           {c.providers.map((p) => (
             <li class={row}>
@@ -192,12 +192,12 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
         <h2 class="text-3xl font-semibold tracking-tight text-balance">The practical details.</h2>
         <div class="mt-10 divide-y divide-slate-200 border-y border-slate-200">
           <details class="group py-2" open>
-            <summary class={summary}>Do I need Claude, Codex and Cursor?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
+            <summary class={summary}>Do I need Claude, Codex, Cursor and Antigravity?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
             <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">No, one is enough. Turn off the ones you don’t use in <a href="#settings" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Settings</a>: their cards go away and Uzzy doesn’t read their sessions.</p>
           </details>
           <details class="group py-2">
             <summary class={summary}>Do I need another account?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
-            <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">No. Uzzy reuses the sessions Claude Code, Codex CLI and Cursor keep on your Mac. You’ll need to be signed in to the tools you want to check.</p>
+            <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">No. Uzzy reuses the sessions Claude Code, Codex CLI, Cursor and Antigravity keep on your Mac. You’ll need to be signed in to the tools you want to check.</p>
           </details>
           <details class="group py-2">
             <summary class={summary}>Where does my data go?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
@@ -240,7 +240,7 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
       <div class="relative">
         <!-- the macOS rendering of AppIcon.icon; the PNG keeps macOS's transparent margin -->
         <img src="/brand/app-icon-512.png" alt="" width="104" height="104" class="mx-auto mb-5 size-[104px]" loading="lazy" />
-        <h2 class="text-3xl font-semibold tracking-tight text-balance">That’s one less thing to check in three places.</h2>
+        <h2 class="text-3xl font-semibold tracking-tight text-balance">That’s one less thing to check in four places.</h2>
         <p class="mt-3 text-slate-300 text-pretty">Your AI usage limits and reset times, one click away.</p>
         <DownloadButton variant="inverse" className="mt-8" />
         <p class="mt-4 text-sm text-slate-300 text-pretty">{c.REQUIREMENTS} · Open source, MIT</p>

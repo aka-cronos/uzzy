@@ -4,28 +4,28 @@ export const DOWNLOAD_URL =
 export const REPO_URL = "https://github.com/aka-cronos/uzzy";
 export const MAKER = "akacronos";
 export const X_URL = `https://x.com/${MAKER}`;
-export const VERSION = "0.4.0";
+export const VERSION = "0.5.1";
 export const REQUIREMENTS = "macOS 27 · Apple Silicon";
 
 export const hero = {
   title: "Your AI tools have limits. Checking them shouldn’t be a task.",
-  subtitle: "See how much you’ve used, how much is left and when your usage limits reset—for Claude, Codex and Cursor, in one menu bar panel.",
+  subtitle: "See how much you’ve used, how much is left and when your usage limits reset—for Claude, Codex, Cursor and Antigravity, in one menu bar panel.",
 };
 
-export const why = "Keep using Claude, Codex and Cursor. Uzzy brings their usage limits together so you can stop checking each one separately.";
+export const why = "Keep using Claude, Codex, Cursor and Antigravity. Uzzy brings their usage limits together so you can stop checking each one separately.";
 
 export const features = [
-  { title: "Three tools. One quick check.", body: "Open Uzzy from your menu bar to see Claude, Codex and Cursor together, with a separate card for each provider, led by its logo and showing its plan." },
-  { title: "Different limits stay different.", body: "Check each usage limit on its own, with its reset time, countdown and last reading. Five-hour and weekly limits are never blended into one number." },
+  { title: "Four tools. One quick check.", body: "Open Uzzy from your menu bar to see Claude, Codex, Cursor and Antigravity together, with a separate card for each provider, led by its logo and showing its plan." },
+  { title: "Different limits stay different.", body: "Check each usage limit on its own, with its reset time, countdown and last reading. Five-hour and weekly limits are never blended into one number, and a limit you haven’t used yet shows no reset until its period starts." },
   { title: "Checks while you look.", body: "Uzzy refreshes readings when needed as you open the panel, then every five minutes while it stays open. Close it and the requests stop." },
-  { title: "Missing doesn’t mean zero.", body: "If a session expires or a provider can’t be reached, Uzzy tells you what happened. The other providers keep working." },
+  { title: "Missing doesn’t mean zero.", body: "If a session expires or a provider can’t be reached, Uzzy tells you what happened. The other providers keep working. While the panel is open, Claude, Codex and Antigravity pick up a renewed session on their own." },
 ];
 
 export const providers = [
   {
     name: "Claude",
     session: "Claude Code",
-    shows: "5 hours, weekly, weekly per model, usage credits this month, credit balance, cloud session credits",
+    shows: "5 hours, weekly, weekly per model, banked resets, usage credits this month, credit balance, cloud session credits",
   },
   {
     name: "Codex",
@@ -36,6 +36,11 @@ export const providers = [
     name: "Cursor",
     session: "Cursor",
     shows: "Weekly usage on unified plans, Cursor Models and Other Models on legacy plans, credit balance",
+  },
+  {
+    name: "Antigravity",
+    session: "Antigravity",
+    shows: "5 hours and weekly for Gemini, for Claude and GPT, and for any model group your plan keeps apart",
   },
 ];
 
@@ -50,10 +55,10 @@ export const settings = [
 
 export const privacy = [
   { title: "Read-only access.", body: "Uzzy reuses your existing sessions. It never asks for a password, signs in for you or writes credentials. It reads Cursor’s encrypted session only after you allow access to its key in the Keychain." },
-  { title: "Straight to your providers.", body: "Usage and balance requests go directly to Claude, Codex and Cursor. Once a day Uzzy asks GitHub for the latest version, unless you turn that off. No telemetry. No server of its own." },
+  { title: "Straight to your providers.", body: "Usage and balance requests go directly to Claude, Codex, Cursor and Antigravity. Once a day Uzzy asks GitHub for the latest version, unless you turn that off. No telemetry. No server of its own." },
   { title: "Readings stay in memory.", body: "Uzzy doesn’t save usage readings to disk." },
 ];
 
-export const hosts = ["api.anthropic.com", "chatgpt.com", "api2.cursor.sh", "api.github.com"];
+export const hosts = ["api.anthropic.com", "chatgpt.com", "api2.cursor.sh", "cloudcode-pa.googleapis.com", "api.github.com"];
 
-export const disclaimer = "Uzzy is an independent project, not affiliated with, endorsed or sponsored by Anthropic, OpenAI or Anysphere. It reads usage limits through undocumented endpoints that may change without notice.";
+export const disclaimer = "Uzzy is an independent project, not affiliated with, endorsed or sponsored by Anthropic, OpenAI, Anysphere or Google. It reads usage limits through undocumented endpoints that may change without notice.";
