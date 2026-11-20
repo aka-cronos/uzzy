@@ -18,7 +18,7 @@ export const features = [
   { title: "Four tools. One quick check.", body: "Open Uzzy from your menu bar to see Claude, Codex, Cursor and Antigravity together, with a separate card for each provider, led by its logo and showing its plan." },
   { title: "Different limits stay different.", body: "Check each usage limit on its own, with its reset time, countdown and last reading. Five-hour and weekly limits are never blended into one number, and a limit you haven’t used yet shows no reset until its period starts." },
   { title: "Checks while you look.", body: "Uzzy refreshes readings when needed as you open the panel, then every five minutes while it stays open. Close it and the requests stop." },
-  { title: "Missing doesn’t mean zero.", body: "If a session expires or a provider can’t be reached, Uzzy tells you what happened. The other providers keep working." },
+  { title: "Missing doesn’t mean zero.", body: "If a session expires or a provider can’t be reached, Uzzy tells you what happened. The other providers keep working, and a session its app renews is picked up on its own while the panel is open." },
 ];
 
 export const providers = [
