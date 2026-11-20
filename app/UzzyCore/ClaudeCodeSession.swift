@@ -33,7 +33,7 @@ public struct ClaudeCodeSessionReader: SessionReader {
     @concurrent
     public func read() async -> SessionReading {
         let credentials: Data
-        switch keychainItem() {
+        switch KeychainItem.read(service: keychainService, with: securityTool) {
         case .found(let data): credentials = data
         case .notFound: return .noSession
         case .denied: return .accessDenied
@@ -46,46 +46,6 @@ public struct ClaudeCodeSessionReader: SessionReader {
         }
         guard let oauth = stored.claudeAiOauth, let token = oauth.accessToken, !token.isEmpty else { return .noSession }
         return .session(Session(accessToken: token, accountID: accountID(), plan: oauth.subscriptionType))
-    }
-
-    private enum KeychainItem {
-        case found(Data)
-        case notFound
-        case denied
-        case failed
-    }
-
-    /// `security` exits with the low byte of the Keychain error it got.
-    private enum ExitStatus {
-        static let itemNotFound: Int32 = 44 // errSecItemNotFound
-        static let authFailed: Int32 = 51 // errSecAuthFailed
-        static let userCanceled: Int32 = 128 // errSecUserCanceled
-    }
-
-    private func keychainItem() -> KeychainItem {
-        let tool = Process()
-        tool.executableURL = securityTool
-        tool.arguments = ["find-generic-password", "-s", keychainService, "-w"]
-        let output = Pipe()
-        tool.standardOutput = output
-        tool.standardError = FileHandle.nullDevice
-        do {
-            try tool.run()
-        } catch {
-            return .failed
-        }
-        // Reads before waiting, so a full pipe never blocks the tool.
-        let data = (try? output.fileHandleForReading.readToEnd()) ?? Data()
-        tool.waitUntilExit()
-        guard tool.terminationReason == .exit else { return .failed }
-        switch tool.terminationStatus {
-        case 0: return .found(data)
-        case ExitStatus.itemNotFound: return .notFound
-        // The user denied the prompt. If the prompt could not be shown, the
-        // Keychain is unavailable rather than denied or malformed.
-        case ExitStatus.userCanceled, ExitStatus.authFailed: return .denied
-        default: return .failed
-        }
     }
 
     /// `nil` when the identity cannot be verified: missing file, field or format.
