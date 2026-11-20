@@ -16,7 +16,7 @@ enum Cursor: ProviderAdapter {
         return request
     }
 
-    static func metadataRequest(for session: Session) -> URLRequest? {
+    static func metadataRequest(for session: Session, after response: Data) -> URLRequest? {
         var request = request(for: session)
         request.url = URL(string: "https://api2.cursor.sh/aiserver.v1.DashboardService/GetPlanInfo")!
         return request
