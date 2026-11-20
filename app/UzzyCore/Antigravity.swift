@@ -7,8 +7,10 @@ enum Antigravity: ProviderAdapter {
     static let provider = Provider.antigravity
 
     /// Cloud Code leaves the plan out and refuses the quota summary (403)
-    /// unless the client presents itself as Antigravity.
-    static let userAgent = "antigravity/2.33.0 darwin/arm64"
+    /// unless the client presents itself as Antigravity, and leaves out the
+    /// groups a plan keeps apart (Gemini 4 Argon on Google AI Pro) unless it
+    /// presents itself as Antigravity's app, the "hub".
+    static let userAgent = "antigravity/hub/2.33.0 darwin/arm64"
 
     /// The account query: its plan and the project its quotas belong to.
     static func request(for session: Session) -> URLRequest {

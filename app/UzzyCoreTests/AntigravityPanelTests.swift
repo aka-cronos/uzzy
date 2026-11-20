@@ -64,8 +64,10 @@ struct AntigravityPanelTests {
         ])
         #expect(requests.allSatisfy { $0.httpMethod == "POST" })
         #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "Authorization") == "Bearer sample-token" })
-        // Cloud Code refuses the summary to a client that is not Antigravity.
-        #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "User-Agent")?.hasPrefix("antigravity/") == true })
+        // Cloud Code refuses the summary to a client that is not Antigravity,
+        // and leaves out the groups a plan keeps apart (Gemini 4 Argon) unless
+        // it presents itself as Antigravity's app ("hub").
+        #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "User-Agent")?.hasPrefix("antigravity/hub/") == true })
         let summaryBody = try #require(requests.last?.httpBody)
         #expect(try JSONSerialization.jsonObject(with: summaryBody) as? [String: String] == ["project": "sample-project"])
     }
