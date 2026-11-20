@@ -36,9 +36,9 @@ enum Antigravity: ProviderAdapter {
     }
 
     /// One quota per group and window, in the summary's group order, each
-    /// group's 5-hour limit before its weekly one. Buckets of a window
-    /// Uzzy does not know are left out; a summary without any known one is
-    /// not understood.
+    /// group's 5-hour limit before its weekly one. Disabled buckets and
+    /// buckets of a window Uzzy does not know are left out; a summary
+    /// without any known one is not understood.
     static func quotas(from body: Data, metadata: Data?, readAt moment: Date) -> Result<[QuotaReading], Failure> {
         guard let metadata, let summary = try? JSONDecoder().decode(Summary.self, from: metadata) else {
             return .failure(.incompatibleResponse)
@@ -46,8 +46,11 @@ enum Antigravity: ProviderAdapter {
         var periods: [QuotaPeriod] = []
         var copies: [QuotaPeriod: [Bucket]] = [:]
         for group in summary.groups ?? [] {
-            guard let name = name(of: group) else { continue }
-            let buckets = (group.buckets ?? []).compactMap { bucket in
+            // A plan may list limits it turns off; a group left with none
+            // shows nothing.
+            let active = (group.buckets ?? []).filter { !$0.disabled }
+            guard let name = name(of: group, buckets: active) else { continue }
+            let buckets = active.compactMap { bucket in
                 window(bucket.window).map { (window: $0, bucket: bucket) }
             }
             for window in [QuotaPeriod.fiveHours, .weekly] {
@@ -79,12 +82,16 @@ enum Antigravity: ProviderAdapter {
     }
 
     /// Every paid tier Uzzy knows. Any other value shows no plan.
-    private static let planNames = ["g1-pro-tier": "Google AI Pro"]
+    private static let planNames = [
+        "g1-pro-tier": "Google AI Pro",
+        "g1-ultra-tier": "Google AI Ultra",
+        "g1-ultra-lite-tier": "Google AI Ultra Lite",
+    ]
 
     /// The groups Antigravity's own quota screen shows go by a short name;
     /// any other group by the name the summary gives it.
-    private static func name(of group: Group) -> String? {
-        let ids = Set((group.buckets ?? []).compactMap(\.bucketId))
+    private static func name(of group: Group, buckets: [Bucket]) -> String? {
+        let ids = Set(buckets.compactMap(\.bucketId))
         if !ids.isDisjoint(with: ["gemini-5h", "gemini-weekly"]) { return "Gemini" }
         if !ids.isDisjoint(with: ["3p-5h", "3p-weekly"]) { return "Claude and GPT" }
         let name = group.displayName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -153,6 +160,22 @@ enum Antigravity: ProviderAdapter {
         let window: String?
         let resetTime: String?
         let remainingFraction: Double?
+        /// A limit the plan turns off. Only `true` turns it off: a value of
+        /// another shape is left out, and never loses the summary.
+        let disabled: Bool
+
+        private enum CodingKeys: String, CodingKey {
+            case bucketId, window, resetTime, remainingFraction, disabled
+        }
+
+        init(from decoder: any Decoder) throws {
+            let values = try decoder.container(keyedBy: CodingKeys.self)
+            bucketId = try values.decodeIfPresent(String.self, forKey: .bucketId)
+            window = try values.decodeIfPresent(String.self, forKey: .window)
+            resetTime = try values.decodeIfPresent(String.self, forKey: .resetTime)
+            remainingFraction = try values.decodeIfPresent(Double.self, forKey: .remainingFraction)
+            disabled = (try? values.decodeIfPresent(Bool.self, forKey: .disabled)) == true
+        }
 
         /// The used share, as a percentage to two decimals so a fraction such
         /// as 0.96 reads 4%. Nil when the summary leaves the fraction out:
