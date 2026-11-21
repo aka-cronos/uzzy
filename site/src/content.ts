@@ -4,7 +4,7 @@ export const DOWNLOAD_URL =
 export const REPO_URL = "https://github.com/aka-cronos/uzzy";
 export const MAKER = "akacronos";
 export const X_URL = `https://x.com/${MAKER}`;
-export const VERSION = "0.5.2";
+export const VERSION = "0.6.0";
 export const REQUIREMENTS = "macOS 27 · Apple Silicon";
 
 export const hero = {
@@ -17,7 +17,8 @@ export const why = "Keep using Claude, Codex, Cursor and Antigravity. Uzzy bring
 export const features = [
   { title: "Four tools. One quick check.", body: "Open Uzzy from your menu bar to see Claude, Codex, Cursor and Antigravity together, with a separate card for each provider, led by its logo and showing its plan." },
   { title: "Different limits stay different.", body: "Check each usage limit on its own, with its reset time, countdown and last reading. Five-hour and weekly limits are never blended into one number, and a limit you haven’t used yet shows no reset until its period starts." },
-  { title: "Checks while you look.", body: "Uzzy refreshes readings when needed as you open the panel, then every five minutes while it stays open. Close it and the requests stop." },
+  { title: "Checks while you look.", body: "Uzzy refreshes readings when needed as you open the panel, then every five minutes while it stays open. Close it and the requests stop, unless you turn on background refresh in Settings." },
+  { title: "Alerts, if you want them.", body: "Turn on background refresh in Settings to check usage limits every 5, 10, 15 or 30 minutes while the panel is closed, reusing your last session without asking for Keychain access. Get notified when a usage limit nears your threshold, reaches 100%, or resets. Everything is off until you turn it on." },
   { title: "Missing doesn’t mean zero.", body: "If a session expires or a provider can’t be reached, Uzzy tells you what happened. The other providers keep working. While the panel is open, Claude, Codex and Antigravity pick up a renewed session on their own." },
 ];
 
