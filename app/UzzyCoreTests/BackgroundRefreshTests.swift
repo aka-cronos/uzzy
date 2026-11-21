@@ -97,7 +97,9 @@ struct BackgroundRefreshTests {
         let core = makeCore()
         await openAndClose(core)
 
-        await advance(core, by: 3 * backgroundInterval)
+        for _ in 0..<3 {
+            await advance(core, by: backgroundInterval)
+        }
 
         #expect(await sessionReader.reads == 1)
         #expect(await requestCount() == 4)
