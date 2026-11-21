@@ -48,7 +48,7 @@ A quota value derived from other valid data of that same quota, account, unit an
 _Avoid_: Provider-reported value (when it is calculated), estimate (for an exact calculation).
 
 **Session**:
-The sign-in an official app (Claude Code, Codex CLI, Cursor, Antigravity) keeps on this Mac, which Uzzy reuses read-only to query quotas. It can be missing, expired (rejected by the provider), inaccessible (access denied by the user), in an unknown format, or without subscription quotas (e.g. Codex CLI signed in with an API key).
+The sign-in an official app (Claude Code, Codex CLI, Cursor, Antigravity) keeps on this Mac—or, for Antigravity, another client's token file or the running app's local service—which Uzzy reuses read-only to query quotas. It can be missing, expired (rejected by the provider), inaccessible (access denied by the user), in an unknown format, or without subscription quotas (e.g. Codex CLI signed in with an API key).
 _Avoid_: Login, account (the account is the identity behind a session), the 5-hour quota period.
 
 **Account**:

@@ -55,10 +55,10 @@ export const settings = [
 
 export const privacy = [
   { title: "Read-only access.", body: "Uzzy reuses your existing sessions. It never asks for a password, signs in for you or writes credentials. It reads Cursor’s encrypted session only after you allow access to its key in the Keychain." },
-  { title: "Straight to your providers.", body: "Usage and balance requests go directly to Claude, Codex, Cursor and Antigravity. Once a day Uzzy asks GitHub for the latest version, unless you turn that off. No telemetry. No server of its own." },
+  { title: "Straight to your providers.", body: "Usage and balance requests go directly to Claude, Codex, Cursor and Antigravity, or to Antigravity running on your Mac. Once a day Uzzy asks GitHub for the latest version, unless you turn that off. No telemetry. No server of its own." },
   { title: "Readings stay in memory.", body: "Uzzy doesn’t save usage readings to disk." },
 ];
 
-export const hosts = ["api.anthropic.com", "chatgpt.com", "api2.cursor.sh", "daily-cloudcode-pa.sandbox.googleapis.com", "api.github.com"];
+export const hosts = ["api.anthropic.com", "chatgpt.com", "api2.cursor.sh", "daily-cloudcode-pa.sandbox.googleapis.com", "127.0.0.1", "api.github.com"];
 
 export const disclaimer = "Uzzy is an independent project, not affiliated with, endorsed or sponsored by Anthropic, OpenAI, Anysphere or Google. It reads usage limits through undocumented endpoints that may change without notice.";

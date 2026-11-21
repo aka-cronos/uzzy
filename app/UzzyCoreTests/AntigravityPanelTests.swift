@@ -308,6 +308,215 @@ struct AntigravityPanelTests {
         #expect(await antigravitySessionReader.reads == reads)
     }
 
+    // MARK: Local daemon sessions
+
+    @Test func aLocalDaemonSessionQueriesGetUserStatusAndRetrieveUserQuotaSummary() async throws {
+        let daemon = Session(
+            accessToken: "local-csrf",
+            accountID: "sample@example.com",
+            endpoint: URL(string: "http://127.0.0.1:50001")
+        )
+        await antigravitySessionReader.answer(with: .session(daemon))
+        // Ultra accounts report `planInfo.planName = "Pro"` alongside
+        // `userTier.id = "g1-ultra-tier"`; only `userTier.id` names the plan.
+        await transport.answerAntigravityDaemonStatus(with: .json(#"""
+            {
+              "userStatus": {
+                "email": "sample@example.com",
+                "userTier": {"id": "g1-ultra-tier", "name": "Google AI Ultra"},
+                "planStatus": {"planInfo": {"planName": "Pro", "teamsTier": "TEAMS_TIER_PRO"}}
+              }
+            }
+            """#))
+
+        await openPanel()
+
+        let requests = await transport.quotaRequests(to: .antigravity)
+        #expect(requests.map(\.url) == [
+            URL(string: "http://127.0.0.1:50001/exa.language_server_pb.LanguageServerService/GetUserStatus"),
+            URL(string: "http://127.0.0.1:50001/exa.language_server_pb.LanguageServerService/RetrieveUserQuotaSummary"),
+        ])
+        #expect(requests.allSatisfy { $0.httpMethod == "POST" })
+        #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "Connect-Protocol-Version") == "1" })
+        #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "x-codeium-csrf-token") == "local-csrf" })
+        #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "Authorization") == nil })
+        #expect(antigravityCard()?.plan == "Google AI Ultra")
+        guard case .quotas(let quotas) = antigravityCard()?.content else {
+            Issue.record("The Antigravity card does not show its quotas from the local daemon")
+            return
+        }
+        #expect(quotas.count == 5)
+    }
+
+    /// Antigravity's local service caches summaries for several minutes: an
+    /// untouched 0% bucket whose reset lags 6 minutes behind `now + window`
+    /// hides its reset, while one 20 minutes behind keeps its reset.
+    @Test func anUntouchedAntigravityWindowToleratesCachedResetLag() async {
+        // Reading moment is 2026-09-23T14:32:00Z. `now + 5h` is 19:32:00Z.
+        // 19:26:00Z is 6 minutes behind (untouched, cached); 19:12:00Z is 20 minutes behind (started).
+        await transport.answer(with: .json(#"""
+            {"groups": [
+              {"displayName": "Gemini Models", "buckets": [
+                {"bucketId": "gemini-5h", "window": "5h", "resetTime": "2026-09-23T19:26:00Z", "remainingFraction": 1}
+              ]},
+              {"displayName": "Claude and GPT models", "buckets": [
+                {"bucketId": "3p-5h", "window": "5h", "resetTime": "2026-09-23T19:12:00Z", "remainingFraction": 1}
+              ]}
+            ]}
+            """#), for: .antigravity)
+
+        await openPanel()
+
+        #expect(antigravityCard()?.content == .quotas([
+            Quota(period: .limit("Gemini", .fiveHours), value: .percent(0, calculated: false),
+                  reset: nil, readAt: Samples.readingMoment),
+            // 2026-09-23T19:12:00Z
+            Quota(period: .limit("Claude and GPT", .fiveHours), value: .percent(0, calculated: false),
+                  reset: .at(Date(timeIntervalSince1970: 1_790_190_720)), readAt: Samples.readingMoment),
+        ]))
+    }
+
+    /// When a local daemon stops while the panel is open, the automatic refresh
+    /// marks the reused session unconfirmed (keeping stale readings) and the
+    /// 30-second recheck picks up a restarted daemon on a new port.
+    @Test func aStoppedDaemonMarksStaleAndRecoversWhenRestarted() async {
+        let initialDaemon = Session(
+            accessToken: "csrf-1",
+            accountID: "sample@example.com",
+            endpoint: URL(string: "http://127.0.0.1:50001")
+        )
+        await antigravitySessionReader.answer(with: .session(initialDaemon))
+        await openPanel()
+        guard case .quotas = antigravityCard()?.content else {
+            Issue.record("Expected initial daemon quotas")
+            return
+        }
+
+        // Daemon stops before the 5-minute automatic refresh.
+        await transport.answerAntigravityDaemonStatus(with: .networkError)
+        clock.advance(by: 5 * 60)
+        await core.queriesFinished()
+
+        guard case .stale(_, failure: .reusedSessionRejected) = antigravityCard()?.content else {
+            Issue.record("Expected stale reusedSessionRejected, got \(String(describing: antigravityCard()?.content))")
+            return
+        }
+
+        // Daemon restarts on a new port; the 30-second recheck recovers on its own.
+        let restartedDaemon = Session(
+            accessToken: "csrf-2",
+            accountID: "sample@example.com",
+            endpoint: URL(string: "http://127.0.0.1:50002")
+        )
+        await antigravitySessionReader.answer(with: .session(restartedDaemon))
+        await transport.answerAntigravityDaemonStatus(with: .antigravityDaemonStatusSample)
+        clock.advance(by: Self.recheck)
+        await core.queriesFinished()
+
+        guard case .quotas = antigravityCard()?.content else {
+            Issue.record("Expected recovery after daemon restarted")
+            return
+        }
+        #expect(await transport.quotaRequests(to: .antigravity).last?.url?.port == 50002)
+    }
+
+    /// A live daemon that times out (e.g. while waiting on Google upstream)
+    /// stays `.timedOut` rather than rejecting the session, so the scheduled
+    /// retry recovers with the same port and CSRF token.
+    @Test func aSlowDaemonTimesOutAndRetriesWithTheSameSession() async {
+        let daemon = Session(
+            accessToken: "csrf-1",
+            accountID: "sample@example.com",
+            endpoint: URL(string: "http://127.0.0.1:50001")
+        )
+        await antigravitySessionReader.answer(with: .session(daemon))
+        await openPanel()
+        guard case .quotas = antigravityCard()?.content else {
+            Issue.record("Expected initial daemon quotas")
+            return
+        }
+
+        await transport.answerAntigravityDaemonQuota(with: .timeout)
+        clock.advance(by: 5 * 60)
+        await core.queriesFinished()
+
+        guard case .stale(_, failure: .timedOut) = antigravityCard()?.content else {
+            Issue.record("Expected stale timedOut, got \(String(describing: antigravityCard()?.content))")
+            return
+        }
+
+        // Same daemon responds on the scheduled 30-second retry.
+        await transport.answerAntigravityDaemonQuota(with: .antigravityDaemonQuotaSample)
+        clock.advance(by: Self.recheck)
+        await core.queriesFinished()
+
+        guard case .quotas = antigravityCard()?.content else {
+            Issue.record("Expected recovery on scheduled retry with the same daemon session")
+            return
+        }
+        #expect(await transport.quotaRequests(to: .antigravity).last?.url?.port == 50001)
+    }
+
+    @Test func anUnreachableDaemonOnFreshReadIsSessionExpiredNotOffline() async {
+        let daemon = Session(
+            accessToken: "csrf-1",
+            accountID: "sample@example.com",
+            endpoint: URL(string: "http://127.0.0.1:50001")
+        )
+        await antigravitySessionReader.answer(with: .session(daemon))
+        await transport.answerAntigravityDaemonStatus(with: .networkError)
+
+        await openPanel()
+
+        #expect(antigravityCard()?.content == .failed(.sessionExpired))
+    }
+
+    @Test(arguments: [(401, Failure.sessionExpired), (403, .accessRefused)])
+    func aRejectedDaemonSessionRechecksAndRecovers(status: Int, failure: Failure) async {
+        let initialDaemon = Session(
+            accessToken: "csrf-1",
+            accountID: "sample@example.com",
+            endpoint: URL(string: "http://127.0.0.1:50001")
+        )
+        await antigravitySessionReader.answer(with: .session(initialDaemon))
+        await transport.answerAntigravityDaemonStatus(with: .status(status))
+
+        await openPanel()
+        #expect(antigravityCard()?.content == .failed(failure))
+
+        let renewedDaemon = Session(
+            accessToken: "csrf-2",
+            accountID: "sample@example.com",
+            endpoint: URL(string: "http://127.0.0.1:50002")
+        )
+        await antigravitySessionReader.answer(with: .session(renewedDaemon))
+        await transport.answerAntigravityDaemonStatus(with: .antigravityDaemonStatusSample)
+        clock.advance(by: Self.recheck)
+        await core.queriesFinished()
+
+        guard case .quotas = antigravityCard()?.content else {
+            Issue.record("Expected recovery after daemon token changed")
+            return
+        }
+    }
+
+    @Test func reopeningWhileDaemonReadingIsFreshSkipsTheQuery() async {
+        let daemon = Session(
+            accessToken: "csrf-1",
+            accountID: "sample@example.com",
+            endpoint: URL(string: "http://127.0.0.1:50001")
+        )
+        await antigravitySessionReader.answer(with: .session(daemon))
+        await openPanel()
+        let countBefore = await transport.quotaRequests(to: .antigravity).count
+
+        core.panelClosed()
+        clock.advance(by: 60)
+        await openPanel()
+
+        #expect(await transport.quotaRequests(to: .antigravity).count == countBefore)
+    }
+
     static let recheck: TimeInterval = 30
 }
 
