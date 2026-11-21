@@ -153,7 +153,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
         // Only the real accounts fire alerts, never a debug scenario.
         realCore.alertFired = { [weak self] alert in self?.notify(alert) }
         notifier.openPanel = { [weak self] in
-            guard let self, popover?.isShown != true else { return }
+            guard let self, self.popover?.isShown != true else { return }
             openPanel()
         }
 
