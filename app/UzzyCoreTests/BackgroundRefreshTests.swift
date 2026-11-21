@@ -46,7 +46,8 @@ struct BackgroundRefreshTests {
     @Test func itIsOffByDefault() {
         #expect(BackgroundRefresh.off.isOn == false)
         #expect(BackgroundRefresh.off.interval == 15 * 60)
-        #expect(BackgroundRefresh.intervals == [5 * 60, 10 * 60, 15 * 60, 30 * 60])
+        let expected: [TimeInterval] = [300, 600, 900, 1800]
+        #expect(BackgroundRefresh.intervals == expected)
     }
 
     @Test func itsIntervalIsNeverUnderFiveMinutes() {
