@@ -4,7 +4,7 @@ Thanks for your interest in Uzzy. It is a small personal project, so please read
 
 ## Start with an issue
 
-Open an [issue](https://github.com/aka-cronos/uzzy/issues/new/choose) before you open a pull request, and wait until it is agreed. Pull requests without an agreed issue may be closed. Design decisions live in the issues of map [#1](https://github.com/aka-cronos/uzzy/issues/1).
+Open an [issue](https://github.com/aka-cronos/uzzy/issues/new/choose) before you open a pull request, and wait until it is agreed. Pull requests without an agreed issue may be closed. Design decisions live in the issues of map [#1](https://github.com/aka-cronos/uzzy/issues/1). Dependabot's update pull requests are the exception: they need no issue.
 
 If a provider changed its API and a card now shows «Respuesta incompatible» or wrong data, use the **Provider API changed** template.
 
