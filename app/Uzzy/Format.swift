@@ -31,6 +31,10 @@ struct Format {
     var settings: String { text("Settings") }
     /// The main menu command that opens Settings (⌘,).
     var openSettings: String { "\(settings)…" }
+    /// The Settings tabs, in their toolbar order.
+    var generalTab: String { text("General") }
+    var providersTab: String { text("Providers") }
+    var notificationsTab: String { text("Notifications") }
     /// The main menu's File menu.
     var fileMenu: String { text("File") }
     /// The main menu command that closes the front window or the panel (⌘W).

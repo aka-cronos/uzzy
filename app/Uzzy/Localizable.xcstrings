@@ -889,7 +889,7 @@
       }
     },
     "Providers" : {
-      "comment" : "Settings section title.",
+      "comment" : "A Settings tab: the providers, their card order and whether each is turned on.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1604,7 +1604,7 @@
       }
     },
     "Notifications" : {
-      "comment" : "A Settings section: background refresh and the alerts it can fire.",
+      "comment" : "A Settings tab: background refresh and the alerts it can fire.",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1614,8 +1614,30 @@
         }
       }
     },
+    "General" : {
+      "comment" : "A Settings tab: usage limits, resets and updates.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "General"
+          }
+        }
+      }
+    },
+    "Alerts" : {
+      "comment" : "A Settings section on the Notifications tab: the alerts background refresh can fire.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alertas"
+          }
+        }
+      }
+    },
     "Background refresh" : {
-      "comment" : "A Settings switch.",
+      "comment" : "A Settings switch, and the section on the Notifications tab that holds it.",
       "localizations" : {
         "es" : {
           "stringUnit" : {

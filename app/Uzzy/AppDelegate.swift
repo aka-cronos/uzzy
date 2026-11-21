@@ -51,7 +51,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
         isEnabled: UpdatePreferences.checksForUpdates(in: .standard)
     )
     #endif
-    private var settingsWindow: NSWindow?
+    /// Created on first use and kept after closing, so a reopened Settings
+    /// shows the tab it was closed on.
+    private var settingsWindow: SettingsWindowController?
     #if DEBUG
     private lazy var scenarios = ScenarioSwitch(realCore: realCore)
     #endif
@@ -320,25 +322,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
     @objc func showSettings(_ sender: Any?) {
         core.panelClosed()
         if settingsWindow == nil {
-            let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: SettingsView.width, height: 0),
-                                  styleMask: [.titled, .closable], backing: .buffered, defer: false)
-            window.title = Format.current.settings
-            let content = NSHostingController(rootView: SettingsView(
-                core: realCore,
-                notifier: notifier,
-                setProviderEnabled: { [weak self] provider, enabled in self?.setProviderEnabled(enabled, for: provider) },
-                setProviderOrder: { [weak self] order in self?.setProviderOrder(order) },
-                setUpdateChecks: { [weak self] enabled in self?.updates.setEnabled(enabled) }
-            ))
-            // The window takes the form's height, so no row is clipped.
-            content.sizingOptions = [.preferredContentSize]
-            window.contentViewController = content
-            window.isReleasedWhenClosed = false
-            window.center()
-            settingsWindow = window
+            settingsWindow = SettingsWindowController { navigation, heightChanged in
+                SettingsView(
+                    core: realCore,
+                    notifier: notifier,
+                    setProviderEnabled: { [weak self] provider, enabled in self?.setProviderEnabled(enabled, for: provider) },
+                    setProviderOrder: { [weak self] order in self?.setProviderOrder(order) },
+                    setUpdateChecks: { [weak self] enabled in self?.updates.setEnabled(enabled) },
+                    navigation: navigation,
+                    heightChanged: heightChanged
+                )
+            }
+        } else {
+            // A reopened window keeps its SwiftUI views, which may not
+            // appear again, so the permission is read here too.
+            notifier.refreshAuthorization()
         }
         NSApp.activate(ignoringOtherApps: true)
-        settingsWindow?.makeKeyAndOrderFront(nil)
+        settingsWindow?.window?.makeKeyAndOrderFront(nil)
         closePanel()
     }
 

@@ -1,8 +1,9 @@
 import SwiftUI
 import UzzyCore
 
-/// A native grouped settings pane: each row has a title, a short description
-/// and a trailing control, as in System Settings.
+/// The Settings window's content: the selected tab's native grouped form,
+/// where each row has a title, a short description and a trailing control,
+/// as in System Settings.
 struct SettingsView: View {
     static let width: CGFloat = 480
 
@@ -13,6 +14,10 @@ struct SettingsView: View {
     let setProviderEnabled: @MainActor (Provider, Bool) -> Void
     let setProviderOrder: @MainActor ([Provider]) -> Void
     let setUpdateChecks: @MainActor (Bool) -> Void
+    /// The tab the window's toolbar selected.
+    let navigation: SettingsNavigation
+    /// Reports the tab and the height it lays out at, which the window takes.
+    let heightChanged: @MainActor (SettingsTab, CGFloat) -> Void
     @AppStorage("displayMagnitude") private var selectedMagnitude: QuotaMagnitude = .used
     @AppStorage(CountdownStyle.key) private var countdownStyle: CountdownStyle = .simple
     @AppStorage("showBankedResets") private var showBankedResets = true
@@ -37,23 +42,26 @@ struct SettingsView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            form
-            // Under the form, not in a section footer. A grouped row paints
-            // a card, and the window sizes to this stack.
-            if let versionLine {
-                Text(versionLine)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    // The footer text starts 30pt from the window edge.
-                    // This line sits outside the form, so it pads to match.
-                    .padding(.horizontal, 30)
-                    .padding(.bottom, 16)
+            switch navigation.tab {
+            case .general:
+                general
+            case .providers:
+                providers
+            case .notifications:
+                notifications
             }
         }
+        .id(navigation.tab)
         .frame(width: Self.width)
         .fixedSize(horizontal: false, vertical: true)
+        // The window takes the tab's height, so no row is clipped. The tab
+        // rides along so a switch reports even between equal heights.
+        .onGeometryChange(for: TabHeight.self) { [tab = navigation.tab] in TabHeight(tab: tab, height: $0.size.height) } action: { size in
+            heightChanged(size.tab, size.height)
+        }
+        // Keep the form pinned to the top edge while the window animates
+        // between tab heights, rather than centering it in the previous height.
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .onChange(of: showClaude) { _, enabled in setProviderEnabled(.claude, enabled) }
         .onChange(of: showCodex) { _, enabled in setProviderEnabled(.codex, enabled) }
         .onChange(of: showAntigravity) { _, enabled in setProviderEnabled(.antigravity, enabled) }
@@ -69,7 +77,26 @@ struct SettingsView: View {
         .onChange(of: alertThreshold) { _, _ in alertsChanged(turningOn: false) }
         .onChange(of: alertLimitReached) { _, isOn in alertsChanged(turningOn: isOn) }
         .onChange(of: alertLimitReset) { _, isOn in alertsChanged(turningOn: isOn) }
+        .onChange(of: navigation.tab) { _, tab in
+            if tab == .notifications { notifier.refreshAuthorization() }
+        }
         .onAppear { notifier.refreshAuthorization() }
+        // On the window rather than the Providers tab: turning Cursor off
+        // shows the steps, and they must not depend on the tab staying put.
+        .alert("Revoke access to Cursor's key?", isPresented: $isConfirmingRevocation) {
+            Button("Revoke", role: .destructive) {
+                core.revokeCursorAccess()
+                isShowingKeychainSteps = true
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("\(Format.appName) will stop reading the Cursor session until you allow it again on the Cursor card.")
+        }
+        .alert("Remove \(Format.appName) from the keychain item", isPresented: $isShowingKeychainSteps) {
+            Button("OK") {}
+        } message: {
+            Text("\(Format.appName) no longer reads Cursor's key. If you chose Always Allow, macOS still lets it, and only you can remove that: open Keychain Access, search for \"Cursor Safe Storage\" (account Cursor), open it, and in Access Control remove \(Format.appName), then Save Changes.")
+        }
     }
 
     /// Turning an alert on is the only moment macOS's permission is asked.
@@ -83,26 +110,95 @@ struct SettingsView: View {
         if turningOn { notifier.requestAuthorization() }
     }
 
-    private var form: some View {
-        Form {
-            Section("Usage limits") {
-                let title = String(localized: "Percentage on the cards")
-                let description = String(localized: "Shows how much of each limit you've used, or how much you have left until it resets.")
-                SettingsRow(title: title, description: description) {
-                    // The hidden title still names the control for VoiceOver.
-                    Picker(title, selection: $selectedMagnitude) {
-                        // The same words as the suffix after each card's figure.
-                        Text(Format.current.name(of: QuotaMagnitude.used).localizedCapitalized).tag(QuotaMagnitude.used)
-                        Text(Format.current.name(of: QuotaMagnitude.remaining).localizedCapitalized).tag(QuotaMagnitude.remaining)
+    /// A tab's grouped form, at its full height: the window sizes to it
+    /// instead of scrolling.
+    private func tabForm(@ViewBuilder _ sections: () -> some View) -> some View {
+        Form(content: sections)
+            .formStyle(.grouped)
+            .scrollDisabled(true)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// The display, reset and update settings, over the app's version.
+    private var general: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            tabForm {
+                Section("Usage limits") {
+                    let title = String(localized: "Percentage on the cards")
+                    let description = String(localized: "Shows how much of each limit you've used, or how much you have left until it resets.")
+                    SettingsRow(title: title, description: description) {
+                        // The hidden title still names the control for VoiceOver.
+                        Picker(title, selection: $selectedMagnitude) {
+                            // The same words as the suffix after each card's figure.
+                            Text(Format.current.name(of: QuotaMagnitude.used).localizedCapitalized).tag(QuotaMagnitude.used)
+                            Text(Format.current.name(of: QuotaMagnitude.remaining).localizedCapitalized).tag(QuotaMagnitude.remaining)
+                        }
+                        .pickerStyle(.segmented)
+                        .labelsHidden()
+                        .fixedSize()
+                        .accessibilityHint(description)
                     }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
-                    .fixedSize()
-                    .accessibilityHint(description)
+                }
+                Section("Resets") {
+                    let countdownTitle = String(localized: "Time until a reset")
+                    let countdownDescription = String(localized: "Shows a short countdown, like 2 h, or a detailed one, like 2 h 28 min.")
+                    SettingsRow(title: countdownTitle, description: countdownDescription) {
+                        Picker(countdownTitle, selection: $countdownStyle) {
+                            Text(Format.current.name(of: CountdownStyle.simple)).tag(CountdownStyle.simple)
+                            Text(Format.current.name(of: CountdownStyle.detailed)).tag(CountdownStyle.detailed)
+                        }
+                        .pickerStyle(.segmented)
+                        .labelsHidden()
+                        .fixedSize()
+                        .accessibilityHint(countdownDescription)
+                    }
+                    let bankedTitle = String(localized: "Resets available")
+                    let bankedDescription = String(localized: "Shows how many resets the account has available, next to the provider's name.")
+                    SettingsRow(title: bankedTitle, description: bankedDescription) {
+                        Toggle(bankedTitle, isOn: $showBankedResets)
+                            .toggleStyle(.switch)
+                            .labelsHidden()
+                            .accessibilityHint(bankedDescription)
+                            // As in `ProviderRow`: a switch with a hidden label
+                            // exposes no press action.
+                            .accessibilityAction { showBankedResets.toggle() }
+                    }
+                }
+                Section("Updates") {
+                    let title = String(localized: "Check for updates")
+                    let description = String(localized: "Asks GitHub once a day for a newer version of \(Format.appName), without sending any data about you. You install it yourself.")
+                    SettingsRow(title: title, description: description) {
+                        Toggle(title, isOn: $checkForUpdates)
+                            .toggleStyle(.switch)
+                            .labelsHidden()
+                            .accessibilityHint(description)
+                            // As in `ProviderRow`: a switch with a hidden label
+                            // exposes no press action.
+                            .accessibilityAction { checkForUpdates.toggle() }
+                    }
                 }
             }
-            // The rows follow the panel's card order. Only here can it change,
-            // with buttons that keyboard and VoiceOver can reach.
+            // Under the form, not in a section footer. A grouped row paints
+            // a card, and the window sizes to this stack.
+            if let versionLine {
+                Text(versionLine)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    // The footer text starts 30pt from the window edge.
+                    // This line sits outside the form, so it pads to match.
+                    .padding(.horizontal, 30)
+                    .padding(.bottom, 16)
+            }
+        }
+    }
+
+    /// The rows follow the panel's card order. Only here can it change, with
+    /// buttons that keyboard and VoiceOver can reach. The section has no
+    /// header: the selected tab already says "Providers".
+    private var providers: some View {
+        tabForm {
             Section {
                 ForEach(order, id: \.self) { provider in
                     ProviderRow(
@@ -120,144 +216,90 @@ struct SettingsView: View {
                         }
                     }
                 }
-            } header: {
-                Text("Providers")
             } footer: {
                 Text("The cards follow the order of this list. A provider that's turned off has no card, and \(Format.appName) doesn't read its session or check its usage limits.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            Section("Resets") {
-                let countdownTitle = String(localized: "Time until a reset")
-                let countdownDescription = String(localized: "Shows a short countdown, like 2 h, or a detailed one, like 2 h 28 min.")
-                SettingsRow(title: countdownTitle, description: countdownDescription) {
-                    Picker(countdownTitle, selection: $countdownStyle) {
-                        Text(Format.current.name(of: CountdownStyle.simple)).tag(CountdownStyle.simple)
-                        Text(Format.current.name(of: CountdownStyle.detailed)).tag(CountdownStyle.detailed)
-                    }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
-                    .fixedSize()
-                    .accessibilityHint(countdownDescription)
-                }
-                let bankedTitle = String(localized: "Resets available")
-                let bankedDescription = String(localized: "Shows how many resets the account has available, next to the provider's name.")
-                SettingsRow(title: bankedTitle, description: bankedDescription) {
-                    Toggle(bankedTitle, isOn: $showBankedResets)
-                        .toggleStyle(.switch)
-                        .labelsHidden()
-                        .accessibilityHint(bankedDescription)
-                        // As in `ProviderRow`: a switch with a hidden label
-                        // exposes no press action.
-                        .accessibilityAction { showBankedResets.toggle() }
-                }
-            }
-            notifications
-            Section("Updates") {
-                let title = String(localized: "Check for updates")
-                let description = String(localized: "Asks GitHub once a day for a newer version of \(Format.appName), without sending any data about you. You install it yourself.")
-                SettingsRow(title: title, description: description) {
-                    Toggle(title, isOn: $checkForUpdates)
-                        .toggleStyle(.switch)
-                        .labelsHidden()
-                        .accessibilityHint(description)
-                        // As in `ProviderRow`: a switch with a hidden label
-                        // exposes no press action.
-                        .accessibilityAction { checkForUpdates.toggle() }
-                }
-            }
         }
-        .formStyle(.grouped)
-        .scrollDisabled(true)
-        .alert("Revoke access to Cursor's key?", isPresented: $isConfirmingRevocation) {
-            Button("Revoke", role: .destructive) {
-                core.revokeCursorAccess()
-                isShowingKeychainSteps = true
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("\(Format.appName) will stop reading the Cursor session until you allow it again on the Cursor card.")
-        }
-        .alert("Remove \(Format.appName) from the keychain item", isPresented: $isShowingKeychainSteps) {
-            Button("OK") {}
-        } message: {
-            Text("\(Format.appName) no longer reads Cursor's key. If you chose Always Allow, macOS still lets it, and only you can remove that: open Keychain Access, search for \"Cursor Safe Storage\" (account Cursor), open it, and in Access Control remove \(Format.appName), then Save Changes.")
-        }
-        .fixedSize(horizontal: false, vertical: true)
     }
 
     /// Background refresh, then the alerts it can fire. Every row but the
     /// first waits for background refresh.
     private var notifications: some View {
-        Section {
-            let refreshTitle = String(localized: "Background refresh")
-            let refreshDescription = String(localized: "Checks turned-on providers even while the panel is closed.")
-            SettingsRow(title: refreshTitle, description: refreshDescription) {
-                Toggle(refreshTitle, isOn: $backgroundRefresh)
-                    .toggleStyle(.switch)
+        tabForm {
+            Section {
+                let refreshTitle = String(localized: "Background refresh")
+                let refreshDescription = String(localized: "Checks turned-on providers even while the panel is closed.")
+                SettingsRow(title: refreshTitle, description: refreshDescription) {
+                    Toggle(refreshTitle, isOn: $backgroundRefresh)
+                        .toggleStyle(.switch)
+                        .labelsHidden()
+                        .accessibilityHint(refreshDescription)
+                        // As in `ProviderRow`: a switch with a hidden label
+                        // exposes no press action.
+                        .accessibilityAction { backgroundRefresh.toggle() }
+                }
+                let intervalTitle = String(localized: "Refresh interval")
+                let intervalDescription = String(localized: "How often to check usage limits while the panel is closed.")
+                SettingsRow(title: intervalTitle, description: intervalDescription) {
+                    Picker(intervalTitle, selection: $intervalMinutes) {
+                        ForEach(BackgroundRefresh.intervals, id: \.self) { interval in
+                            Text(Format.current.duration(seconds: Int(interval))).tag(Int(interval / 60))
+                        }
+                    }
                     .labelsHidden()
-                    .accessibilityHint(refreshDescription)
-                    // As in `ProviderRow`: a switch with a hidden label
-                    // exposes no press action.
-                    .accessibilityAction { backgroundRefresh.toggle() }
+                    .fixedSize()
+                    .accessibilityHint(intervalDescription)
+                }
+                .disabled(!backgroundRefresh)
+            } header: {
+                Text("Background refresh")
+            } footer: {
+                Text("In the background, \(Format.appName) reuses the session it last read when you opened the panel and never asks for keychain access. If a provider's session expires, its checks pause until you open the panel.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            let intervalTitle = String(localized: "Refresh interval")
-            let intervalDescription = String(localized: "How often to check usage limits while the panel is closed.")
-            SettingsRow(title: intervalTitle, description: intervalDescription) {
-                Picker(intervalTitle, selection: $intervalMinutes) {
-                    ForEach(BackgroundRefresh.intervals, id: \.self) { interval in
-                        Text(Format.current.duration(seconds: Int(interval))).tag(Int(interval / 60))
+            Section("Alerts") {
+                alertRow(
+                    title: String(localized: "Near a usage limit"),
+                    description: String(localized: "Notifies once per window when a usage limit crosses the threshold."),
+                    isOn: $alertNearLimit
+                )
+                let thresholdTitle = String(localized: "Alert threshold")
+                let thresholdDescription = String(localized: "Applies to all turned-on providers.")
+                SettingsRow(title: thresholdTitle, description: thresholdDescription) {
+                    Picker(thresholdTitle, selection: $alertThreshold) {
+                        ForEach(AlertSettings.thresholds, id: \.self) { threshold in
+                            Text(Format.current.threshold(threshold, in: selectedMagnitude)).tag(Int(threshold))
+                        }
+                    }
+                    .labelsHidden()
+                    .fixedSize()
+                    .accessibilityHint(thresholdDescription)
+                }
+                .disabled(!backgroundRefresh || !alertNearLimit)
+                alertRow(
+                    title: String(localized: "When a limit is reached"),
+                    description: String(localized: "Notifies when a usage limit reaches 100% used (0% left)."),
+                    isOn: $alertLimitReached
+                )
+                alertRow(
+                    title: String(localized: "When a limit resets"),
+                    description: String(localized: "Notifies when a limit at 100% resets and can be used again."),
+                    isOn: $alertLimitReset
+                )
+                if backgroundRefresh, alertNearLimit || alertLimitReached || alertLimitReset, notifier.isDenied {
+                    let deniedTitle = String(localized: "Notifications turned off")
+                    let deniedDescription = String(localized: "Notifications are turned off for \(Format.appName) in macOS.")
+                    SettingsRow(title: deniedTitle, description: deniedDescription) {
+                        Button("Open Settings…") { openURL(Notifier.systemSettings) }
+                            .accessibilityHint(deniedDescription)
                     }
                 }
-                .labelsHidden()
-                .fixedSize()
-                .accessibilityHint(intervalDescription)
             }
-            .disabled(!backgroundRefresh)
-            alertRow(
-                title: String(localized: "Near a usage limit"),
-                description: String(localized: "Notifies once per window when a usage limit crosses the threshold."),
-                isOn: $alertNearLimit
-            )
-            let thresholdTitle = String(localized: "Alert threshold")
-            let thresholdDescription = String(localized: "Applies to all turned-on providers.")
-            SettingsRow(title: thresholdTitle, description: thresholdDescription) {
-                Picker(thresholdTitle, selection: $alertThreshold) {
-                    ForEach(AlertSettings.thresholds, id: \.self) { threshold in
-                        Text(Format.current.threshold(threshold, in: selectedMagnitude)).tag(Int(threshold))
-                    }
-                }
-                .labelsHidden()
-                .fixedSize()
-                .accessibilityHint(thresholdDescription)
-            }
-            .disabled(!backgroundRefresh || !alertNearLimit)
-            alertRow(
-                title: String(localized: "When a limit is reached"),
-                description: String(localized: "Notifies when a usage limit reaches 100% used (0% left)."),
-                isOn: $alertLimitReached
-            )
-            alertRow(
-                title: String(localized: "When a limit resets"),
-                description: String(localized: "Notifies when a limit at 100% resets and can be used again."),
-                isOn: $alertLimitReset
-            )
-            if backgroundRefresh, alertNearLimit || alertLimitReached || alertLimitReset, notifier.isDenied {
-                let deniedTitle = String(localized: "Notifications turned off")
-                let deniedDescription = String(localized: "Notifications are turned off for \(Format.appName) in macOS.")
-                SettingsRow(title: deniedTitle, description: deniedDescription) {
-                    Button("Open Settings…") { openURL(Notifier.systemSettings) }
-                        .accessibilityHint(deniedDescription)
-                }
-            }
-        } header: {
-            Text("Notifications")
-        } footer: {
-            Text("In the background, \(Format.appName) reuses the session it last read when you opened the panel and never asks for keychain access. If a provider's session expires, its checks pause until you open the panel.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 
@@ -309,6 +351,12 @@ struct SettingsView: View {
         ProviderPreferences.save(order, in: .standard)
         setProviderOrder(order)
     }
+}
+
+/// The height a tab lays out at, which the window takes.
+nonisolated private struct TabHeight: Equatable, Sendable {
+    let tab: SettingsTab
+    let height: CGFloat
 }
 
 /// One switch per provider, described by the session it reads, after the
