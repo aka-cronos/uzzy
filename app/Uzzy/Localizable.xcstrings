@@ -1481,6 +1481,314 @@
           }
         }
       }
+    },
+    "%@ used on %@ (%@)" : {
+      "comment" : "A notification's title when a usage limit nears its end: the used percentage, the provider and the limit, e.g. \"85% used on Claude (5-hour)\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ usado en %2$@ (%3$@)"
+          }
+        }
+      }
+    },
+    "%@ left on %@ (%@)" : {
+      "comment" : "A notification's title when a usage limit nears its end: the percentage left, the provider and the limit, e.g. \"15% left on Claude (5-hour)\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ restante en %2$@ (%3$@)"
+          }
+        }
+      }
+    },
+    "%@ (%@) limit reached" : {
+      "comment" : "A notification's title when a usage limit reaches 100% used: the provider and the limit, e.g. \"Claude (5-hour) limit reached\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ (%2$@) llegó al límite"
+          }
+        }
+      }
+    },
+    "%@ ready to use again" : {
+      "comment" : "A notification's title when a usage limit at 100% resets: the provider, e.g. \"Claude ready to use again\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ listo para volver a usarse"
+          }
+        }
+      }
+    },
+    "5-hour limit reset" : {
+      "comment" : "A notification's body: which usage limit reset.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Límite de 5 horas reiniciado"
+          }
+        }
+      }
+    },
+    "Weekly limit reset" : {
+      "comment" : "A notification's body: which usage limit reset.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Límite semanal reiniciado"
+          }
+        }
+      }
+    },
+    "Billing cycle limit reset" : {
+      "comment" : "A notification's body: which usage limit reset.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Límite del ciclo de facturación reiniciado"
+          }
+        }
+      }
+    },
+    "%@ limit reset" : {
+      "comment" : "A notification's body: which usage limit reset, by its length or the name the provider gives it, e.g. \"90 min limit reset\" or \"Sonnet · weekly limit reset\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Límite de %@ reiniciado"
+          }
+        }
+      }
+    },
+    "5-hour" : {
+      "comment" : "A usage limit inside a notification's title, e.g. \"Claude (5-hour) limit reached\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "5 horas"
+          }
+        }
+      }
+    },
+    "weekly" : {
+      "comment" : "A usage limit inside a notification's title, e.g. \"Claude (weekly) limit reached\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "semanal"
+          }
+        }
+      }
+    },
+    "billing cycle" : {
+      "comment" : "A usage limit inside a notification's title, e.g. \"Cursor (billing cycle) limit reached\".",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ciclo de facturación"
+          }
+        }
+      }
+    },
+    "Notifications" : {
+      "comment" : "A Settings section: background refresh and the alerts it can fire.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notificaciones"
+          }
+        }
+      }
+    },
+    "Background refresh" : {
+      "comment" : "A Settings switch.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actualización en segundo plano"
+          }
+        }
+      }
+    },
+    "Checks turned-on providers even while the panel is closed." : {
+      "comment" : "The Background refresh setting's description.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consulta los proveedores activados aunque el panel esté cerrado."
+          }
+        }
+      }
+    },
+    "Refresh interval" : {
+      "comment" : "A Settings picker.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Intervalo de actualización"
+          }
+        }
+      }
+    },
+    "How often to check usage limits while the panel is closed." : {
+      "comment" : "The Refresh interval setting's description.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cada cuánto consultar los límites de uso con el panel cerrado."
+          }
+        }
+      }
+    },
+    "Near a usage limit" : {
+      "comment" : "A Settings switch for an alert.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cerca de un límite de uso"
+          }
+        }
+      }
+    },
+    "Notifies once per window when a usage limit crosses the threshold." : {
+      "comment" : "The Near a usage limit setting's description.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avisa una vez por periodo cuando un límite de uso supera el umbral."
+          }
+        }
+      }
+    },
+    "Alert threshold" : {
+      "comment" : "A Settings picker: the percentage that counts as near a usage limit.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umbral de aviso"
+          }
+        }
+      }
+    },
+    "Applies to all turned-on providers." : {
+      "comment" : "The Alert threshold setting's description.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se aplica a todos los proveedores activados."
+          }
+        }
+      }
+    },
+    "When a limit is reached" : {
+      "comment" : "A Settings switch for an alert.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Al llegar a un límite"
+          }
+        }
+      }
+    },
+    "Notifies when a usage limit reaches 100% used (0% left)." : {
+      "comment" : "The When a limit is reached setting's description.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avisa cuando un límite de uso llega al 100% usado (0% restante)."
+          }
+        }
+      }
+    },
+    "When a limit resets" : {
+      "comment" : "A Settings switch for an alert.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando un límite se reinicia"
+          }
+        }
+      }
+    },
+    "Notifies when a limit at 100% resets and can be used again." : {
+      "comment" : "The When a limit resets setting's description.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avisa cuando un límite al 100% se reinicia y puede volver a usarse."
+          }
+        }
+      }
+    },
+    "Notifications turned off" : {
+      "comment" : "A Settings row shown when macOS doesn't let the app notify.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notificaciones desactivadas"
+          }
+        }
+      }
+    },
+    "Notifications are turned off for %@ in macOS." : {
+      "comment" : "The description of the row shown when macOS doesn't let the app notify.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Las notificaciones de %@ están desactivadas en macOS."
+          }
+        }
+      }
+    },
+    "Open Settings…" : {
+      "comment" : "A button that opens macOS's notification settings.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir ajustes…"
+          }
+        }
+      }
+    },
+    "In the background, %@ reuses the session it last read when you opened the panel and never asks for keychain access. If a provider's session expires, its checks pause until you open the panel." : {
+      "comment" : "The Notifications section's footer in Settings.",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En segundo plano, %@ reutiliza la última sesión que leyó al abrir el panel y nunca pide acceso al llavero. Si la sesión de un proveedor vence, sus consultas se pausan hasta que abras el panel."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

@@ -185,6 +185,63 @@ struct Format {
         }
     }
 
+    /// A Settings choice of alert threshold, a used percentage, in the
+    /// panel's magnitude: e.g. "80% used" or "20% left".
+    func threshold(_ usedPercent: Double, in magnitude: QuotaMagnitude) -> String {
+        "\(percent(magnitude == .used ? usedPercent : 100 - usedPercent)) \(name(of: magnitude))"
+    }
+
+    /// A notification's first line: e.g. "85% used on Claude (5-hour)",
+    /// "Claude (5-hour) limit reached" or "Claude ready to use again".
+    /// `provider` is the provider's name.
+    func alertTitle(_ alert: UsageAlert, provider: String, magnitude: QuotaMagnitude) -> String {
+        switch alert {
+        case .nearLimit(_, let period, let used, _):
+            let limit = limitName(of: period)
+            return switch magnitude {
+            case .used: text("\(percent(used)) used on \(provider) (\(limit))")
+            case .remaining: text("\(percent(100 - used)) left on \(provider) (\(limit))")
+            }
+        case .limitReached(_, let period, _):
+            return text("\(provider) (\(limitName(of: period))) limit reached")
+        case .limitReset:
+            return text("\(provider) ready to use again")
+        }
+    }
+
+    /// A notification's second line: when the limit resets, as on the
+    /// cards, e.g. "Resets today, 14:42 · in 2 h 18 min", or which limit
+    /// reset, e.g. "5-hour limit reset". Empty when the limit has no known
+    /// reset ahead.
+    func alertBody(_ alert: UsageAlert, now: Date, countdown style: CountdownStyle = .simple) -> String {
+        switch alert {
+        case .nearLimit(_, _, _, let reset), .limitReached(_, _, let reset):
+            guard let reset, reset > now else { return "" }
+            return self.reset(.at(reset), now: now, countdown: style)
+        case .limitReset(_, let period):
+            return switch period {
+            case .fiveHours: text("5-hour limit reset")
+            case .weekly: text("Weekly limit reset")
+            case .billingCycle: text("Billing cycle limit reset")
+            case .lasting, .limit, .usageCredits: text("\(limitName(of: period)) limit reset")
+            }
+        }
+    }
+
+    /// A limit's name inside a notification, e.g. "5-hour", "weekly", or
+    /// "Sonnet · weekly" for a limit the provider names.
+    func limitName(of period: QuotaPeriod) -> String {
+        switch period {
+        case .fiveHours: text("5-hour")
+        case .weekly: text("weekly")
+        case .lasting(let seconds): duration(seconds: seconds)
+        case .billingCycle: text("billing cycle")
+        case .usageCredits: text("Usage credits")
+        case .limit(let name, .billingCycle): name
+        case .limit(let name, let period): "\(name) · \(limitName(of: period))"
+        }
+    }
+
     /// E.g. "today, 14:42", so a moment on another day is not mistaken for
     /// today. It always follows other words, so English starts in lowercase.
     func dayAndTime(_ date: Date, now: Date) -> String {

@@ -8,6 +8,8 @@ struct SettingsView: View {
 
     /// The real accounts' core, which holds the consent to read Cursor's key.
     let core: UsageCore
+    /// Asks for and reports macOS's permission to notify.
+    let notifier: Notifier
     let setProviderEnabled: @MainActor (Provider, Bool) -> Void
     let setProviderOrder: @MainActor ([Provider]) -> Void
     let setUpdateChecks: @MainActor (Bool) -> Void
@@ -19,12 +21,19 @@ struct SettingsView: View {
     @AppStorage(ProviderPreferences.cursorKey) private var showCursor = true
     @AppStorage(ProviderPreferences.antigravityKey) private var showAntigravity = true
     @AppStorage(UpdatePreferences.checkKey) private var checkForUpdates = true
+    @AppStorage(NotificationPreferences.backgroundRefreshKey) private var backgroundRefresh = false
+    @AppStorage(NotificationPreferences.intervalKey) private var intervalMinutes = NotificationPreferences.defaultIntervalMinutes
+    @AppStorage(NotificationPreferences.nearLimitKey) private var alertNearLimit = false
+    @AppStorage(NotificationPreferences.thresholdKey) private var alertThreshold = NotificationPreferences.defaultThreshold
+    @AppStorage(NotificationPreferences.limitReachedKey) private var alertLimitReached = false
+    @AppStorage(NotificationPreferences.limitResetKey) private var alertLimitReset = false
     /// `@AppStorage` cannot hold a list, so the order is saved by hand.
     @State private var order = ProviderPreferences.order(in: .standard)
     @State private var isConfirmingRevocation = false
     /// The steps to remove Uzzy from the keychain item, after the consent
     /// is withdrawn: macOS may still trust the app with the key.
     @State private var isShowingKeychainSteps = false
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -54,6 +63,24 @@ struct SettingsView: View {
             if !enabled, hadAccess { isShowingKeychainSteps = true }
         }
         .onChange(of: checkForUpdates) { _, enabled in setUpdateChecks(enabled) }
+        .onChange(of: backgroundRefresh) { _, isOn in core.setBackgroundRefresh(isOn) }
+        .onChange(of: intervalMinutes) { _, minutes in core.setBackgroundInterval(TimeInterval(minutes * 60)) }
+        .onChange(of: alertNearLimit) { _, isOn in alertsChanged(turningOn: isOn) }
+        .onChange(of: alertThreshold) { _, _ in alertsChanged(turningOn: false) }
+        .onChange(of: alertLimitReached) { _, isOn in alertsChanged(turningOn: isOn) }
+        .onChange(of: alertLimitReset) { _, isOn in alertsChanged(turningOn: isOn) }
+        .onAppear { notifier.refreshAuthorization() }
+    }
+
+    /// Turning an alert on is the only moment macOS's permission is asked.
+    private func alertsChanged(turningOn: Bool) {
+        core.setAlerts(AlertSettings(
+            nearLimit: alertNearLimit,
+            threshold: Double(alertThreshold),
+            limitReached: alertLimitReached,
+            limitReset: alertLimitReset
+        ))
+        if turningOn { notifier.requestAuthorization() }
     }
 
     private var form: some View {
@@ -126,6 +153,7 @@ struct SettingsView: View {
                         .accessibilityAction { showBankedResets.toggle() }
                 }
             }
+            notifications
             Section("Updates") {
                 let title = String(localized: "Check for updates")
                 let description = String(localized: "Asks GitHub once a day for a newer version of \(Format.appName), without sending any data about you. You install it yourself.")
@@ -157,6 +185,94 @@ struct SettingsView: View {
             Text("\(Format.appName) no longer reads Cursor's key. If you chose Always Allow, macOS still lets it, and only you can remove that: open Keychain Access, search for \"Cursor Safe Storage\" (account Cursor), open it, and in Access Control remove \(Format.appName), then Save Changes.")
         }
         .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// Background refresh, then the alerts it can fire. Every row but the
+    /// first waits for background refresh.
+    private var notifications: some View {
+        Section {
+            let refreshTitle = String(localized: "Background refresh")
+            let refreshDescription = String(localized: "Checks turned-on providers even while the panel is closed.")
+            SettingsRow(title: refreshTitle, description: refreshDescription) {
+                Toggle(refreshTitle, isOn: $backgroundRefresh)
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+                    .accessibilityHint(refreshDescription)
+                    // As in `ProviderRow`: a switch with a hidden label
+                    // exposes no press action.
+                    .accessibilityAction { backgroundRefresh.toggle() }
+            }
+            let intervalTitle = String(localized: "Refresh interval")
+            let intervalDescription = String(localized: "How often to check usage limits while the panel is closed.")
+            SettingsRow(title: intervalTitle, description: intervalDescription) {
+                Picker(intervalTitle, selection: $intervalMinutes) {
+                    ForEach(BackgroundRefresh.intervals, id: \.self) { interval in
+                        Text(Format.current.duration(seconds: Int(interval))).tag(Int(interval / 60))
+                    }
+                }
+                .labelsHidden()
+                .fixedSize()
+                .accessibilityHint(intervalDescription)
+            }
+            .disabled(!backgroundRefresh)
+            alertRow(
+                title: String(localized: "Near a usage limit"),
+                description: String(localized: "Notifies once per window when a usage limit crosses the threshold."),
+                isOn: $alertNearLimit
+            )
+            let thresholdTitle = String(localized: "Alert threshold")
+            let thresholdDescription = String(localized: "Applies to all turned-on providers.")
+            SettingsRow(title: thresholdTitle, description: thresholdDescription) {
+                Picker(thresholdTitle, selection: $alertThreshold) {
+                    ForEach(AlertSettings.thresholds, id: \.self) { threshold in
+                        Text(Format.current.threshold(threshold, in: selectedMagnitude)).tag(Int(threshold))
+                    }
+                }
+                .labelsHidden()
+                .fixedSize()
+                .accessibilityHint(thresholdDescription)
+            }
+            .disabled(!backgroundRefresh || !alertNearLimit)
+            alertRow(
+                title: String(localized: "When a limit is reached"),
+                description: String(localized: "Notifies when a usage limit reaches 100% used (0% left)."),
+                isOn: $alertLimitReached
+            )
+            alertRow(
+                title: String(localized: "When a limit resets"),
+                description: String(localized: "Notifies when a limit at 100% resets and can be used again."),
+                isOn: $alertLimitReset
+            )
+            if backgroundRefresh, alertNearLimit || alertLimitReached || alertLimitReset, notifier.isDenied {
+                let deniedTitle = String(localized: "Notifications turned off")
+                let deniedDescription = String(localized: "Notifications are turned off for \(Format.appName) in macOS.")
+                SettingsRow(title: deniedTitle, description: deniedDescription) {
+                    Button("Open Settings…") { openURL(Notifier.systemSettings) }
+                        .accessibilityHint(deniedDescription)
+                }
+            }
+        } header: {
+            Text("Notifications")
+        } footer: {
+            Text("In the background, \(Format.appName) reuses the session it last read when you opened the panel and never asks for keychain access. If a provider's session expires, its checks pause until you open the panel.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    /// An alert's switch, which waits for background refresh.
+    private func alertRow(title: String, description: String, isOn: Binding<Bool>) -> some View {
+        SettingsRow(title: title, description: description) {
+            Toggle(title, isOn: isOn)
+                .toggleStyle(.switch)
+                .labelsHidden()
+                .accessibilityHint(description)
+                // As in `ProviderRow`: a switch with a hidden label exposes
+                // no press action.
+                .accessibilityAction { isOn.wrappedValue.toggle() }
+        }
+        .disabled(!backgroundRefresh)
     }
 
     /// "Version 0.1.1 (3)" from the bundle, or nothing when either value is

@@ -25,8 +25,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
             rawValue: UserDefaults.standard.string(forKey: "displayMagnitude") ?? ""
         ) ?? .used,
         initialEnabledProviders: ProviderPreferences.enabledProviders(in: .standard),
-        initialOrder: ProviderPreferences.order(in: .standard)
+        initialOrder: ProviderPreferences.order(in: .standard),
+        initialBackgroundRefresh: NotificationPreferences.backgroundRefresh(in: .standard),
+        initialAlerts: NotificationPreferences.alerts(in: .standard)
     )
+    /// Created at launch so a click on a notification reaches it, but it
+    /// asks for permission only when an alert is turned on in Settings.
+    private let notifier = Notifier()
     #if DEBUG
     /// A Debug build never asks GitHub. `-update <version>` offers that
     /// version instead, e.g. `-update 9.9.9`.
@@ -145,6 +150,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
 
         updates.start()
 
+        // Only the real accounts fire alerts, never a debug scenario.
+        realCore.alertFired = { [weak self] alert in self?.notify(alert) }
+        notifier.openPanel = { [weak self] in
+            guard let self, popover?.isShown != true else { return }
+            openPanel()
+        }
+
         #if DEBUG
         // `-scenario <id>` opens the panel on that scenario, e.g. `-scenario stale`.
         // The icon waits for it, so the real accounts are never read.
@@ -180,8 +192,32 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
     }
     #endif
 
+    /// The real accounts may refresh in the background while a debug
+    /// scenario is shown, so both learn of the wake.
     @objc private func systemDidWake() {
-        core.systemWoke()
+        realCore.systemWoke()
+        #if DEBUG
+        if scenarios.core !== realCore {
+            scenarios.core.systemWoke()
+        }
+        #endif
+    }
+
+    /// In the panel's magnitude and countdown, as Settings saves them.
+    private func notify(_ alert: UsageAlert) {
+        let defaults = UserDefaults.standard
+        let magnitude = QuotaMagnitude(rawValue: defaults.string(forKey: "displayMagnitude") ?? "") ?? .used
+        let countdown = CountdownStyle(rawValue: defaults.string(forKey: CountdownStyle.key) ?? "") ?? .simple
+        let format = Format.current
+        notifier.deliver(
+            title: format.alertTitle(alert, provider: alert.provider.name, magnitude: magnitude),
+            body: format.alertBody(alert, now: realCore.now(), countdown: countdown)
+        )
+    }
+
+    /// The person may have changed Uzzy's notifications in System Settings.
+    func applicationDidBecomeActive(_ notification: Notification) {
+        notifier.refreshAuthorization()
     }
 
     @objc private func togglePanel() {
@@ -289,6 +325,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
             window.title = Format.current.settings
             let content = NSHostingController(rootView: SettingsView(
                 core: realCore,
+                notifier: notifier,
                 setProviderEnabled: { [weak self] provider, enabled in self?.setProviderEnabled(enabled, for: provider) },
                 setProviderOrder: { [weak self] order in self?.setProviderOrder(order) },
                 setUpdateChecks: { [weak self] enabled in self?.updates.setEnabled(enabled) }
