@@ -95,6 +95,10 @@ final class ProviderRefresh {
     /// its own never queries. `nil` once a query succeeds.
     @ObservationIgnored private var rejectedSession: Session?
 
+    /// Called on the main actor each time a query ends with a new reading,
+    /// fresh or failed.
+    @ObservationIgnored var readingChanged: (@MainActor (Provider) -> Void)?
+
     private let adapter: any ProviderAdapter.Type
     private let sessionReader: any SessionReader
     private let transport: any HTTPTransport
@@ -133,6 +137,30 @@ final class ProviderRefresh {
     /// they are. Without quotas the card has no account to name.
     var plan: String? {
         reading.lastValidReadingOfAnyAccount?.plan
+    }
+
+    /// The account and subscription quotas of the reading, only while it is
+    /// fresh: a failed query, a stale reading or another account's gives
+    /// none. Only quotas with a percentage count; usage credits do not.
+    func alertReading(at now: Date) -> (accountID: String?, quotas: [AlertQuota])? {
+        guard case .quotas(let fresh) = reading else { return nil }
+        let quotas = fresh.quotas.compactMap { each -> AlertQuota? in
+            let quota = each.quota(in: .used, at: now)
+            guard case .percent(let used, _) = quota.value else { return nil }
+            return AlertQuota(period: quota.period, usedPercent: used, reset: quota.reset)
+        }
+        return (fresh.accountID, quotas)
+    }
+
+    /// Turning background refresh on is a user action: a provider with no
+    /// session in memory reads it, which may show the Keychain prompt, so
+    /// the queries that follow have one to reuse. It never asks again after
+    /// the user denied access, the provider rejected the session, or Cursor
+    /// still waits for consent to read its key.
+    func backgroundRefreshTurnedOn() {
+        guard isEnabled, session == nil, !reading.waitsForTheUser else { return }
+        if case .failed(.sessionNeedsAccess, _) = reading { return }
+        startQuery(reading.isFresh(at: clock.now()) ? .recheck : .read(skipping: nil))
     }
 
     /// Forgets the session and reading, then starts over as if just
@@ -237,6 +265,7 @@ final class ProviderRefresh {
                 planRetry(after: result)
             }
             planRecheck()
+            if result != nil { readingChanged?(provider) }
         }
     }
 
