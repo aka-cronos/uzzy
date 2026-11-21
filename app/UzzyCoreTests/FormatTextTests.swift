@@ -33,6 +33,16 @@ struct FormatTextTests {
         #expect(Format.english.closeWindow == "Close Window")
     }
 
+    @Test func settingsTabNames() {
+        #expect(Format.spanish.generalTab == "General")
+        #expect(Format.spanish.providersTab == "Proveedores")
+        #expect(Format.spanish.notificationsTab == "Notificaciones")
+
+        #expect(Format.english.generalTab == "General")
+        #expect(Format.english.providersTab == "Providers")
+        #expect(Format.english.notificationsTab == "Notifications")
+    }
+
     @Test func theUpdateButtonNamesTheVersionItDownloads() {
         #expect(Format.spanish.downloadUpdate("0.1.2") == "Descargar \(Format.appName) 0.1.2")
         #expect(Format.english.downloadUpdate("0.1.2") == "Download \(Format.appName) 0.1.2")
