@@ -28,6 +28,8 @@ function StatusCluster({ date, time }: { date: string; time: string }) {
         alt=""
         width="31.15"
         height="21.41"
+        loading="lazy"
+        decoding="async"
         aria-hidden="true"
         className="shrink-0"
       />
@@ -76,6 +78,7 @@ export function FeaturesSection() {
                 src="/cover/bg.jpg"
                 alt=""
                 loading="lazy"
+                decoding="async"
                 className={`pointer-events-none absolute h-[900px] w-[1520px] max-w-none object-cover ${
                   CLOSEUP_OFFSETS[cardIdx] ?? CLOSEUP_OFFSETS[0]
                 }`}

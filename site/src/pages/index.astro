@@ -1,4 +1,5 @@
 ---
+import { Image } from "astro:assets";
 import Layout from "@/layouts/Layout.astro";
 import Lockup from "@/components/Lockup.astro";
 import { DownloadButton } from "@/components/DownloadButton";
@@ -7,6 +8,8 @@ import { FeaturesSection } from "@/components/FeaturesSection";
 import { MacDesktopHero } from "@/components/MacDesktopHero";
 import { ProvidersSection } from "@/components/ProvidersSection";
 import { SettingsSection } from "@/components/SettingsSection";
+import appIconImg from "@/assets/app-icon-512.png";
+import bgImg from "@/assets/bg.jpg";
 import * as c from "@/content";
 
 const focus = "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900";
@@ -89,9 +92,9 @@ const jsonLd = JSON.stringify(structuredData).replaceAll("<", "\\u003c");
 
     <section class="mx-auto max-w-[1440px] px-6 pb-20 sm:px-10 lg:px-12 lg:pb-24">
       <div class="relative overflow-hidden rounded-2xl bg-slate-950 px-8 py-16 text-center text-slate-50">
-        <img src="/cover/bg.jpg" alt="" aria-hidden="true" class="absolute inset-0 size-full object-cover" loading="lazy" />
+        <Image src={bgImg} alt="" aria-hidden="true" class="absolute inset-0 size-full object-cover" />
         <div class="relative">
-          <img src="/brand/app-icon-512.png" alt="" aria-hidden="true" width="104" height="104" class="mx-auto mb-5 size-[104px]" loading="lazy" />
+          <Image src={appIconImg} alt="" aria-hidden="true" width={104} height={104} densities={[1, 2]} class="mx-auto mb-5 size-[104px]" />
           <h2 class="text-3xl font-semibold tracking-tight text-balance">That’s one less thing to check in four places</h2>
           <p class="mt-3 text-slate-300 text-pretty">Your AI usage limits and reset times, one click away.</p>
           <DownloadButton variant="inverse" className="mt-8" />

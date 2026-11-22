@@ -64,6 +64,7 @@ export function SettingsSection() {
                   width={tab.width}
                   height={tab.height}
                   loading="lazy"
+                  decoding="async"
                   className="max-h-full w-auto max-w-[min(100%,592px)] object-contain"
                 />
               </div>

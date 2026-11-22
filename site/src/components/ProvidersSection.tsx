@@ -283,6 +283,8 @@ export function ProvidersSection() {
                     aria-hidden="true"
                     width={26}
                     height={p.name === "Cursor" ? 28 : 26}
+                    loading="lazy"
+                    decoding="async"
                     className={onLight(p.name)}
                   />
                 </button>
