@@ -85,7 +85,8 @@ const jsonLd = JSON.stringify(structuredData).replaceAll("<", "\\u003c");
     <MacDesktopHero client:load />
     <div class="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-12">
       <ProvidersSection client:visible />
-      <FeaturesSection client:visible />
+      <!-- client:idle hydrates before scroll so the IntersectionObserver arms while SSR stays visible -->
+      <FeaturesSection client:idle />
       <SettingsSection client:visible />
       <FaqSection />
     </div>
