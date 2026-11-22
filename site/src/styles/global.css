@@ -5,31 +5,16 @@
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* Motion is CSS only, so the page still ships no client JavaScript. */
-
 /* The hero's blocks come in one after another on load; --i is the block's place in the queue. */
 .rise {
   animation: rise 600ms var(--ease-out-strong) both;
   animation-delay: calc(var(--i, 0) * 70ms);
 }
 
-/* The panel opens from the menu bar icon it hangs from, once the hero has started. */
-.panel-drop {
-  transform-origin: top center;
-  animation: drop 500ms var(--ease-out-strong) 200ms both;
-}
-
 @keyframes rise {
   from {
     opacity: 0;
     translate: 0 8px;
-  }
-}
-
-@keyframes drop {
-  from {
-    opacity: 0;
-    scale: 0.96;
   }
 }
 
@@ -51,13 +36,6 @@
 .settings-progress-bar {
   transform-origin: left center;
   animation: settings-progress 6.5s linear forwards;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .settings-progress-bar {
-    animation: none;
-    transform: scaleX(1);
-  }
 }
 
 /* The header gets a hairline once the page scrolls under it. */
@@ -105,8 +83,12 @@
 
 /* Reduced motion keeps the fades and drops the movement. */
 @media (prefers-reduced-motion: reduce) {
-  .rise,
-  .panel-drop {
+  .rise {
     animation-name: fade;
+  }
+
+  .settings-progress-bar {
+    animation: none;
+    transform: scaleX(1);
   }
 }

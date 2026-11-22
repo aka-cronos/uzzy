@@ -193,7 +193,11 @@ export function ProvidersSection() {
           <button
             type="button"
             aria-label="Uzzy: optional daily update check via api.github.com"
+            aria-describedby="provider-tooltip-uzzy"
             onClick={() => setActiveNode((prev) => (prev === "Uzzy" ? null : "Uzzy"))}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") setActiveNode(null);
+            }}
             onFocus={() => setActiveNode("Uzzy")}
             onBlur={() => setActiveNode((prev) => (prev === "Uzzy" ? null : prev))}
             className="grid size-16 cursor-pointer place-items-center rounded-2xl bg-slate-950 text-slate-50 shadow-[0_0_0_6px_rgb(15_23_42/0.06),0_14px_28px_-10px_rgb(15_23_42/0.45)] transition-transform duration-150 hover:scale-[1.03] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900"
@@ -204,6 +208,7 @@ export function ProvidersSection() {
           </button>
 
           <div
+            id="provider-tooltip-uzzy"
             role="tooltip"
             className={`pointer-events-none absolute bottom-[calc(100%+10px)] left-1/2 z-30 flex -translate-x-1/2 items-center rounded-lg bg-slate-900 px-3 py-1.5 text-xs whitespace-nowrap text-slate-50 shadow-lg transition-[opacity,translate] duration-150 ${
               activeNode === "Uzzy" ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0"
@@ -237,15 +242,15 @@ export function ProvidersSection() {
             const isOpen = activeNode === p.name;
             const tooltipAlign =
               idx === 0
-                ? "left-0 sm:left-1/2 sm:-translate-x-1/2"
+                ? "left-0 lg:left-1/2 lg:-translate-x-1/2"
                 : idx === c.providers.length - 1
-                  ? "right-0 sm:left-1/2 sm:right-auto sm:-translate-x-1/2"
+                  ? "right-0 lg:left-1/2 lg:right-auto lg:-translate-x-1/2"
                   : "left-1/2 -translate-x-1/2";
             const arrowAlign =
               idx === 0
-                ? "left-7 sm:left-1/2 sm:-translate-x-1/2"
+                ? "left-7 lg:left-1/2 lg:-translate-x-1/2"
                 : idx === c.providers.length - 1
-                  ? "right-7 sm:left-1/2 sm:right-auto sm:-translate-x-1/2"
+                  ? "right-7 lg:left-1/2 lg:right-auto lg:-translate-x-1/2"
                   : "left-1/2 -translate-x-1/2";
 
             return (
@@ -259,7 +264,11 @@ export function ProvidersSection() {
                 <button
                   type="button"
                   aria-label={`${p.name}: connects to ${p.hosts.join(" and ")}`}
+                  aria-describedby={`provider-tooltip-${p.name.toLowerCase()}`}
                   onClick={() => setActiveNode((prev) => (prev === p.name ? null : p.name))}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") setActiveNode(null);
+                  }}
                   onFocus={() => setActiveNode(p.name)}
                   onBlur={() => setActiveNode((prev) => (prev === p.name ? null : prev))}
                   className={`grid size-[56px] cursor-pointer place-items-center rounded-2xl border bg-white transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900 sm:size-[60px] ${
@@ -270,7 +279,8 @@ export function ProvidersSection() {
                 >
                   <img
                     src={LOGOS[p.name]}
-                    alt={p.name}
+                    alt=""
+                    aria-hidden="true"
                     width={26}
                     height={p.name === "Cursor" ? 28 : 26}
                     className={onLight(p.name)}
@@ -278,8 +288,9 @@ export function ProvidersSection() {
                 </button>
 
                 <div
+                  id={`provider-tooltip-${p.name.toLowerCase()}`}
                   role="tooltip"
-                  className={`pointer-events-none absolute top-[calc(100%+10px)] z-30 flex items-center rounded-lg bg-slate-900 px-3 py-1.5 text-xs whitespace-nowrap text-slate-50 shadow-lg transition-[opacity,translate] duration-150 ${tooltipAlign} ${
+                  className={`pointer-events-none absolute top-[calc(100%+10px)] z-30 flex max-w-[calc(100vw-3rem)] items-center rounded-lg bg-slate-900 px-3 py-1.5 text-xs text-slate-50 shadow-lg transition-[opacity,translate] duration-150 sm:whitespace-nowrap ${tooltipAlign} ${
                     isOpen ? "translate-y-0 opacity-100" : "-translate-y-1 opacity-0"
                   }`}
                 >

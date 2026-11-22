@@ -18,21 +18,21 @@ export const features = [
     title: "Every limit stays separate",
     body: "Five-hour, weekly and per-model usage limits are never blended into one number. Each keeps its own bar, reset time and countdown.",
     images: ["/cover/panel.png"],
-    imageAlt: "The Uzzy panel showing Claude and Codex with separate 5-hour and Weekly usage limits, progress bars and reset countdowns.",
+    imageAlt:
+      "The Uzzy panel showing Claude and Codex with separate 5-hour and Weekly usage limits, progress bars and reset countdowns.",
     kind: "popover" as const,
     popoverWidth: 408,
     popoverTop: "top-[calc(100%-17px)]",
-    cropPosition: "object-left-top",
   },
   {
     title: "Missing never means zero",
     body: "If a session expires or a provider can’t be reached, Uzzy explains why and keeps your last reading marked out of date.",
     images: ["/features/stale.png"],
-    imageAlt: "The Uzzy panel when offline: shows the error message and marks the last valid readings (35% and 62% used) as out of date.",
+    imageAlt:
+      "The Uzzy panel when offline: shows the error message and marks the last valid readings (35% and 62% used) as out of date.",
     kind: "popover" as const,
     popoverWidth: 432,
     popoverTop: "top-[calc(100%-18px)]",
-    cropPosition: "object-right-bottom",
   },
   {
     title: "Quiet until you look. Alerts on your terms",
@@ -42,35 +42,19 @@ export const features = [
       "/features/notif-reached.png",
       "/features/notif-reset.png",
     ],
-    imageAlt: "macOS notifications from Uzzy: 85% used on Claude (5-hour), Codex (5-hour) limit reached, and Claude ready to use again after reset.",
+    imageAlt:
+      "macOS notifications from Uzzy: 85% used on Claude (5-hour), Codex (5-hour) limit reached, and Claude ready to use again after reset.",
     kind: "notifications" as const,
     popoverWidth: undefined,
     popoverTop: undefined,
-    cropPosition: "object-center",
   },
 ];
 
 export const providers = [
-  {
-    name: "Claude",
-    hosts: ["api.anthropic.com"],
-    shows: "Per-model weekly limits, resets available, usage credits and cloud session credits",
-  },
-  {
-    name: "Codex",
-    hosts: ["chatgpt.com"],
-    shows: "ChatGPT sign-in via Codex CLI, extra limits, resets available and credit balance",
-  },
-  {
-    name: "Cursor",
-    hosts: ["api2.cursor.sh"],
-    shows: "Unified weekly plans, legacy Cursor Models and Other Models, and credit balance",
-  },
-  {
-    name: "Antigravity",
-    hosts: ["daily-cloudcode-pa.sandbox.googleapis.com", "127.0.0.1"],
-    shows: "Gemini, Claude and GPT, plus any model group your plan keeps apart",
-  },
+  { name: "Claude", hosts: ["api.anthropic.com"] },
+  { name: "Codex", hosts: ["chatgpt.com"] },
+  { name: "Cursor", hosts: ["api2.cursor.sh"] },
+  { name: "Antigravity", hosts: ["daily-cloudcode-pa.sandbox.googleapis.com", "127.0.0.1"] },
 ];
 
 export type SettingsTabId = "general" | "providers" | "notifications";
@@ -150,30 +134,6 @@ export const settingsTabs: {
       },
     ],
   },
-];
-
-export const privacy = [
-  {
-    title: "Read-only sessions",
-    body: "Uzzy never asks for passwords, signs in for you or writes credentials. Cursor’s encrypted session is read only after you allow Keychain access.",
-  },
-  {
-    title: "Straight to your providers",
-    body: "Requests go directly to your providers, plus GitHub once a day for updates if enabled. No Uzzy server. No telemetry.",
-  },
-  {
-    title: "In memory only",
-    body: "Usage readings are never saved to disk.",
-  },
-];
-
-export const hosts = [
-  "api.anthropic.com",
-  "chatgpt.com",
-  "api2.cursor.sh",
-  "daily-cloudcode-pa.sandbox.googleapis.com",
-  "127.0.0.1",
-  "api.github.com",
 ];
 
 export const faqs = [
