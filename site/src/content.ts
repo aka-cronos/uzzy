@@ -17,18 +17,30 @@ export const features = [
   {
     title: "Every limit stays separate.",
     body: "Five-hour, weekly and per-model usage limits are never blended into one number. Each keeps its own bar, reset time and countdown.",
+    images: ["/features/limits.png"],
+    imageAlt: "The Uzzy panel showing Claude with separate 5-hour (35% used) and Weekly (62% used) usage limits, progress bars and reset countdowns.",
+    kind: "popover" as const,
+    cropPosition: "object-left-top",
   },
   {
-    title: "Refreshes only when you look.",
-    body: "Uzzy checks when you open the panel and every five minutes while it stays open. Close it and requests stop, unless you turn on background refresh.",
-  },
-  {
-    title: "Optional alerts, off by default.",
-    body: "Turn on background refresh in Settings to get notified near your threshold, at 100%, or when a limit resets.",
+    title: "Checks on look. Alerts on your terms.",
+    body: "Refreshes only while the panel is open. Turn on background refresh in Settings to get notified near your threshold, at 100%, or on reset.",
+    images: [
+      "/features/notif-near.png",
+      "/features/notif-reached.png",
+      "/features/notif-reset.png",
+    ],
+    imageAlt: "macOS notifications from Uzzy: 85% used on Claude (5-hour), Codex (5-hour) limit reached, and Claude ready to use again after reset.",
+    kind: "notifications" as const,
+    cropPosition: "object-center",
   },
   {
     title: "Missing never means zero.",
-    body: "If a session expires or a provider can’t be reached, Uzzy tells you why and keeps your last reading marked out of date.",
+    body: "If a session expires or a provider can’t be reached, Uzzy explains why and keeps your last reading marked out of date.",
+    images: ["/features/stale.png"],
+    imageAlt: "The Uzzy panel when offline: shows the error message and marks the last valid readings (35% and 62% used) as out of date.",
+    kind: "popover" as const,
+    cropPosition: "object-right-bottom",
   },
 ];
 
