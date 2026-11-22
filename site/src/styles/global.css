@@ -11,9 +11,11 @@
   animation-delay: calc(var(--i, 0) * 70ms);
 }
 
-/* The hero panel drops from the menu bar icon on load via CSS so SSR and no-JS stay visible. */
+/* The hero panel drops from the menu bar icon on load via CSS so SSR and no-JS stay visible.
+ * Uses `backwards` (not `both`) so interactive toggle transitions work after the entrance ends,
+ * and omits `translate` so `-translate-x-1/2` horizontal centering is preserved. */
 .panel-drop {
-  animation: drop 320ms var(--ease-out-strong) 180ms both;
+  animation: drop 320ms var(--ease-out-strong) 180ms backwards;
 }
 
 @keyframes rise {
@@ -26,7 +28,6 @@
 @keyframes drop {
   from {
     opacity: 0;
-    translate: 0 -6px;
     scale: 0.97;
   }
 }
