@@ -8,22 +8,34 @@ export const VERSION = "0.6.0";
 export const REQUIREMENTS = "macOS 27 · Apple Silicon";
 
 export const hero = {
-  title: "Your AI tools have limits. Checking them shouldn’t be a task.",
+  title: "Your AI tools have limits. Checking them shouldn’t be a task",
   subtitle:
     "See what you’ve used, what’s left and when your usage limits reset for Claude, Codex, Cursor and Antigravity, right in your menu bar.",
 };
 
 export const features = [
   {
-    title: "Every limit stays separate.",
+    title: "Every limit stays separate",
     body: "Five-hour, weekly and per-model usage limits are never blended into one number. Each keeps its own bar, reset time and countdown.",
-    images: ["/features/limits.png"],
-    imageAlt: "The Uzzy panel showing Claude with separate 5-hour (35% used) and Weekly (62% used) usage limits, progress bars and reset countdowns.",
+    images: ["/cover/panel.png"],
+    imageAlt: "The Uzzy panel showing Claude and Codex with separate 5-hour and Weekly usage limits, progress bars and reset countdowns.",
     kind: "popover" as const,
+    popoverWidth: 408,
+    popoverTop: "top-[calc(100%-17px)]",
     cropPosition: "object-left-top",
   },
   {
-    title: "Checks on look. Alerts on your terms.",
+    title: "Missing never means zero",
+    body: "If a session expires or a provider can’t be reached, Uzzy explains why and keeps your last reading marked out of date.",
+    images: ["/features/stale.png"],
+    imageAlt: "The Uzzy panel when offline: shows the error message and marks the last valid readings (35% and 62% used) as out of date.",
+    kind: "popover" as const,
+    popoverWidth: 432,
+    popoverTop: "top-[calc(100%-18px)]",
+    cropPosition: "object-right-bottom",
+  },
+  {
+    title: "Quiet until you look. Alerts on your terms",
     body: "Refreshes only while the panel is open. Turn on background refresh in Settings to get notified near your threshold, at 100%, or on reset.",
     images: [
       "/features/notif-near.png",
@@ -32,38 +44,32 @@ export const features = [
     ],
     imageAlt: "macOS notifications from Uzzy: 85% used on Claude (5-hour), Codex (5-hour) limit reached, and Claude ready to use again after reset.",
     kind: "notifications" as const,
+    popoverWidth: undefined,
+    popoverTop: undefined,
     cropPosition: "object-center",
-  },
-  {
-    title: "Missing never means zero.",
-    body: "If a session expires or a provider can’t be reached, Uzzy explains why and keeps your last reading marked out of date.",
-    images: ["/features/stale.png"],
-    imageAlt: "The Uzzy panel when offline: shows the error message and marks the last valid readings (35% and 62% used) as out of date.",
-    kind: "popover" as const,
-    cropPosition: "object-right-bottom",
   },
 ];
 
 export const providers = [
   {
     name: "Claude",
-    session: "Claude Code",
-    shows: "5-hour, weekly and per-model limits, resets available, usage credits and credit balances",
+    hosts: ["api.anthropic.com"],
+    shows: "Per-model weekly limits, resets available, usage credits and cloud session credits",
   },
   {
     name: "Codex",
-    session: "Codex CLI · ChatGPT sign-in",
-    shows: "5-hour, weekly and extra limits, resets available and credit balance",
+    hosts: ["chatgpt.com"],
+    shows: "ChatGPT sign-in via Codex CLI, extra limits, resets available and credit balance",
   },
   {
     name: "Cursor",
-    session: "Cursor",
-    shows: "Unified or legacy plan limits (Cursor Models and Other Models) and credit balance",
+    hosts: ["api2.cursor.sh"],
+    shows: "Unified weekly plans, legacy Cursor Models and Other Models, and credit balance",
   },
   {
     name: "Antigravity",
-    session: "Antigravity",
-    shows: "5-hour and weekly limits for Gemini, Claude and GPT, and any model group your plan keeps apart",
+    hosts: ["daily-cloudcode-pa.sandbox.googleapis.com", "127.0.0.1"],
+    shows: "Gemini, Claude and GPT, plus any model group your plan keeps apart",
   },
 ];
 
@@ -89,15 +95,15 @@ export const settingsTabs: {
     alt: "Uzzy Settings, General tab: a Used / Left switch for the percentage on the cards, a Simple / Detailed switch for the time until a reset, a switch for resets available, a switch to check for updates, and the installed version at the bottom.",
     items: [
       {
-        title: "Used or left.",
+        title: "Used or left",
         body: "Show how much of each usage limit you’ve used, or how much is left.",
       },
       {
-        title: "Resets & countdowns.",
-        body: "Pick short (2 h) or detailed (2 h 28 min) countdowns, and show or hide resets available.",
+        title: "Resets & countdowns",
+        body: "Pick short (2 h) or detailed (2 h 28 min) countdowns, and turn resets available on or off.",
       },
       {
-        title: "Update checks.",
+        title: "Update checks",
         body: "Checks GitHub once a day with no data about you. Turn it off anytime.",
       },
     ],
@@ -112,15 +118,15 @@ export const settingsTabs: {
     alt: "Uzzy Settings, Providers tab: Claude, Codex, Cursor and Antigravity with buttons to reorder them and a switch to turn each one on or off.",
     items: [
       {
-        title: "Only the tools you use.",
-        body: "Turn off any provider you don’t use. It gets no card and Uzzy never reads its session.",
+        title: "Only the tools you use",
+        body: "Use one, two or all four. Turn off any provider you don’t use so it gets no card and Uzzy never reads its session.",
       },
       {
-        title: "Your order.",
+        title: "Your order",
         body: "Move cards up or down so the provider you check most comes first.",
       },
       {
-        title: "Cursor Keychain access.",
+        title: "Cursor Keychain access",
         body: "Revoke access to Cursor’s key anytime right from the Providers tab.",
       },
     ],
@@ -135,15 +141,15 @@ export const settingsTabs: {
     alt: "Uzzy Settings, Notifications tab: a switch and interval picker for background refresh, and alert switches for near a usage limit with threshold, when a limit is reached, and when a limit resets.",
     items: [
       {
-        title: "Background refresh.",
+        title: "Background refresh",
         body: "Off by default. Check turned-on providers every 5, 10, 15 or 30 minutes while the panel is closed, reusing your last session with no Keychain prompts.",
       },
       {
-        title: "Near a usage limit.",
+        title: "Near a usage limit",
         body: "Get notified once per window when any turned-on provider crosses the threshold you pick.",
       },
       {
-        title: "Reached & reset.",
+        title: "Reached & reset",
         body: "Get notified when a limit hits 100% used (0% left), and again when it resets.",
       },
     ],
@@ -152,15 +158,15 @@ export const settingsTabs: {
 
 export const privacy = [
   {
-    title: "Read-only sessions.",
+    title: "Read-only sessions",
     body: "Uzzy never asks for passwords, signs in for you or writes credentials. Cursor’s encrypted session is read only after you allow Keychain access.",
   },
   {
-    title: "Straight to your providers.",
+    title: "Straight to your providers",
     body: "Requests go directly to your providers, plus GitHub once a day for updates if enabled. No Uzzy server. No telemetry.",
   },
   {
-    title: "In memory only.",
+    title: "In memory only",
     body: "Usage readings are never saved to disk.",
   },
 ];
