@@ -85,8 +85,7 @@ const jsonLd = JSON.stringify(structuredData).replaceAll("<", "\\u003c");
     <MacDesktopHero client:load />
     <div class="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-12">
       <ProvidersSection client:visible />
-      <!-- client:idle hydrates before scroll so the IntersectionObserver arms while SSR stays visible -->
-      <FeaturesSection client:idle />
+      <FeaturesSection />
       <SettingsSection client:visible />
       <FaqSection />
     </div>
@@ -122,4 +121,33 @@ const jsonLd = JSON.stringify(structuredData).replaceAll("<", "\\u003c");
       </div>
     </div>
   </footer>
+
+  <script>
+    if (
+      typeof IntersectionObserver !== "undefined" &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      const cards = document.querySelectorAll<HTMLElement>("[data-feature-card]");
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const card = entry.target.closest<HTMLElement>("[data-feature-card]");
+            card?.removeAttribute("data-feature-pending");
+            observer.unobserve(entry.target);
+          }
+        },
+        { threshold: 0.8 },
+      );
+
+      for (const card of cards) {
+        const trigger = card.querySelector("[data-feature-trigger]");
+        if (!trigger) continue;
+        // Only arm cards that are still below the viewport on load so in-view cards never flash hidden.
+        if (card.getBoundingClientRect().top <= window.innerHeight) continue;
+        card.setAttribute("data-feature-pending", "");
+        observer.observe(trigger);
+      }
+    }
+  </script>
 </Layout>

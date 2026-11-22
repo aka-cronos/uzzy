@@ -71,6 +71,41 @@
   }
 }
 
+/* One-shot per-card entrance for Features: default visible in SSR/no-JS, armed via data-feature-pending until each card's description enters the viewport. */
+.feature-popover {
+  transition:
+    opacity 500ms var(--ease-out-strong),
+    scale 500ms var(--ease-out-strong);
+}
+
+.feature-notifs {
+  transition:
+    opacity 500ms var(--ease-out-strong),
+    translate 500ms var(--ease-out-strong);
+}
+
+[data-feature-card][data-feature-pending] .feature-popover {
+  opacity: 0;
+  scale: 0.96;
+  transition: none;
+}
+
+[data-feature-card][data-feature-pending] .feature-notifs {
+  opacity: 0;
+  translate: 56px 0;
+  transition: none;
+}
+
+@media (min-width: 64rem) {
+  [data-feature-card="1"] .feature-popover {
+    transition-delay: 90ms;
+  }
+
+  [data-feature-card="2"] .feature-notifs {
+    transition-delay: 160ms;
+  }
+}
+
 /* An answer opens to its own height instead of jumping. */
 @supports (interpolate-size: allow-keywords) {
   @media (prefers-reduced-motion: no-preference) {
