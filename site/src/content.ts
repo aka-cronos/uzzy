@@ -78,7 +78,6 @@ export type SettingsTabId = "general" | "providers" | "notifications";
 export const settingsTabs: {
   id: SettingsTabId;
   label: string;
-  summary: string;
   image: string;
   width: number;
   height: number;
@@ -88,7 +87,6 @@ export const settingsTabs: {
   {
     id: "general",
     label: "General",
-    summary: "Display style for usage limits, reset countdowns, resets available, and update checks.",
     image: "/settings-general.png",
     width: 592,
     height: 672,
@@ -104,37 +102,35 @@ export const settingsTabs: {
       },
       {
         title: "Update checks",
-        body: "Checks GitHub once a day with no data about you. Turn it off anytime.",
+        body: "Checks GitHub once a day for new releases with no data about you. Turn it off anytime.",
       },
     ],
   },
   {
     id: "providers",
     label: "Providers",
-    summary: "Choose which of Claude, Codex, Cursor and Antigravity are turned on, and set the card order.",
     image: "/settings-providers.png",
     width: 592,
-    height: 487,
-    alt: "Uzzy Settings, Providers tab: Claude, Codex, Cursor and Antigravity with buttons to reorder them and a switch to turn each one on or off.",
+    height: 540,
+    alt: "Uzzy Settings, Providers tab: Claude, Codex, Cursor with Keychain access revoke control, and Antigravity with buttons to reorder them and a switch to turn each one on or off.",
     items: [
       {
         title: "Only the tools you use",
-        body: "Use one, two or all four. Turn off any provider you don’t use so it gets no card and Uzzy never reads its session.",
+        body: "Use one, two or all four. Turned-off providers get no card and Uzzy never reads their sessions.",
       },
       {
         title: "Your order",
-        body: "Move cards up or down so the provider you check most comes first.",
+        body: "Move cards up or down so the providers you check most always stay at the top.",
       },
       {
         title: "Cursor Keychain access",
-        body: "Revoke access to Cursor’s key anytime right from the Providers tab.",
+        body: "Cursor’s session is read only after you allow it, and you can revoke access here anytime.",
       },
     ],
   },
   {
     id: "notifications",
     label: "Notifications",
-    summary: "Optional background refresh and usage limit alerts, all turned off until you opt in.",
     image: "/settings-notifications.png",
     width: 592,
     height: 687,
@@ -142,7 +138,7 @@ export const settingsTabs: {
     items: [
       {
         title: "Background refresh",
-        body: "Off by default. Check turned-on providers every 5, 10, 15 or 30 minutes while the panel is closed, reusing your last session with no Keychain prompts.",
+        body: "Off by default. Check every 5 to 30 minutes while closed, with no extra Keychain prompts.",
       },
       {
         title: "Near a usage limit",

@@ -39,6 +39,27 @@
   }
 }
 
+@keyframes settings-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.settings-progress-bar {
+  transform-origin: left center;
+  animation: settings-progress 6.5s linear forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-progress-bar {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
+
 /* The header gets a hairline once the page scrolls under it. */
 @supports (animation-timeline: scroll()) {
   .header-edge {
