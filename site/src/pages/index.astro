@@ -121,4 +121,31 @@ const jsonLd = JSON.stringify(structuredData).replaceAll("<", "\\u003c");
       </div>
     </div>
   </footer>
+
+  <script>
+    if (
+      typeof IntersectionObserver !== "undefined" &&
+      !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      const cards = document.querySelectorAll<HTMLElement>("[data-feature-card]");
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const card = entry.target.closest<HTMLElement>("[data-feature-card]");
+            card?.removeAttribute("data-feature-pending");
+            observer.unobserve(entry.target);
+          }
+        },
+        { threshold: 0.8 },
+      );
+
+      for (const card of cards) {
+        const trigger = card.querySelector("[data-feature-trigger]");
+        if (!trigger) continue;
+        card.setAttribute("data-feature-pending", "");
+        requestAnimationFrame(() => observer.observe(trigger));
+      }
+    }
+  </script>
 </Layout>

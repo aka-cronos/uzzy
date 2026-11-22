@@ -46,8 +46,8 @@ export function FeaturesSection() {
 
       <div className="mt-10 grid gap-8 lg:grid-cols-3 lg:gap-9">
         {c.features.map((f, cardIdx) => (
-          <article key={f.title} className="flex flex-col gap-5">
-            <div className="feature-stage @container relative flex aspect-[4/3] flex-col overflow-hidden rounded-2xl bg-slate-950 text-[13px] font-semibold text-slate-50 select-none">
+          <article key={f.title} data-feature-card={cardIdx} className="flex flex-col gap-5">
+            <div className="@container relative flex aspect-[4/3] flex-col overflow-hidden rounded-2xl bg-slate-950 text-[13px] font-semibold text-slate-50 select-none">
               <img
                 src="/cover/bg.jpg"
                 alt=""
@@ -71,7 +71,7 @@ export function FeaturesSection() {
                       style={{
                         width: `min(${f.popoverWidth}px, ${f.popoverWidth === 432 ? "106cqw" : "104cqw"})`,
                       }}
-                      className={`feature-popover ${cardIdx === 1 ? "feature-popover-2" : ""} pointer-events-none absolute ${f.popoverTop} left-1/2 h-auto max-w-none -translate-x-1/2 origin-top`}
+                      className={`feature-popover pointer-events-none absolute ${f.popoverTop} left-1/2 h-auto max-w-none -translate-x-1/2 origin-top`}
                     />
                   </span>
                   <div className="flex items-center pl-1 whitespace-nowrap">
@@ -105,7 +105,9 @@ export function FeaturesSection() {
 
             <div>
               <h3 className="text-lg font-semibold text-balance text-slate-900">{f.title}</h3>
-              <p className="mt-1.5 leading-relaxed text-slate-600 text-pretty">{f.body}</p>
+              <p data-feature-trigger className="mt-1.5 leading-relaxed text-slate-600 text-pretty">
+                {f.body}
+              </p>
             </div>
           </article>
         ))}
