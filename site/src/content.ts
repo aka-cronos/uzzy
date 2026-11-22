@@ -178,19 +178,29 @@ export const hosts = [
 
 export const faqs = [
   {
-    question: "Do I need all four tools?",
+    question: "Where do the numbers come from?",
     answer:
-      "No, one is enough. Turn off the rest in Settings: their cards disappear and Uzzy won’t read their sessions.",
+      "Uzzy reads the local sessions on your Mac in read-only mode and calls the same endpoints the official apps use. Usage percentages and reset times come straight from each provider, never estimated or scraped.",
+  },
+  {
+    question: "Can it alert me before I reach a usage limit?",
+    answer:
+      "Yes. Background refresh and notifications are turned off by default. Turn them on in Settings to get notified near your threshold, at 100% used, or when a limit resets, with no extra Keychain prompts.",
+  },
+  {
+    question: "Does Uzzy save anything to disk or track me?",
+    answer:
+      "No. Usage readings stay in memory only and are never written to disk. Only your preferences are saved locally. There is no Uzzy server and no telemetry.",
+  },
+  {
+    question: "What happens if a provider changes its endpoint?",
+    answer:
+      "Because Uzzy uses undocumented endpoints, a provider can change them without notice. When that happens, Uzzy explains the error and keeps your last reading marked out of date instead of showing 0%. I work on a fix as soon as possible and ship an update once one is found.",
   },
   {
     question: "How do I update Uzzy?",
     answer:
-      "Uzzy doesn’t auto-update. When a new version is out, an Update button appears in the panel to download the new Uzzy.dmg.",
-  },
-  {
-    question: "Does background refresh trigger Keychain prompts?",
-    answer:
-      "No. Background checks reuse the session from the last time you opened the panel. If a session expires, checks pause until you open the panel again.",
+      "Uzzy doesn’t auto-update. If update checks are turned on in Settings, it checks GitHub once a day and shows an Update button in the panel when a new Uzzy.dmg is out.",
   },
 ];
 
