@@ -5,18 +5,17 @@
   --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* Motion is CSS only, so the page still ships no client JavaScript. */
-
 /* The hero's blocks come in one after another on load; --i is the block's place in the queue. */
 .rise {
   animation: rise 600ms var(--ease-out-strong) both;
   animation-delay: calc(var(--i, 0) * 70ms);
 }
 
-/* The panel opens from the menu bar icon it hangs from, once the hero has started. */
+/* The hero panel drops from the menu bar icon on load via CSS so SSR and no-JS stay visible.
+ * Uses `backwards` (not `both`) so interactive toggle transitions work after the entrance ends,
+ * and omits `translate` so `-translate-x-1/2` horizontal centering is preserved. */
 .panel-drop {
-  transform-origin: top center;
-  animation: drop 500ms var(--ease-out-strong) 200ms both;
+  animation: drop 320ms var(--ease-out-strong) 180ms backwards;
 }
 
 @keyframes rise {
@@ -29,7 +28,7 @@
 @keyframes drop {
   from {
     opacity: 0;
-    scale: 0.96;
+    scale: 0.97;
   }
 }
 
@@ -37,6 +36,20 @@
   from {
     opacity: 0;
   }
+}
+
+@keyframes settings-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.settings-progress-bar {
+  transform-origin: left center;
+  animation: settings-progress 6.5s linear forwards;
 }
 
 /* The header gets a hairline once the page scrolls under it. */
@@ -87,5 +100,10 @@
   .rise,
   .panel-drop {
     animation-name: fade;
+  }
+
+  .settings-progress-bar {
+    animation: none;
+    transform: scaleX(1);
   }
 }

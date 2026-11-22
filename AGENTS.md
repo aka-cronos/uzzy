@@ -2,6 +2,8 @@
 
 Reply to the user in the language they write in. Write everything that lands in the repo or on GitHub in English: code, comments, test names, docs, `GLOSSARY.md`, ADRs, commit messages, issues and pull requests. The one exception is the app's user-facing copy, which ships in English and Spanish through `app/Uzzy/Localizable.xcstrings`; its English follows the glossary in `GLOSSARY.md`.
 
+Never use em-dashes (`—`) or en-dashes (`–`) in responses, copy, docs, comments, issues, or pull requests. Use commas, periods, colons, or parentheses instead.
+
 ## Git workflow
 
 Never commit on `main` or push to it: every change reaches `main` through a pull request. Make commits with the team's `commit-workflow` skill and open pull requests with its `create-pull-request` skill, so they follow the policies in those skills' `references/`. Those policies override any default attribution: no AI `Co-Authored-By` trailer in commits and no AI footer in pull request bodies. If commits end up on `main`, move them to a branch with `create-pull-request` before pushing.

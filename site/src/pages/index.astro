@@ -1,76 +1,74 @@
 ---
-// The uzzy.app landing: variant F from issue #105 with the identity from #116
-// (variant I): the 07c lockup, the 06b cards in the menu bar and the app icon
-// in the CTA banner.
+import { Image } from "astro:assets";
 import Layout from "@/layouts/Layout.astro";
-import DesktopCard from "@/components/DesktopCard.astro";
 import Lockup from "@/components/Lockup.astro";
 import { DownloadButton } from "@/components/DownloadButton";
-import { buttonVariants } from "@/components/ui/button";
-import {
-  ArrowCircleUpIcon,
-  ArrowsClockwiseIcon,
-  ArrowsDownUpIcon,
-  BellIcon,
-  CardsThreeIcon,
-  ClockCounterClockwiseIcon,
-  CpuIcon,
-  LockSimpleIcon,
-  PercentIcon,
-  PlusIcon,
-  QuestionIcon,
-  ShareNetworkIcon,
-  SlidersHorizontalIcon,
-  TimerIcon,
-  ToggleRightIcon,
-  XLogoIcon,
-} from "@phosphor-icons/react";
+import { FaqSection } from "@/components/FaqSection";
+import { FeaturesSection } from "@/components/FeaturesSection";
+import { MacDesktopHero } from "@/components/MacDesktopHero";
+import { ProvidersSection } from "@/components/ProvidersSection";
+import { SettingsSection } from "@/components/SettingsSection";
+import appIconImg from "@/assets/app-icon-512.png";
+import bgImg from "@/assets/bg.jpg";
 import * as c from "@/content";
 
-const logos = { Claude: "/cover/claude.svg", Codex: "/cover/codex.svg", Cursor: "/cover/cursor.svg", Antigravity: "/cover/antigravity.svg" };
-const logo = (name: string) => logos[name as keyof typeof logos];
-// the Codex, Cursor and Antigravity logos are white; invert them on light surfaces
-const onLight = (name: string) => (name === "Claude" ? "" : "invert");
-// hero + header fill one viewport, capped at a 14" MacBook Pro viewport
-const heroHeight = "clamp(620px, calc(100vh - 72px), 788px)";
-// gap between the fixed header and the desktop card: centred in the hero, never under 24px; shared by the aside's padding and the card's sticky offset so the card doesn't shift on scroll
-const cardGap = `max(24px, calc((${heroHeight} - 730px) / 2))`;
 const focus = "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900";
-const nav = [["Features", "#features"], ["Providers", "#providers"], ["Settings", "#settings"], ["Privacy", "#privacy"]];
-// Phosphor icons, one per row
-const featureIcons = [CardsThreeIcon, SlidersHorizontalIcon, ArrowsClockwiseIcon, BellIcon, QuestionIcon];
-const settingsIcons = [PercentIcon, ToggleRightIcon, ArrowsDownUpIcon, TimerIcon, ClockCounterClockwiseIcon, ArrowCircleUpIcon];
-const privacyIcons = [LockSimpleIcon, ShareNetworkIcon, CpuIcon];
-const iconSize = 20;
-const rowIcon = "grid size-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700 ring-1 ring-slate-200";
-const summary = `flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 rounded text-lg font-semibold text-balance [&::-webkit-details-marker]:hidden ${focus}`;
-// turns into a cross while its answer is open
-const plusIcon = "shrink-0 text-slate-500 transition-transform duration-200 ease-out-strong group-open:rotate-45";
-const rowList = "mt-10 divide-y divide-slate-200";
-const row = "flex gap-5 py-6";
+const nav = [
+  ["Providers", "#providers"],
+  ["Features", "#features"],
+  ["Settings", "#settings"],
+  ["FAQ", "#faq"],
+];
 
-// schema.org SoftwareApplication for search results, built from the copy
+// schema.org SoftwareApplication + FAQPage for search results, built from the copy
 const absolute = (path: string) => new URL(path, Astro.site).href;
-const softwareApplication = {
+const structuredData = {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "Uzzy",
-  description: c.hero.subtitle,
-  url: absolute("/"),
-  operatingSystem: c.REQUIREMENTS.split(" · ")[0],
-  applicationCategory: "UtilitiesApplication",
-  offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-  downloadUrl: c.DOWNLOAD_URL,
-  softwareVersion: c.VERSION,
-  image: absolute("/icon-512.png"),
-  screenshot: absolute("/cover/panel.png"),
-  author: { "@type": "Person", name: "aka-cronos", url: c.REPO_URL },
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      name: "Uzzy",
+      description: c.hero.subtitle,
+      url: absolute("/"),
+      operatingSystem: c.REQUIREMENTS.split(" · ")[0],
+      applicationCategory: "UtilitiesApplication",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      downloadUrl: c.DOWNLOAD_URL,
+      softwareVersion: c.VERSION,
+      image: absolute("/icon-512.png"),
+      screenshot: [
+        absolute("/cover/panel.png"),
+        absolute("/settings-general.png"),
+        absolute("/settings-providers.png"),
+        absolute("/settings-notifications.png"),
+      ],
+      author: { "@type": "Person", name: "aka-cronos", url: c.REPO_URL },
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: c.faqs.map((faq) => ({
+        "@type": "Question",
+        name: faq.question,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: faq.answer,
+        },
+      })),
+    },
+  ],
 };
-// JSON.stringify leaves "<" as is; escape it so no string can close the <script>
-const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
+const jsonLd = JSON.stringify(structuredData).replaceAll("<", "\\u003c");
 ---
 <Layout>
   <script is:inline type="application/ld+json" slot="head" set:html={jsonLd} />
+
+  <a
+    href="#main-content"
+    class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[60] focus:rounded-full focus:bg-slate-900 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-slate-50 focus:outline-2 focus:outline-offset-2 focus:outline-slate-900"
+  >
+    Skip to content
+  </a>
+
   <header class="header-edge fixed inset-x-0 top-0 z-50 border-b border-transparent bg-slate-50/60 backdrop-blur-md">
     <div class="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between px-6 sm:px-10 lg:px-12">
       <Lockup class={focus} />
@@ -83,175 +81,31 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
     </div>
   </header>
 
-  <div class="mx-auto grid max-w-[1440px] gap-16 pt-[72px] px-6 sm:px-10 xl:grid-cols-[minmax(0,1fr)_560px] lg:px-12 xl:pb-16">
-    <main class="min-w-0">
-      <section class="flex max-w-[60ch] flex-col justify-center gap-9 py-16 xl:h-(--hero) xl:py-0" style={`--hero:${heroHeight}`}>
-        <div class="rise flex flex-col gap-4">
-          <h1 class="text-4xl leading-[1.1] font-semibold tracking-tight text-pretty sm:text-5xl">{c.hero.title}</h1>
-          <p class="text-lg leading-relaxed text-pretty text-slate-600">{c.hero.subtitle}</p>
-        </div>
-        <ul class="rise flex flex-wrap gap-3 [--i:1]" aria-label="Supported providers">
-          {c.providers.map((p) => (
-            <li class="flex items-center gap-2 rounded-full border border-slate-300 bg-slate-100 px-3.5 py-1 text-sm font-medium text-slate-700">
-              <img src={logo(p.name)} alt="" width="16" height={p.name === "Cursor" ? 18 : 16} class={onLight(p.name)} />{p.name}
-            </li>
-          ))}
-        </ul>
-        <div class="rise flex flex-col gap-3 [--i:2]">
-          <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <DownloadButton />
-            <a href={c.REPO_URL} class={`inline-flex min-h-11 items-center rounded font-medium text-slate-600 underline-offset-4 transition-colors duration-200 hover:text-slate-900 hover:underline ${focus}`}>View on GitHub</a>
-          </div>
-          <p class="text-sm text-slate-600 text-pretty">Free and open source · Version {c.VERSION} · {c.REQUIREMENTS}</p>
-        </div>
-      </section>
-
-      <!-- small screens: the desktop card sits under the hero, scaled to fit -->
-      <div class="flex justify-center pb-16 xl:hidden">
-        <DesktopCard class="[zoom:0.55] sm:[zoom:0.85]" />
-      </div>
-
-      <section id="features" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
-        <h2 class="text-3xl font-semibold tracking-tight text-balance">Different tools. One place to check.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-pretty text-slate-600">{c.why}</p>
-        <div class={rowList}>
-          {c.features.map((f, i) => (
-            <div class={row}>
-              <span class={rowIcon}>
-                {(() => { const Icon = featureIcons[i]; return <Icon size={iconSize} aria-hidden="true" />; })()}
-              </span>
-              <div class="min-w-0">
-                <h3 class="text-lg font-semibold text-balance">{f.title}</h3>
-                <p class="mt-1.5 leading-relaxed text-slate-600 text-pretty">{f.body}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section id="providers" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
-        <h2 class="text-3xl font-semibold tracking-tight text-balance">Your tools already know you.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-slate-600 text-pretty">Uzzy reuses the sessions Claude Code, Codex CLI, Cursor and Antigravity already keep on your Mac. No extra sign-in. No API key to paste. Use one, two or all four.</p>
-        <ul class={rowList}>
-          {c.providers.map((p) => (
-            <li class={row}>
-              <span class={rowIcon}>
-                <img src={logo(p.name)} alt="" width="20" height={p.name === "Cursor" ? 22 : 20} class={onLight(p.name)} />
-              </span>
-              <div class="min-w-0">
-                <h3 class="text-lg font-semibold text-balance">{p.name}</h3>
-                <p class="mt-1.5 leading-relaxed text-slate-600 text-pretty">Reuses your {p.session} session. {p.shows}.</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section id="settings" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
-        <h2 class="text-3xl font-semibold tracking-tight text-balance">Set it up your way, or don’t.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-slate-600 text-pretty">Open Settings with ⌘, from the panel. Your choices are remembered across launches, and the installed version is shown at the bottom.</p>
-        <ul class={rowList}>
-          {c.settings.map((s, i) => (
-            <li class={row}>
-              <span class={rowIcon}>
-                {(() => { const Icon = settingsIcons[i]; return <Icon size={iconSize} aria-hidden="true" />; })()}
-              </span>
-              <div class="min-w-0">
-                <h3 class="text-lg font-semibold text-balance">{s.title}</h3>
-                <p class="mt-1.5 leading-relaxed text-slate-600 text-pretty">{s.body}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-        <!-- the bare @2x window from the README screenshot, without the wallpaper so it doesn't compete with the desktop card; shown at half its pixel size -->
-        <img src="/settings.png" alt="The Uzzy Settings window: a Used / Left switch for the percentage on the cards; the Claude, Codex and Cursor providers with buttons to reorder them and a switch to turn each one on or off; a Simple / Detailed switch for the time until a reset and a switch for the resets available; a switch to check for updates; and the installed version at the bottom." width="592" height="866" class="mx-auto mt-4 h-auto w-full max-w-[592px]" loading="lazy" />
-      </section>
-
-      <section id="privacy" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
-        <h2 class="text-3xl font-semibold tracking-tight text-balance">Your credentials stay where they are.</h2>
-        <ul class={rowList}>
-          {c.privacy.map((p, i) => (
-            <li class={row}>
-              <span class={rowIcon}>
-                {(() => { const Icon = privacyIcons[i]; return <Icon size={iconSize} aria-hidden="true" />; })()}
-              </span>
-              <div class="min-w-0">
-                <h3 class="text-lg font-semibold text-balance">{p.title}</h3>
-                <p class="mt-1.5 leading-relaxed text-slate-600 text-pretty">{p.body}</p>
-                {i === 1 && (
-                  <div class="mt-3 flex flex-wrap gap-2" aria-label="The only hosts Uzzy connects to">
-                    {c.hosts.map((h) => <code class="rounded-md bg-slate-100 px-2.5 py-1 font-mono text-sm text-slate-700 ring-1 ring-slate-200">{h}</code>)}
-                  </div>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section id="faq" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
-        <h2 class="text-3xl font-semibold tracking-tight text-balance">The practical details.</h2>
-        <div class="mt-10 divide-y divide-slate-200 border-y border-slate-200">
-          <details class="group py-2" open>
-            <summary class={summary}>Do I need Claude, Codex, Cursor and Antigravity?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
-            <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">No, one is enough. Turn off the ones you don’t use in <a href="#settings" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Settings</a>: their cards go away and Uzzy doesn’t read their sessions.</p>
-          </details>
-          <details class="group py-2">
-            <summary class={summary}>Do I need another account?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
-            <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">No. Uzzy reuses the sessions Claude Code, Codex CLI, Cursor and Antigravity keep on your Mac. You’ll need to be signed in to the tools you want to check.</p>
-          </details>
-          <details class="group py-2">
-            <summary class={summary}>Where does my data go?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
-            <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">Uzzy queries your providers directly using your existing sessions. It has no server of its own and sends no telemetry.</p>
-          </details>
-          <details class="group py-2">
-            <summary class={summary}>What if a reading is unavailable?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
-            <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">Uzzy explains what went wrong. If it has an earlier reading for the same account, it shows it as out of date. Missing data is never shown as zero.</p>
-          </details>
-          <details class="group py-2">
-            <summary class={summary}>How do I update Uzzy?<PlusIcon size={iconSize} aria-hidden="true" className={plusIcon} /></summary>
-            <p class="pb-5 pr-7 leading-relaxed text-slate-600 text-pretty">Uzzy doesn’t update itself. When a newer version is published, an Update button appears next to the name in the panel and downloads the new <code class="font-mono text-[0.9em]">Uzzy.dmg</code>. Install it the same way as the first time.</p>
-          </details>
-        </div>
-      </section>
-
-      <!-- feedback for people who don't code; developers still have GitHub -->
-      <section id="feedback" class="scroll-mt-[72px] w-full max-w-[60ch] py-20 lg:py-24">
-        <h2 class="text-3xl font-semibold tracking-tight text-balance">Tell me what you think.</h2>
-        <p class="mt-5 text-lg leading-relaxed text-slate-600 text-pretty">I’m <a href={c.X_URL} class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>@{c.MAKER}</a>, a designer who got tired of checking three places, so I built Uzzy. Found a bug, have an idea or want another provider? Send me a message on X. You don’t need to know how to code.</p>
-        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-          <a href={c.X_URL} class={buttonVariants()}>
-            <XLogoIcon size={18} aria-hidden="true" />Message me on X
-          </a>
-          <a href={`${c.REPO_URL}/issues`} class={`inline-flex min-h-11 items-center rounded font-medium text-slate-600 underline-offset-4 transition-colors duration-200 hover:text-slate-900 hover:underline ${focus}`}>Developers: open an issue</a>
-        </div>
-      </section>
-    </main>
-
-    <!-- large screens: vertically centred in the hero, then sticky while scrolling at the same offset (72px header + cardGap), so it never shifts; the grid's bottom padding stops it 64px before the CTA banner -->
-    <aside class="hidden pt-(--card-gap) xl:block" style={`--card-gap:${cardGap}`}>
-      <DesktopCard class="sticky top-[calc(72px+var(--card-gap))]" />
-    </aside>
-  </div>
-
-  <section class="mx-auto max-w-[1440px] px-6 pb-20 sm:px-10 lg:px-12 lg:pb-24">
-    <div class="relative overflow-hidden rounded-2xl bg-slate-950 px-8 py-16 text-center text-slate-50">
-      <!-- same tinted wallpaper as the desktop card -->
-      <img src="/cover/bg.jpg" alt="" class="absolute inset-0 size-full object-cover" loading="lazy" />
-      <div class="relative">
-        <!-- the macOS rendering of AppIcon.icon; the PNG keeps macOS's transparent margin -->
-        <img src="/brand/app-icon-512.png" alt="" width="104" height="104" class="mx-auto mb-5 size-[104px]" loading="lazy" />
-        <h2 class="text-3xl font-semibold tracking-tight text-balance">That’s one less thing to check in four places.</h2>
-        <p class="mt-3 text-slate-300 text-pretty">Your AI usage limits and reset times, one click away.</p>
-        <DownloadButton variant="inverse" className="mt-8" />
-        <p class="mt-4 text-sm text-slate-300 text-pretty">{c.REQUIREMENTS} · Open source, MIT</p>
-      </div>
-    </div>
-  </section>
-
-  <footer>
+  <main id="main-content" class="overflow-x-clip">
+    <MacDesktopHero client:load />
     <div class="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-12">
-      <!-- brand and links on one line; the legal small print gets its own full-width band -->
+      <ProvidersSection client:visible />
+      <FeaturesSection client:visible />
+      <SettingsSection client:visible />
+      <FaqSection />
+    </div>
+
+    <section class="mx-auto max-w-[1440px] px-6 pb-20 sm:px-10 lg:px-12 lg:pb-24">
+      <div class="relative overflow-hidden rounded-2xl bg-slate-950 px-8 py-16 text-center text-slate-50">
+        <Image src={bgImg} alt="" aria-hidden="true" class="absolute inset-0 size-full object-cover" />
+        <div class="relative">
+          <Image src={appIconImg} alt="" aria-hidden="true" width={104} height={104} densities={[1, 2]} class="mx-auto mb-5 size-[104px]" />
+          <h2 class="text-3xl font-semibold tracking-tight text-balance">That’s one less thing to check in four places</h2>
+          <p class="mt-3 text-slate-300 text-pretty">Your AI usage limits and reset times, one click away.</p>
+          <DownloadButton variant="inverse" className="mt-8" />
+          <p class="mt-4 text-sm text-slate-300 text-pretty">{c.REQUIREMENTS} · Open source, MIT</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pb-16">
+    <div class="mx-auto max-w-[1440px] px-6 sm:px-10 lg:px-12">
       <div class="flex flex-col gap-4 py-8 sm:flex-row sm:items-center sm:justify-between">
         <Lockup class={`self-start sm:self-auto ${focus}`} />
         <nav class="flex gap-6 text-sm font-medium text-slate-600" aria-label="Footer">
@@ -263,7 +117,6 @@ const jsonLd = JSON.stringify(softwareApplication).replaceAll("<", "\\u003c");
       <div class="space-y-2 border-t border-slate-200 py-6 text-center text-xs leading-relaxed text-slate-600">
         <p class="text-pretty">{c.disclaimer}</p>
         <p class="text-pretty">This website uses Cloudflare Web Analytics without cookies or personal data. The app sends no telemetry.</p>
-        <!-- Unsplash License: credit not required, but appreciated -->
         <p class="text-pretty">© 2026 Uzzy · Made by <a href={c.X_URL} class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>@{c.MAKER}</a> · Background photo by <a href="https://unsplash.com/@norbertkowalczyk?utm_source=uzzy&utm_medium=referral" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Norbert Kowalczyk</a> on <a href="https://unsplash.com/photos/dark-curved-lines-create-a-mesmerizing-pattern-HuvxHRcOY6E?utm_source=uzzy&utm_medium=referral" class={`underline underline-offset-2 hover:text-slate-900 ${focus}`}>Unsplash</a>.</p>
       </div>
     </div>
