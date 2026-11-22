@@ -2,7 +2,7 @@
 
 <p align="center">
   <strong>Your AI tools have limits. Checking them shouldn’t be a task.</strong><br>
-  See how much you’ve used, how much is left and when your usage limits reset—for Claude, Codex, Cursor and Antigravity, in one menu bar panel.
+  See how much you’ve used, how much is left and when your usage limits reset, for Claude, Codex, Cursor and Antigravity, in one menu bar panel.
 </p>
 
 <p align="center">
@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/app.jpg" width="420" alt="The Uzzy panel open from the menu bar, with one card each for Claude, Codex and Cursor and each account's plan next to its title. Each usage limit has its own bar, its used percentage and its reset time; the Claude card also shows the usage credits spent this month, and the Codex card a badge with its banked resets.">
+  <img src="docs/images/app.jpg" width="420" alt="The Uzzy panel open from the menu bar, with one card each for Claude, Codex, Cursor and Antigravity and each account's plan next to its title. Each usage limit has its own bar, its used percentage and its reset time.">
 </p>
 
 ## Why Uzzy
@@ -31,11 +31,13 @@ Keep using Claude, Codex, Cursor and Antigravity. Uzzy brings their usage limits
 - **Checks while you look.** Uzzy refreshes readings as you open the panel (unless the last reading is under five minutes old), then every five minutes while it stays open, and on demand with the refresh button. Close it and the requests stop, unless you turn on background refresh in Settings.
 - **Alerts, if you want them.** With background refresh on, Uzzy checks your usage limits every 5, 10, 15 or 30 minutes while the panel is closed, reusing the session it last read when you opened the panel, so it never asks for Keychain access on its own. It can notify you when a usage limit nears a threshold you choose, when it reaches 100%, and when a limit at 100% resets and can be used again. Everything is off until you turn it on.
 - **Missing doesn’t mean zero.** If a session expires or a provider can’t be reached, Uzzy tells you what happened (no session, expired session, offline, incompatible response…) and the other providers keep working. While the panel is open, an expired Claude, Codex or Antigravity session is read again every 30 seconds and picked up as soon as its app renews it; Cursor's is read again only when you open the panel or click Refresh. When a refresh fails, the card keeps the last valid reading and marks it as out of date.
-- **Native settings.** Organized into three tabs—General, Providers and Notifications—so you can choose whether the cards show how much is used or left, pick how detailed the countdown to a reset is and whether the resets available on an account are shown, turn the daily check for updates on or off, turn each provider on or off or change the order of the cards, and configure background refresh and usage limit alerts. The installed version and build are shown at the bottom of General.
+- **Native settings.** Organized into three tabs (General, Providers and Notifications) so you can choose whether the cards show how much is used or left, pick how detailed the countdown to a reset is and whether the resets available on an account are shown, turn the daily check for updates on or off, turn each provider on or off or change the order of the cards, and configure background refresh and usage limit alerts. The installed version and build are shown at the bottom of General.
 - **Your language.** The interface follows the system language: English or Spanish.
 
 <p align="center">
-  <img src="docs/images/settings.jpg" width="520" alt="The Uzzy Settings window: a Used / Left switch for the percentage on the cards; the Claude, Codex and Cursor providers with buttons to reorder them and a switch to turn each one on or off; a Simple / Detailed switch for the time until a reset and a switch for the resets available; a switch to check for updates; and the installed version at the bottom.">
+  <img src="docs/images/settings-general.jpg" width="260" alt="Uzzy Settings, General tab: Used / Left switch, Simple / Detailed reset countdown switch, resets available switch, update check switch, and installed version.">
+  <img src="docs/images/settings-providers.jpg" width="260" alt="Uzzy Settings, Providers tab: Claude, Codex, Cursor and Antigravity with reorder controls and switches to turn each provider on or off.">
+  <img src="docs/images/settings-notifications.jpg" width="260" alt="Uzzy Settings, Notifications tab: background refresh interval and switches for near-limit, reached and reset alerts.">
 </p>
 
 Open Settings with ⌘, from the panel; ⌘W closes it and ⌘Q quits. Your choices are remembered across launches. A provider you turn off has no card, and Uzzy does not read its session or query its usage limits.
