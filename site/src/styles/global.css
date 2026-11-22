@@ -87,11 +87,13 @@
 [data-feature-card][data-feature-pending] .feature-popover {
   opacity: 0;
   scale: 0.96;
+  transition: none;
 }
 
 [data-feature-card][data-feature-pending] .feature-notifs {
   opacity: 0;
   translate: 56px 0;
+  transition: none;
 }
 
 @media (min-width: 64rem) {

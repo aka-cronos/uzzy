@@ -143,8 +143,10 @@ const jsonLd = JSON.stringify(structuredData).replaceAll("<", "\\u003c");
       for (const card of cards) {
         const trigger = card.querySelector("[data-feature-trigger]");
         if (!trigger) continue;
+        // Only arm cards that are still below the viewport on load so in-view cards never flash hidden.
+        if (card.getBoundingClientRect().top <= window.innerHeight) continue;
         card.setAttribute("data-feature-pending", "");
-        requestAnimationFrame(() => observer.observe(trigger));
+        observer.observe(trigger);
       }
     }
   </script>
