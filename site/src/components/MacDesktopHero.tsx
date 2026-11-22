@@ -31,22 +31,18 @@ function formatMacClock(date: Date): { date: string; time: string } {
 }
 
 export function MacDesktopHero() {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [clock, setClock] = useState<{ date: string; time: string } | null>(null);
 
   useEffect(() => {
     const tick = () => setClock(formatMacClock(new Date()));
     tick();
     const clockTimer = window.setInterval(tick, 15_000);
-    const openTimer = window.setTimeout(() => setIsOpen(true), 180);
-    return () => {
-      window.clearInterval(clockTimer);
-      window.clearTimeout(openTimer);
-    };
+    return () => window.clearInterval(clockTimer);
   }, []);
 
   const panelMotion =
-    "origin-top transition-[opacity,translate,scale] duration-300 ease-out-strong motion-reduce:transition-opacity motion-reduce:translate-y-0 motion-reduce:scale-100";
+    "panel-drop origin-top transition-[opacity,translate,scale] duration-300 ease-out-strong motion-reduce:transition-opacity motion-reduce:translate-y-0 motion-reduce:scale-100";
 
   return (
     <section className="pt-[88px] pb-12 lg:px-5 lg:pb-16">

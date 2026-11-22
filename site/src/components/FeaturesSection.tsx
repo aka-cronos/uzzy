@@ -43,14 +43,15 @@ function StatusCluster({ date, time }: { date: string; time: string }) {
 
 export function FeaturesSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [visible, setVisible] = useState(false);
+  /* Default true so SSR HTML and no-JS always show the screenshots; JS arms scroll entrance when below the fold. */
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const el = sectionRef.current;
-    if (!el || typeof IntersectionObserver === "undefined") {
-      setVisible(true);
-      return;
-    }
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    if (el.getBoundingClientRect().top <= window.innerHeight * 0.95) return;
+
+    setVisible(false);
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries.some((e) => e.isIntersecting)) {

@@ -11,10 +11,23 @@
   animation-delay: calc(var(--i, 0) * 70ms);
 }
 
+/* The hero panel drops from the menu bar icon on load via CSS so SSR and no-JS stay visible. */
+.panel-drop {
+  animation: drop 320ms var(--ease-out-strong) 180ms both;
+}
+
 @keyframes rise {
   from {
     opacity: 0;
     translate: 0 8px;
+  }
+}
+
+@keyframes drop {
+  from {
+    opacity: 0;
+    translate: 0 -6px;
+    scale: 0.97;
   }
 }
 
@@ -83,7 +96,8 @@
 
 /* Reduced motion keeps the fades and drops the movement. */
 @media (prefers-reduced-motion: reduce) {
-  .rise {
+  .rise,
+  .panel-drop {
     animation-name: fade;
   }
 
