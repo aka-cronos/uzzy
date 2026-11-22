@@ -71,6 +71,53 @@
   }
 }
 
+/* Feature cards reveal smoothly as they scroll into view, with zero JS and full SSR/no-JS visibility. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .feature-stage {
+      view-timeline-name: --feature-stage;
+    }
+
+    .feature-popover {
+      animation: feature-popover-in linear both;
+      animation-timeline: --feature-stage;
+      animation-range: entry 20% cover 46%;
+    }
+
+    .feature-popover-2 {
+      animation-range: entry 26% cover 52%;
+    }
+
+    .feature-notifs {
+      animation: feature-notifs-in linear both;
+      animation-timeline: --feature-stage;
+      animation-range: entry 30% cover 56%;
+    }
+  }
+}
+
+@keyframes feature-popover-in {
+  from {
+    opacity: 0;
+    scale: 0.95;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+@keyframes feature-notifs-in {
+  from {
+    opacity: 0;
+    translate: 56px 0;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
 /* An answer opens to its own height instead of jumping. */
 @supports (interpolate-size: allow-keywords) {
   @media (prefers-reduced-motion: no-preference) {
