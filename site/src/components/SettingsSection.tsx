@@ -43,8 +43,8 @@ export function SettingsSection() {
   return (
     <section ref={sectionRef} id="settings" className="scroll-mt-[72px] py-20 lg:py-24">
       <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-        {/* Left 50%: fixed-height transparent frame with each Settings window vertically centered at 1x size */}
-        <div className="relative h-[420px] overflow-hidden sm:h-[580px] lg:h-[700px]">
+        {/* Left 50% on desktop (second on mobile): fixed-height transparent frame with each Settings window vertically centered at 1x size */}
+        <div className="relative order-2 h-[420px] overflow-hidden sm:h-[580px] lg:order-1 lg:h-[700px]">
           {c.settingsTabs.map((tab, idx) => {
             const isActive = idx === activeIndex;
             return (
@@ -71,8 +71,8 @@ export function SettingsSection() {
           })}
         </div>
 
-        {/* Right 50%: vertically centered against the Settings window */}
-        <div className="max-w-[46ch]">
+        {/* Right 50% on desktop (first on mobile): vertically centered against the Settings window */}
+        <div className="order-1 max-w-[46ch] lg:order-2">
           <h2 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
             Set it up your way, or don’t
           </h2>
