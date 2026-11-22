@@ -80,7 +80,6 @@
 
     .feature-popover {
       animation: feature-popover-in linear both;
-      animation-timeline: --feature-stage;
       animation-range: entry 20% cover 46%;
     }
 
@@ -90,8 +89,13 @@
 
     .feature-notifs {
       animation: feature-notifs-in linear both;
-      animation-timeline: --feature-stage;
       animation-range: entry 30% cover 56%;
+    }
+
+    /* Separate selectors: if LightningCSS merges animation-timeline into the animation shorthand, browsers drop the whole declaration. */
+    img.feature-popover,
+    div.feature-notifs {
+      animation-timeline: --feature-stage;
     }
   }
 }
