@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-import UzzyCore
+@testable import UzzyCore
 
 /// Keeps the alerts a core fires.
 @MainActor
@@ -376,5 +376,186 @@ struct UsageAlertTests {
             resetAt.addingTimeInterval(UsageCore.resetVerificationDelay),
             clock.now().addingTimeInterval(interval),
         ])
+    }
+
+    // MARK: - Overlapping limits
+
+    /// A weekly reset three days after the first reading, long after the
+    /// 5-hour one.
+    let weeklyResetAt = Samples.readingMoment.addingTimeInterval(3 * 86_400)
+    let nextWeeklyResetAt = Samples.readingMoment.addingTimeInterval(10 * 86_400)
+
+    /// Codex answers with a 5-hour window and a weekly one.
+    func answer(fiveHours: Double, fiveHoursReset: Date, weekly: Double, weeklyReset: Date) async {
+        let windows = #"""
+        {"primary_window": {"used_percent": \#(fiveHours), "limit_window_seconds": 18000, "reset_at": \#(fiveHoursReset.timeIntervalSince1970)},
+        "secondary_window": {"used_percent": \#(weekly), "limit_window_seconds": 604800, "reset_at": \#(weeklyReset.timeIntervalSince1970)}}
+        """#
+        await transport.answer(with: .codex(rateLimit: windows), for: .codex)
+    }
+
+    /// Reaches both the 5-hour and the weekly limit on the first tick, 15
+    /// minutes in, with the 5-hour reset at 20 minutes.
+    func reachBothLimits() async {
+        await answer(fiveHours: 50, fiveHoursReset: resetAt, weekly: 90, weeklyReset: weeklyResetAt)
+        core.panelOpened()
+        await core.queriesFinished()
+        core.panelClosed()
+
+        await answer(fiveHours: 100, fiveHoursReset: resetAt, weekly: 100, weeklyReset: weeklyResetAt)
+        clock.advance(by: interval)
+        await core.queriesFinished()
+        #expect(recorder.alerts == [
+            .limitReached(.codex, period: .fiveHours, reset: resetAt),
+            .limitReached(.codex, period: .weekly, reset: weeklyResetAt),
+        ])
+    }
+
+    /// The provider is still unusable until the weekly limit resets, so only
+    /// that reset fires.
+    @Test func aResetWhileTheWeeklyLimitStaysReachedFiresNothing() async {
+        await reachBothLimits()
+
+        await answer(fiveHours: 3, fiveHoursReset: nextResetAt, weekly: 100, weeklyReset: weeklyResetAt)
+        clock.advance(by: interval)
+        await core.queriesFinished()
+        #expect(recorder.alerts.count == 2)
+
+        await answer(fiveHours: 5, fiveHoursReset: nextResetAt, weekly: 1, weeklyReset: nextWeeklyResetAt)
+        clock.advance(by: interval)
+        await core.queriesFinished()
+        #expect(recorder.alerts.count == 3)
+        #expect(recorder.alerts.last == .limitReset(.codex, period: .weekly))
+    }
+
+    @Test func bothLimitsScheduleOneQueryRightAfterTheWeeklyReset() async {
+        await reachBothLimits()
+
+        #expect(clock.scheduledDeadlines == [
+            clock.now().addingTimeInterval(interval),
+            weeklyResetAt.addingTimeInterval(UsageCore.resetVerificationDelay),
+        ])
+    }
+}
+
+/// Which reset fires when several limits of one provider overlap: only the
+/// one after which the provider can be used again.
+@Suite
+struct AlertTrackerOverlapTests {
+    let fiveHoursReset = Samples.readingMoment.addingTimeInterval(2 * 3_600)
+    let nextFiveHoursReset = Samples.readingMoment.addingTimeInterval(7 * 3_600)
+    let weeklyReset = Samples.readingMoment.addingTimeInterval(3 * 86_400)
+
+    func quota(_ period: QuotaPeriod, used: Double, reset: Date?) -> AlertQuota {
+        AlertQuota(period: period, usedPercent: used, reset: reset.map(Reset.at) ?? .unknown)
+    }
+
+    /// The alerts of a second reading, `after`, of the same account as the
+    /// baseline reading, `before`.
+    func alerts(_ provider: Provider, before: [AlertQuota], after: [AlertQuota]) -> [UsageAlert] {
+        var tracker = AlertTracker(threshold: AlertSettings.defaultThreshold)
+        _ = tracker.observe(provider, accountID: "account", quotas: before)
+        return tracker.observe(provider, accountID: "account", quotas: after)
+    }
+
+    @Test func aGroupsWeeklyLimitBlocksItsOwnGroupsReset() {
+        let fiveHours = QuotaPeriod.limit("Gemini", .fiveHours)
+        let weekly = QuotaPeriod.limit("Gemini", .weekly)
+
+        let fired = alerts(
+            .antigravity,
+            before: [quota(fiveHours, used: 100, reset: fiveHoursReset), quota(weekly, used: 100, reset: weeklyReset)],
+            after: [quota(fiveHours, used: 0, reset: nextFiveHoursReset), quota(weekly, used: 100, reset: weeklyReset)]
+        )
+
+        #expect(fired == [])
+    }
+
+    @Test func anotherGroupsWeeklyLimitDoesNotBlockTheReset() {
+        let fiveHours = QuotaPeriod.limit("Gemini", .fiveHours)
+        let weekly = QuotaPeriod.limit("Gemini", .weekly)
+        let otherWeekly = QuotaPeriod.limit("Claude and GPT", .weekly)
+
+        let fired = alerts(
+            .antigravity,
+            before: [
+                quota(fiveHours, used: 100, reset: fiveHoursReset),
+                quota(weekly, used: 40, reset: weeklyReset),
+                quota(otherWeekly, used: 100, reset: weeklyReset),
+            ],
+            after: [
+                quota(fiveHours, used: 0, reset: nextFiveHoursReset),
+                quota(weekly, used: 40, reset: weeklyReset),
+                quota(otherWeekly, used: 100, reset: weeklyReset),
+            ]
+        )
+
+        #expect(fired == [.limitReset(.antigravity, period: fiveHours)])
+    }
+
+    @Test func aNamedLimitDoesNotBlockTheAccountsReset() {
+        let named = QuotaPeriod.limit("GPT-5.3-Codex-Spark", .weekly)
+
+        let fired = alerts(
+            .codex,
+            before: [quota(.fiveHours, used: 100, reset: fiveHoursReset), quota(named, used: 100, reset: weeklyReset)],
+            after: [quota(.fiveHours, used: 2, reset: nextFiveHoursReset), quota(named, used: 100, reset: weeklyReset)]
+        )
+
+        #expect(fired == [.limitReset(.codex, period: .fiveHours)])
+    }
+
+    @Test func theAccountsWeeklyLimitBlocksANamedLimitsReset() {
+        let named = QuotaPeriod.limit("GPT-5.3-Codex-Spark", .fiveHours)
+
+        let fired = alerts(
+            .codex,
+            before: [quota(named, used: 100, reset: fiveHoursReset), quota(.weekly, used: 100, reset: weeklyReset)],
+            after: [quota(named, used: 2, reset: nextFiveHoursReset), quota(.weekly, used: 100, reset: weeklyReset)]
+        )
+
+        #expect(fired == [])
+    }
+
+    /// A new window already at 100% confirms the reset, but a blocking limit
+    /// still holds it back; the new window's limit reached fires as usual.
+    @Test func aNewWindowAlreadyAtTheLimitIsBlockedToo() {
+        let fired = alerts(
+            .claude,
+            before: [quota(.fiveHours, used: 100, reset: fiveHoursReset), quota(.weekly, used: 100, reset: weeklyReset)],
+            after: [quota(.fiveHours, used: 100, reset: nextFiveHoursReset), quota(.weekly, used: 100, reset: weeklyReset)]
+        )
+
+        #expect(fired == [.limitReached(.claude, period: .fiveHours, reset: nextFiveHoursReset)])
+    }
+
+    @Test func theEarliestUsableResetSkipsAResetALaterLimitOutlasts() {
+        let quotas = [quota(.fiveHours, used: 100, reset: fiveHoursReset), quota(.weekly, used: 100, reset: weeklyReset)]
+
+        #expect(AlertQuota.earliestUsableReset(of: quotas) == weeklyReset)
+    }
+
+    @Test func aBlockingLimitWithoutAKnownResetLeavesNoUsableReset() {
+        let quotas = [quota(.fiveHours, used: 100, reset: fiveHoursReset), quota(.weekly, used: 100, reset: nil)]
+
+        #expect(AlertQuota.earliestUsableReset(of: quotas) == nil)
+    }
+
+    @Test func limitsResettingTogetherShareTheirReset() {
+        let quotas = [
+            quota(.fiveHours, used: 100, reset: weeklyReset),
+            quota(.weekly, used: 100, reset: weeklyReset.addingTimeInterval(30)),
+        ]
+
+        #expect(AlertQuota.earliestUsableReset(of: quotas) == weeklyReset)
+    }
+
+    @Test func anotherGroupsLimitLeavesTheEarlierResetUsable() {
+        let quotas = [
+            quota(.limit("Gemini", .fiveHours), used: 100, reset: fiveHoursReset),
+            quota(.limit("Claude and GPT", .weekly), used: 100, reset: weeklyReset),
+        ]
+
+        #expect(AlertQuota.earliestUsableReset(of: quotas) == fiveHoursReset)
     }
 }
