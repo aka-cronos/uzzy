@@ -54,7 +54,7 @@ export const providers = [
   { name: "Claude", hosts: ["api.anthropic.com"] },
   { name: "Codex", hosts: ["chatgpt.com"] },
   { name: "Cursor", hosts: ["api2.cursor.sh"] },
-  { name: "Antigravity", hosts: ["daily-cloudcode-pa.sandbox.googleapis.com", "127.0.0.1"] },
+  { name: "Antigravity", hosts: ["daily-cloudcode-pa.googleapis.com", "127.0.0.1"] },
 ];
 
 export type SettingsTabId = "general" | "providers" | "notifications";

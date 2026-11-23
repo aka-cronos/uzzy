@@ -140,7 +140,7 @@ struct AntigravitySessionTests {
 
         let requests = await transport.quotaRequests(to: .antigravity)
         #expect(requests.count == 2)
-        #expect(requests.allSatisfy { $0.url?.host == "daily-cloudcode-pa.sandbox.googleapis.com" })
+        #expect(requests.allSatisfy { $0.url?.host == "daily-cloudcode-pa.googleapis.com" })
         #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "Authorization") == "Bearer sample-token" })
     }
 
@@ -320,7 +320,7 @@ struct AntigravitySessionTests {
 
         let requests = await transport.quotaRequests(to: .antigravity)
         #expect(requests.count == 2)
-        #expect(requests.allSatisfy { $0.url?.host == "daily-cloudcode-pa.sandbox.googleapis.com" })
+        #expect(requests.allSatisfy { $0.url?.host == "daily-cloudcode-pa.googleapis.com" })
         #expect(requests.allSatisfy { $0.value(forHTTPHeaderField: "Authorization") == "Bearer t3-fresh-token" })
         #expect(requests.allSatisfy { $0.url?.host != "127.0.0.1" })
     }
