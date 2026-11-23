@@ -277,11 +277,13 @@ public final class UsageCore {
     }
 
     /// A limited quota with a known reset is queried once right after it,
-    /// instead of at the next tick, so its reset is confirmed promptly. Only
-    /// while background refresh and reset alerts are on.
+    /// instead of at the next tick, so its reset is confirmed promptly. A
+    /// reset another limit at 100% outlasts confirms nothing worth telling,
+    /// so it is not queried early. Only while background refresh and reset
+    /// alerts are on.
     private func scheduleResetVerification(for provider: Provider, quotas: [AlertQuota]) {
         guard backgroundRefresh.isOn, alerts.limitReset,
-              let resetAt = quotas.filter(\.isLimited).compactMap(\.resetDate).min()
+              let resetAt = AlertQuota.earliestUsableReset(of: quotas)
         else {
             setResetVerification(nil, for: provider)
             return

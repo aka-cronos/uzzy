@@ -99,6 +99,37 @@ struct AlertQuota: Sendable, Equatable {
     var isLimited: Bool {
         usedPercent >= 100
     }
+
+    /// The name of the model, group or bag a named limit covers, or `nil`
+    /// for a limit on the whole account, such as the 5-hour or weekly one.
+    var scope: String? {
+        if case .limit(let name, _) = period { name } else { nil }
+    }
+
+    /// Whether `other`, another quota of the same reading, still stops this
+    /// one from being used: it is at 100% and covers this quota's scope.
+    /// A limit on the whole account covers every scope; a named limit only
+    /// its own name.
+    func isBlocked(by other: AlertQuota) -> Bool {
+        other.period != period && other.isLimited && (other.scope == nil || other.scope == scope)
+    }
+
+    /// The earliest reset, among the limited `quotas`, after which a quota
+    /// can be used again: a limited quota whose reset comes before another
+    /// limited quota blocking it would still be blocked then. `nil` when no
+    /// such reset is known.
+    static func earliestUsableReset(of quotas: [AlertQuota]) -> Date? {
+        let limited = quotas.filter(\.isLimited)
+        return limited.compactMap { quota -> Date? in
+            guard let reset = quota.resetDate else { return nil }
+            let outlasted = limited.contains { other in
+                guard quota.isBlocked(by: other) else { return false }
+                guard let otherReset = other.resetDate else { return true }
+                return otherReset.timeIntervalSince(reset) > QuotaReading.resetAgreement
+            }
+            return outlasted ? nil : reset
+        }.min()
+    }
 }
 
 /// Decides which alerts a fresh reading fires, and remembers which ones
@@ -156,7 +187,11 @@ struct AlertTracker {
             } ?? false
             // A reset that passed without a new reading confirms nothing.
             if window.awaitsReset, quota.reset != .pendingConfirmation, !quota.isLimited || advanced {
-                alerts.append(.limitReset(provider, period: quota.period))
+                // Another limit at 100% still stops the provider from being
+                // used, so its reset is the one that fires.
+                if !quotas.contains(where: quota.isBlocked(by:)) {
+                    alerts.append(.limitReset(provider, period: quota.period))
+                }
                 window.awaitsReset = false
             }
             if advanced {
