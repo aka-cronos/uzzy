@@ -4,7 +4,6 @@ public enum Provider: Sendable, Hashable, CaseIterable {
     case claude
     case codex
     case cursor
-    case antigravity
 }
 
 public struct PanelState: Sendable, Equatable {

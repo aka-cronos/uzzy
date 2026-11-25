@@ -13,7 +13,7 @@ struct SessionStateTests {
     let refreshInterval: TimeInterval = 5 * 60
 
     init() {
-        core = UsageCore(claudeSessionReader: sessionReader, codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(), transport: transport, clock: clock)
+        core = UsageCore(claudeSessionReader: sessionReader, codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), transport: transport, clock: clock)
     }
 
     func claudeContent() -> CardContent? {

@@ -18,7 +18,6 @@ struct ResetTextTests {
             claudeSessionReader: ControlledSessionReader(),
             codexSessionReader: ControlledSessionReader(),
             cursorSessionReader: NoSessionReader(),
-            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: ManualClock(now),
             log: RecordingLog()

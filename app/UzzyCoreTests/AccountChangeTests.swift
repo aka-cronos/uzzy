@@ -15,7 +15,7 @@ struct AccountChangeTests {
     let otherAccount = Session(accessToken: "other-token", accountID: "other-account")
 
     init() {
-        core = UsageCore(claudeSessionReader: sessionReader, codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(), transport: transport, clock: clock, log: RecordingLog())
+        core = UsageCore(claudeSessionReader: sessionReader, codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), transport: transport, clock: clock, log: RecordingLog())
     }
 
     func claudeContent() -> CardContent? {

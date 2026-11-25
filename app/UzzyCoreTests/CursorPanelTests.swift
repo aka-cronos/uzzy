@@ -19,7 +19,6 @@ struct CursorPanelTests {
             claudeSessionReader: ControlledSessionReader(),
             codexSessionReader: ControlledSessionReader(),
             cursorSessionReader: cursorSessionReader,
-            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog()
@@ -35,12 +34,11 @@ struct CursorPanelTests {
         await core.queriesFinished()
     }
 
-    @Test func thePanelShowsTheCardsOfClaudeCodexCursorAndAntigravityInThatOrder() {
+    @Test func thePanelShowsTheCardsOfClaudeCodexAndCursorInThatOrder() {
         #expect(core.state.cards == [
             Card(provider: .claude, content: .loading),
             Card(provider: .codex, content: .loading),
             Card(provider: .cursor, content: .loading),
-            Card(provider: .antigravity, content: .loading),
         ])
     }
 

@@ -11,7 +11,6 @@ struct ClaudePanelTests {
             claudeSessionReader: SampleSessionReader(),
             codexSessionReader: NoSessionReader(),
             cursorSessionReader: NoSessionReader(),
-            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: FixedClock(readingMoment)
         )

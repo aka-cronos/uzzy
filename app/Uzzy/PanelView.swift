@@ -515,11 +515,6 @@ private struct FailureMessage: View {
                     title: "Keychain unavailable",
                     detail: "Couldn't read the Claude Code session in the keychain. Check that it's unlocked and click Refresh."
                 )
-            } else if provider == .antigravity {
-                Message(
-                    title: "Keychain unavailable",
-                    detail: "Couldn't read the Antigravity session in the keychain. Check that it's unlocked and click Refresh."
-                )
             } else if provider == .cursor {
                 Message(
                     title: "Couldn't read the session",
@@ -541,10 +536,6 @@ private struct FailureMessage: View {
                 title: "Incompatible session",
                 detail: "The \(provider.officialApp) session is in a format \(Format.appName) doesn't recognize."
             )
-        case .sessionExpired where provider == .antigravity:
-            // Antigravity renews the token when it runs, and the card reads
-            // it again on its own while the panel is open.
-            Message(title: "Session expired", detail: "Open Antigravity to renew the session. \(Format.appName) updates on its own.")
         case .sessionExpired where provider == .claude || provider == .codex:
             // The card reads the session again on its own while the panel
             // is open; Cursor's key is read only on a user action.
@@ -621,7 +612,6 @@ extension Provider {
         case .claude: "Claude"
         case .codex: "Codex"
         case .cursor: "Cursor"
-        case .antigravity: "Antigravity"
         }
     }
 
@@ -630,7 +620,6 @@ extension Provider {
         case .claude: .providerLogoClaude
         case .codex: .providerLogoCodex
         case .cursor: .providerLogoCursor
-        case .antigravity: .providerLogoAntigravity
         }
     }
 
@@ -640,7 +629,6 @@ extension Provider {
         case .claude: "Claude Code"
         case .codex: "Codex CLI"
         case .cursor: "Cursor"
-        case .antigravity: "Antigravity"
         }
     }
 }

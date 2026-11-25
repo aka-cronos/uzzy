@@ -123,7 +123,6 @@ extension Scenario {
         await stage.transport.answer(with: .networkError, for: .claude)
         await stage.transport.answer(with: .status(503), for: .codex)
         await stage.transport.answer(with: .timeout, for: .cursor)
-        await stage.transport.answer(with: .status(500), for: .antigravity)
         await stage.openPanel()
     }
 
@@ -258,7 +257,6 @@ extension Scenario {
         await stage.transport.answer(with: .json("<html>Sample maintenance page</html>"), for: .claude)
         await stage.transport.answer(with: .codex(rateLimit: "null"), for: .codex)
         await stage.transport.answer(with: .json("{}"), for: .cursor)
-        await stage.transport.answer(with: .json(#"{"groups": []}"#), for: .antigravity)
         await stage.openPanel()
     }
 
@@ -276,11 +274,10 @@ extension Scenario {
         await stage.transport.answer(with: .networkError, for: .claude)
         await stage.transport.answer(with: .timeout, for: .codex)
         await stage.transport.answer(with: .status(503), for: .cursor)
-        await stage.transport.answer(with: .status(502), for: .antigravity)
         await stage.openPanel()
     }
 
-    /// Claude and Antigravity refuse the query (403); Codex asks to wait 10
+    /// Claude refuses the query (403); Codex asks to wait 10
     /// minutes and Cursor asks to wait without saying how long (429).
     public static let refused = Scenario("refused", "Access refused and too many queries") { stage in
         await stage.transport.answer(with: .status(403), for: .claude)
@@ -288,7 +285,6 @@ extension Scenario {
             with: .response(HTTPResponse(status: 429, headers: ["Retry-After": "600"], body: Data())), for: .codex
         )
         await stage.transport.answer(with: .status(429), for: .cursor)
-        await stage.transport.answer(with: .status(403), for: .antigravity)
         await stage.openPanel()
     }
 }
@@ -364,7 +360,6 @@ final class Stage {
         .claude: ControlledSessionReader(session: Samples.claudeSession),
         .codex: ControlledSessionReader(),
         .cursor: ControlledSessionReader(session: Samples.cursorSession),
-        .antigravity: ControlledSessionReader(),
     ]
     let core: UsageCore
 
@@ -373,7 +368,6 @@ final class Stage {
             claudeSessionReader: sessionReaders[.claude]!,
             codexSessionReader: sessionReaders[.codex]!,
             cursorSessionReader: sessionReaders[.cursor]!,
-            antigravitySessionReader: sessionReaders[.antigravity]!,
             transport: transport,
             clock: clock,
             // Keeps the scenarios' failures out of the system log.

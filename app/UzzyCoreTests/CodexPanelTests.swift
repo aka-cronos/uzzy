@@ -21,7 +21,6 @@ struct CodexPanelTests {
             claudeSessionReader: claudeSessionReader,
             codexSessionReader: codexSessionReader,
             cursorSessionReader: NoSessionReader(),
-            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog()

@@ -20,7 +20,6 @@ struct BankedResetTests {
             claudeSessionReader: NoSessionReader(),
             codexSessionReader: codexSessionReader,
             cursorSessionReader: NoSessionReader(),
-            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog()
@@ -137,7 +136,6 @@ struct BankedResetTests {
             claudeSessionReader: ControlledSessionReader(),
             codexSessionReader: ControlledSessionReader(),
             cursorSessionReader: ControlledSessionReader(),
-            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog()

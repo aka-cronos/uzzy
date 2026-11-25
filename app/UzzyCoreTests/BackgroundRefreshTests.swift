@@ -19,7 +19,6 @@ struct BackgroundRefreshTests {
             claudeSessionReader: NoSessionReader(),
             codexSessionReader: sessionReader,
             cursorSessionReader: NoSessionReader(),
-            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog(),

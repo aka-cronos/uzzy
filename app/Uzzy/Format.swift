@@ -185,7 +185,7 @@ struct Format {
         switch provider {
         case .claude: count == 1 ? text("Use it in Claude.") : text("Use them in Claude.")
         case .codex: count == 1 ? text("Use it in Codex.") : text("Use them in Codex.")
-        case .cursor, .antigravity: ""
+        case .cursor: ""
         }
     }
 

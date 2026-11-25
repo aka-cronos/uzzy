@@ -24,7 +24,6 @@ struct SettingsView: View {
     @AppStorage(ProviderPreferences.claudeKey) private var showClaude = true
     @AppStorage(ProviderPreferences.codexKey) private var showCodex = true
     @AppStorage(ProviderPreferences.cursorKey) private var showCursor = true
-    @AppStorage(ProviderPreferences.antigravityKey) private var showAntigravity = true
     @AppStorage(UpdatePreferences.checkKey) private var checkForUpdates = true
     @AppStorage(NotificationPreferences.backgroundRefreshKey) private var backgroundRefresh = false
     @AppStorage(NotificationPreferences.intervalKey) private var intervalMinutes = NotificationPreferences.defaultIntervalMinutes
@@ -64,7 +63,6 @@ struct SettingsView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .onChange(of: showClaude) { _, enabled in setProviderEnabled(.claude, enabled) }
         .onChange(of: showCodex) { _, enabled in setProviderEnabled(.codex, enabled) }
-        .onChange(of: showAntigravity) { _, enabled in setProviderEnabled(.antigravity, enabled) }
         .onChange(of: showCursor) { _, enabled in
             let hadAccess = core.isCursorAccessGranted
             setProviderEnabled(.cursor, enabled)
@@ -332,7 +330,6 @@ struct SettingsView: View {
         case .claude: $showClaude
         case .codex: $showCodex
         case .cursor: $showCursor
-        case .antigravity: $showAntigravity
         }
     }
 
