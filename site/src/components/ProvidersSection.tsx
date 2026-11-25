@@ -6,13 +6,12 @@ const LOGOS: Record<string, string> = {
   Claude: "/cover/claude.svg",
   Codex: "/cover/codex.svg",
   Cursor: "/cover/cursor.svg",
-  Antigravity: "/cover/antigravity.svg",
 };
 
 const onLight = (name: string) => (name === "Claude" ? "" : "invert");
 
-/* Normalized horizontal anchor positions (matching 100, 260, 420, 580 in a 680px canvas) */
-const PROVIDER_FRACTIONS = [100 / 680, 260 / 680, 420 / 680, 580 / 680] as const;
+/* Normalized horizontal anchor positions (matching 140, 340, 540 in a 680px canvas) */
+const PROVIDER_FRACTIONS = [140 / 680, 340 / 680, 540 / 680] as const;
 const DIAGRAM_HEIGHT = 314;
 
 const WIRE_STYLE = {
@@ -45,14 +44,13 @@ export function ProvidersSection() {
 
   const stemPath = `M ${cx} 88 V 143`;
   const leftBusPath = `M ${cx} 186 Q ${cx} 198 ${cx - r} 198 H ${xs[0] + r} Q ${xs[0]} 198 ${xs[0]} 210 V 230`;
-  const rightBusPath = `M ${cx} 186 Q ${cx} 198 ${cx + r} 198 H ${xs[3] - r} Q ${xs[3]} 198 ${xs[3]} 210 V 230`;
-  const innerBranchesPath = `M ${xs[1]} 198 V 230 M ${xs[2]} 198 V 230`;
+  const rightBusPath = `M ${cx} 186 Q ${cx} 198 ${cx + r} 198 H ${xs[2] - r} Q ${xs[2]} 198 ${xs[2]} 210 V 230`;
+  const innerBranchesPath = `M ${xs[1]} 186 V 230`;
 
   const branchMotionPaths = [
     `M ${cx} 143 V 186 Q ${cx} 198 ${cx - r} 198 H ${xs[0] + r} Q ${xs[0]} 198 ${xs[0]} 210 V 230`,
-    `M ${cx} 143 V 186 Q ${cx} 198 ${cx - r} 198 H ${xs[1]} V 230`,
-    `M ${cx} 143 V 186 Q ${cx} 198 ${cx + r} 198 H ${xs[2]} V 230`,
-    `M ${cx} 143 V 186 Q ${cx} 198 ${cx + r} 198 H ${xs[3] - r} Q ${xs[3]} 198 ${xs[3]} 210 V 230`,
+    `M ${cx} 143 V 230`,
+    `M ${cx} 143 V 186 Q ${cx} 198 ${cx + r} 198 H ${xs[2] - r} Q ${xs[2]} 198 ${xs[2]} 210 V 230`,
   ];
 
   return (
