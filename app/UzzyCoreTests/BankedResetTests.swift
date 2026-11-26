@@ -149,7 +149,7 @@ struct BankedResetTests {
         core.panelOpened()
         await core.queriesFinished()
 
-        #expect(core.state.cards.filter { $0.provider != .codex }.map(\.bankedResets) == [nil, nil, nil])
+        #expect(core.state.cards.filter { $0.provider != .codex }.map(\.bankedResets) == [nil, nil])
     }
 
     // MARK: Account-bound lifetime
