@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/app.jpg" width="420" alt="The Uzzy panel open from the menu bar, with one card each for Claude, Codex, Cursor and Antigravity and each account's plan next to its title. Each usage limit has its own bar, its used percentage and its reset time.">
+  <img src="docs/images/app.jpg" width="420" alt="The Uzzy panel open from the menu bar, with one card each for Claude, Codex and Cursor and each account's plan next to its title. Each usage limit has its own bar, its used percentage and its reset time.">
 </p>
 
 ## Why Uzzy
@@ -36,7 +36,7 @@ Keep using Claude, Codex and Cursor. Uzzy brings their usage limits together so 
 
 <p align="center">
   <img src="docs/images/settings-general.jpg" width="260" alt="Uzzy Settings, General tab: Used / Left switch, Simple / Detailed reset countdown switch, resets available switch, update check switch, and installed version.">
-  <img src="docs/images/settings-providers.jpg" width="260" alt="Uzzy Settings, Providers tab: Claude, Codex, Cursor and Antigravity with reorder controls and switches to turn each provider on or off.">
+  <img src="docs/images/settings-providers.jpg" width="260" alt="Uzzy Settings, Providers tab: Claude, Codex and Cursor with reorder controls, Keychain access revoke control and switches to turn each provider on or off.">
   <img src="docs/images/settings-notifications.jpg" width="260" alt="Uzzy Settings, Notifications tab: background refresh interval and switches for near-limit, reached and reset alerts.">
 </p>
 

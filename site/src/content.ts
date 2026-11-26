@@ -94,7 +94,7 @@ export const settingsTabs: {
     label: "Providers",
     image: "/settings-providers.png",
     width: 592,
-    height: 540,
+    height: 487,
     alt: "Uzzy Settings, Providers tab: Claude, Codex and Cursor with Keychain access revoke control, buttons to reorder them and a switch to turn each one on or off.",
     items: [
       {

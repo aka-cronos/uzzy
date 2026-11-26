@@ -14,7 +14,7 @@ const FINDER_MENUS = ["File", "Edit", "View", "Go", "Window", "Help"] as const;
 const PANEL_IMG = {
   src: "/cover/panel.png",
   width: 408,
-  height: 991,
+  height: 669,
   alt: "The Uzzy panel: cards for Claude, Codex and Cursor with their plans, each usage limit with its bar, used percentage and reset time.",
 } as const;
 
