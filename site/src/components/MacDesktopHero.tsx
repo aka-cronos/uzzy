@@ -7,7 +7,6 @@ const LOGOS: Record<string, string> = {
   Claude: "/cover/claude.svg",
   Codex: "/cover/codex.svg",
   Cursor: "/cover/cursor.svg",
-  Antigravity: "/cover/antigravity.svg",
 };
 
 const FINDER_MENUS = ["File", "Edit", "View", "Go", "Window", "Help"] as const;
@@ -16,7 +15,7 @@ const PANEL_IMG = {
   src: "/cover/panel.png",
   width: 408,
   height: 991,
-  alt: "The Uzzy panel: cards for Claude, Codex, Cursor and Antigravity with their plans, each usage limit with its bar, used percentage and reset time.",
+  alt: "The Uzzy panel: cards for Claude, Codex and Cursor with their plans, each usage limit with its bar, used percentage and reset time.",
 } as const;
 
 function formatMacClock(date: Date): { date: string; time: string } {

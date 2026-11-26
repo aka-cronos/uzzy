@@ -31,9 +31,7 @@ struct ScenarioTests {
             #expect(cards[.codex]?.creditBalance?.value == .credits(Decimal(string: "123.45")!))
             #expect(cards[.claude]?.cloudCredit?.value == .money(Money(amount: 90, currency: "USD")))
             #expect(cards[.claude]?.cloudCredit?.total == Money(amount: 120, currency: "USD"))
-            // Antigravity reports no credit balance.
-            #expect(core.state.cards.filter { $0.provider != .antigravity }.allSatisfy { $0.creditBalance?.isStale == stale })
-            #expect(cards[.antigravity]?.creditBalance == nil)
+            #expect(core.state.cards.allSatisfy { $0.creditBalance?.isStale == stale })
             #expect(cards[.claude]?.cloudCredit?.isStale == false)
             #expect(core.state.cards.allSatisfy { if case .quotas = $0.content { true } else { false } })
             core.panelClosed()
@@ -50,14 +48,13 @@ struct ScenarioTests {
         #expect(quotas(cards[.claude]).map(\.value) == [.percent(35, calculated: false), .percent(62, calculated: false)])
         #expect(quotas(cards[.codex]).map(\.value) == [.percent(12, calculated: false), .percent(41, calculated: false)])
         #expect(quotas(cards[.cursor]).map(\.value) == [.percent(18.5, calculated: false), .percent(42.75, calculated: false)])
-        #expect(quotas(cards[.antigravity]).map(\.value) == [4, 36, 0, 0, 12].map { .percent($0, calculated: false) })
         #expect(!core.state.isQuerying)
     }
 
     @Test func quotasShowEachProvidersPlanNextToItsName() async {
         let core = await Scenario.quotas.start()
 
-        #expect(core.state.cards.map(\.plan) == ["Max", "Plus", "Pro+", "Google AI Pro"])
+        #expect(core.state.cards.map(\.plan) == ["Max", "Plus", "Pro+"])
     }
 
     @Test func cursorWeeklyShowsSuperWithOnlyItsIncludedWeeklyLimit() async {
@@ -98,14 +95,14 @@ struct ScenarioTests {
     @Test func loadingShowsEveryCardQueryingItsQuotas() async {
         let core = await Scenario.loading.start()
 
-        #expect(core.state.cards.map(\.content) == [.loading, .loading, .loading, .loading])
+        #expect(core.state.cards.map(\.content) == [.loading, .loading, .loading])
         #expect(core.state.isQuerying)
     }
 
     @Test func newAccountClearsEveryCardWhileTheOtherAccountIsQueried() async {
         let core = await Scenario.newAccount.start()
 
-        #expect(core.state.cards.map(\.content) == Array(repeating: .loadingNewAccount, count: 4))
+        #expect(core.state.cards.map(\.content) == Array(repeating: .loadingNewAccount, count: 3))
     }
 
     @Test func staleKeepsTheLastValidReadingOfEachCardAfterAFailure() async {
@@ -114,10 +111,9 @@ struct ScenarioTests {
 
         guard case .stale(let claude, .offline) = cards[.claude],
               case .stale(let codex, .serverError(status: 503)) = cards[.codex],
-              case .stale(let cursor, .timedOut) = cards[.cursor],
-              case .stale(let antigravity, .serverError(status: 500)) = cards[.antigravity]
+              case .stale(let cursor, .timedOut) = cards[.cursor]
         else { Issue.record("Not stale: \(cards)"); return }
-        #expect((claude + codex + cursor + antigravity).allSatisfy { $0.isStale && $0.readAt == Samples.readingMoment })
+        #expect((claude + codex + cursor).allSatisfy { $0.isStale && $0.readAt == Samples.readingMoment })
         #expect(core.now() > Samples.readingMoment)
     }
 
@@ -166,13 +162,13 @@ struct ScenarioTests {
     @Test func noSessionShowsEveryCardSignedOut() async {
         let core = await Scenario.noSession.start()
 
-        #expect(core.state.cards.map(\.content) == Array(repeating: .failed(.noSession), count: 4))
+        #expect(core.state.cards.map(\.content) == Array(repeating: .failed(.noSession), count: 3))
     }
 
     @Test func sessionExpiredShowsEverySessionRejected() async {
         let core = await Scenario.sessionExpired.start()
 
-        #expect(core.state.cards.map(\.content) == Array(repeating: .failed(.sessionExpired), count: 4))
+        #expect(core.state.cards.map(\.content) == Array(repeating: .failed(.sessionExpired), count: 3))
     }
 
     @Test func reusedSessionRejectedKeepsEveryReadingStaleWithoutCallingTheSessionExpired() async {
@@ -210,13 +206,13 @@ struct ScenarioTests {
     @Test func incompatibleSessionShowsEverySessionInAnUnknownFormat() async {
         let core = await Scenario.incompatibleSession.start()
 
-        #expect(core.state.cards.map(\.content) == Array(repeating: .failed(.incompatibleSession), count: 4))
+        #expect(core.state.cards.map(\.content) == Array(repeating: .failed(.incompatibleSession), count: 3))
     }
 
     @Test func incompatibleResponseShowsEveryResponseNotUnderstood() async {
         let core = await Scenario.incompatibleResponse.start()
 
-        #expect(core.state.cards.map(\.content) == Array(repeating: .failed(.incompatibleResponse), count: 4))
+        #expect(core.state.cards.map(\.content) == Array(repeating: .failed(.incompatibleResponse), count: 3))
     }
 
     @Test func incompatibleCursorResetShowsItsOwnFailure() async {
@@ -229,7 +225,7 @@ struct ScenarioTests {
         let core = await Scenario.networkFailures.start()
 
         #expect(core.state.cards.map(\.content) == [
-            .failed(.offline), .failed(.timedOut), .failed(.serverError(status: 503)), .failed(.serverError(status: 502)),
+            .failed(.offline), .failed(.timedOut), .failed(.serverError(status: 503)),
         ])
     }
 
@@ -240,7 +236,6 @@ struct ScenarioTests {
             .failed(.accessRefused),
             .failed(.rateLimited(until: Samples.readingMoment.addingTimeInterval(600))),
             .failed(.rateLimited(until: nil)),
-            .failed(.accessRefused),
         ])
     }
 

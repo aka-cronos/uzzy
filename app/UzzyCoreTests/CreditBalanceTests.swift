@@ -11,7 +11,7 @@ struct CreditBalanceTests {
             """.utf8))
         let core = UsageCore(
             claudeSessionReader: NoSessionReader(), codexSessionReader: SampleSessionReader(),
-            cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(), transport: transport, clock: FixedClock(Samples.readingMoment)
+            cursorSessionReader: NoSessionReader(), transport: transport, clock: FixedClock(Samples.readingMoment)
         )
         core.panelOpened()
         await core.queriesFinished()
@@ -30,7 +30,7 @@ struct CreditBalanceTests {
             """.utf8))
         let core = UsageCore(
             claudeSessionReader: NoSessionReader(), codexSessionReader: SampleSessionReader(),
-            cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(), transport: transport, clock: FixedClock(Samples.readingMoment)
+            cursorSessionReader: NoSessionReader(), transport: transport, clock: FixedClock(Samples.readingMoment)
         )
         core.panelOpened()
         await core.queriesFinished()
@@ -51,7 +51,7 @@ struct CreditBalanceTests {
             """.utf8))
         let core = UsageCore(
             claudeSessionReader: SampleSessionReader(), codexSessionReader: NoSessionReader(),
-            cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(), transport: transport, clock: clock
+            cursorSessionReader: NoSessionReader(), transport: transport, clock: clock
         )
         core.panelOpened()
         await core.queriesFinished()
@@ -69,7 +69,7 @@ struct CreditBalanceTests {
         await transport.answerCredits(with: .json(#"{"billingMode":\#(mode),"eligible":true,"availableCents":"725","autoTopUp":{"enabled":false},"noUsageBasedAllowed":true}"#), for: .cursor)
         let core = UsageCore(
             claudeSessionReader: NoSessionReader(), codexSessionReader: NoSessionReader(),
-            cursorSessionReader: SampleSessionReader(), antigravitySessionReader: NoSessionReader(), transport: transport, clock: FixedClock(Samples.readingMoment)
+            cursorSessionReader: SampleSessionReader(), transport: transport, clock: FixedClock(Samples.readingMoment)
         )
         core.panelOpened()
         await core.queriesFinished()
@@ -79,7 +79,7 @@ struct CreditBalanceTests {
 
     @Test func aLargeExactCodexCreditQuantityIsPreserved() async {
         let transport = SampleTransport(codexResponse: Data(#"{"rate_limit":{"primary_window":{"used_percent":12,"limit_window_seconds":18000}},"credits":{"balance":"100000000000000000000000000000000000000","unlimited":false}}"#.utf8))
-        let core = UsageCore(claudeSessionReader: NoSessionReader(), codexSessionReader: SampleSessionReader(), cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(), transport: transport, clock: FixedClock(Samples.readingMoment))
+        let core = UsageCore(claudeSessionReader: NoSessionReader(), codexSessionReader: SampleSessionReader(), cursorSessionReader: NoSessionReader(), transport: transport, clock: FixedClock(Samples.readingMoment))
         core.panelOpened()
         await core.queriesFinished()
         #expect(core.state.cards.first { $0.provider == .codex }?.creditBalance?.value == .credits(pow(Decimal(10), 38)))
@@ -90,7 +90,7 @@ struct CreditBalanceTests {
         let transport = SampleTransport(codexResponse: Data("""
             {"rate_limit":{"primary_window":{"used_percent":12,"limit_window_seconds":18000}}\(creditFields)}
             """.utf8))
-        let core = UsageCore(claudeSessionReader: NoSessionReader(), codexSessionReader: SampleSessionReader(), cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(), transport: transport, clock: FixedClock(Samples.readingMoment), initialEnabledProviders: [.codex])
+        let core = UsageCore(claudeSessionReader: NoSessionReader(), codexSessionReader: SampleSessionReader(), cursorSessionReader: NoSessionReader(), transport: transport, clock: FixedClock(Samples.readingMoment), initialEnabledProviders: [.codex])
         core.panelOpened()
         await core.queriesFinished()
         #expect(core.state.cards.first?.creditBalance == nil)

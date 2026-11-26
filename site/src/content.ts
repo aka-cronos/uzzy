@@ -10,7 +10,7 @@ export const REQUIREMENTS = "macOS 27 · Apple Silicon";
 export const hero = {
   title: "Your AI tools have limits. Checking them shouldn’t be a task",
   subtitle:
-    "See what you’ve used, what’s left and when your usage limits reset for Claude, Codex, Cursor and Antigravity, right in your menu bar.",
+    "See what you’ve used, what’s left and when your usage limits reset for Claude, Codex and Cursor, right in your menu bar.",
 };
 
 export const features = [
@@ -54,7 +54,6 @@ export const providers = [
   { name: "Claude", hosts: ["api.anthropic.com"] },
   { name: "Codex", hosts: ["chatgpt.com"] },
   { name: "Cursor", hosts: ["api2.cursor.sh"] },
-  { name: "Antigravity", hosts: ["daily-cloudcode-pa.googleapis.com", "127.0.0.1"] },
 ];
 
 export type SettingsTabId = "general" | "providers" | "notifications";
@@ -96,11 +95,11 @@ export const settingsTabs: {
     image: "/settings-providers.png",
     width: 592,
     height: 540,
-    alt: "Uzzy Settings, Providers tab: Claude, Codex, Cursor with Keychain access revoke control, and Antigravity with buttons to reorder them and a switch to turn each one on or off.",
+    alt: "Uzzy Settings, Providers tab: Claude, Codex and Cursor with Keychain access revoke control, buttons to reorder them and a switch to turn each one on or off.",
     items: [
       {
         title: "Only the tools you use",
-        body: "Use one, two or all four. Turned-off providers get no card and Uzzy never reads their sessions.",
+        body: "Use one, two or all three. Turned-off providers get no card and Uzzy never reads their sessions.",
       },
       {
         title: "Your order",
@@ -165,4 +164,4 @@ export const faqs = [
 ];
 
 export const disclaimer =
-  "Uzzy is an independent project, not affiliated with, endorsed or sponsored by Anthropic, OpenAI, Anysphere or Google. It reads usage limits through undocumented endpoints that may change without notice.";
+  "Uzzy is an independent project, not affiliated with, endorsed or sponsored by Anthropic, OpenAI or Anysphere. It reads usage limits through undocumented endpoints that may change without notice.";

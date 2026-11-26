@@ -17,7 +17,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate, App
         claudeSessionReader: ClaudeCodeSessionReader(),
         codexSessionReader: CodexCLISessionReader(),
         cursorSessionReader: CursorSessionReader(consent: AppDelegate.cursorAccess),
-        antigravitySessionReader: AntigravitySessionReader(transport: AppDelegate.transport),
         cursorAccess: AppDelegate.cursorAccess,
         transport: AppDelegate.transport,
         clock: SystemClock(),

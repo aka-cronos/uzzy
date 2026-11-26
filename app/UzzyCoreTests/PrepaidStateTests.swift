@@ -14,7 +14,6 @@ struct PrepaidStateTests {
             claudeSessionReader: provider == .claude ? session : NoSessionReader(),
             codexSessionReader: provider == .codex ? session : NoSessionReader(),
             cursorSessionReader: provider == .cursor ? session : NoSessionReader(),
-            antigravitySessionReader: NoSessionReader(),
             transport: transport, clock: clock, initialEnabledProviders: [provider]
         )
     }

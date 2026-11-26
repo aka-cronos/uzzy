@@ -20,7 +20,6 @@ struct CursorSessionTests {
             claudeSessionReader: NoSessionReader(),
             codexSessionReader: NoSessionReader(),
             cursorSessionReader: CursorSessionReader(databaseFile: database.file),
-            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog()

@@ -16,7 +16,6 @@ struct QuotaPresentationTests {
             claudeSessionReader: SampleSessionReader(),
             codexSessionReader: NoSessionReader(),
             cursorSessionReader: NoSessionReader(),
-            antigravitySessionReader: NoSessionReader(),
             transport: SampleTransport(claudeResponse: Data(claudeResponse.utf8)),
             clock: clock ?? FixedClock(readingMoment)
         )
@@ -46,7 +45,6 @@ struct QuotaPresentationTests {
             claudeSessionReader: SampleSessionReader(),
             codexSessionReader: NoSessionReader(),
             cursorSessionReader: NoSessionReader(),
-            antigravitySessionReader: NoSessionReader(),
             transport: SampleTransport(),
             clock: FixedClock(readingMoment),
             initialMagnitude: .remaining

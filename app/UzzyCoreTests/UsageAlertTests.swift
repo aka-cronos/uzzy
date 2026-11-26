@@ -37,7 +37,6 @@ struct UsageAlertTests {
             claudeSessionReader: NoSessionReader(),
             codexSessionReader: sessionReader,
             cursorSessionReader: NoSessionReader(),
-            antigravitySessionReader: NoSessionReader(),
             transport: transport,
             clock: clock,
             log: RecordingLog(),
@@ -459,11 +458,11 @@ struct AlertTrackerOverlapTests {
     }
 
     @Test func aGroupsWeeklyLimitBlocksItsOwnGroupsReset() {
-        let fiveHours = QuotaPeriod.limit("Gemini", .fiveHours)
-        let weekly = QuotaPeriod.limit("Gemini", .weekly)
+        let fiveHours = QuotaPeriod.limit("Group A", .fiveHours)
+        let weekly = QuotaPeriod.limit("Group A", .weekly)
 
         let fired = alerts(
-            .antigravity,
+            .codex,
             before: [quota(fiveHours, used: 100, reset: fiveHoursReset), quota(weekly, used: 100, reset: weeklyReset)],
             after: [quota(fiveHours, used: 0, reset: nextFiveHoursReset), quota(weekly, used: 100, reset: weeklyReset)]
         )
@@ -472,12 +471,12 @@ struct AlertTrackerOverlapTests {
     }
 
     @Test func anotherGroupsWeeklyLimitDoesNotBlockTheReset() {
-        let fiveHours = QuotaPeriod.limit("Gemini", .fiveHours)
-        let weekly = QuotaPeriod.limit("Gemini", .weekly)
-        let otherWeekly = QuotaPeriod.limit("Claude and GPT", .weekly)
+        let fiveHours = QuotaPeriod.limit("Group A", .fiveHours)
+        let weekly = QuotaPeriod.limit("Group A", .weekly)
+        let otherWeekly = QuotaPeriod.limit("Group B", .weekly)
 
         let fired = alerts(
-            .antigravity,
+            .codex,
             before: [
                 quota(fiveHours, used: 100, reset: fiveHoursReset),
                 quota(weekly, used: 40, reset: weeklyReset),
@@ -490,7 +489,7 @@ struct AlertTrackerOverlapTests {
             ]
         )
 
-        #expect(fired == [.limitReset(.antigravity, period: fiveHours)])
+        #expect(fired == [.limitReset(.codex, period: fiveHours)])
     }
 
     @Test func aNamedLimitDoesNotBlockTheAccountsReset() {

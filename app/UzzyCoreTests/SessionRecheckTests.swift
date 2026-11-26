@@ -13,7 +13,6 @@ struct SessionRecheckTests {
         .claude: ControlledSessionReader(),
         .codex: ControlledSessionReader(),
         .cursor: ControlledSessionReader(),
-        .antigravity: ControlledSessionReader(),
     ]
     let transport = ControlledTransport()
     let core: UsageCore
@@ -24,7 +23,6 @@ struct SessionRecheckTests {
             claudeSessionReader: readers[.claude]!,
             codexSessionReader: readers[.codex]!,
             cursorSessionReader: readers[.cursor]!,
-            antigravitySessionReader: readers[.antigravity]!,
             transport: transport,
             clock: clock,
             log: RecordingLog()
@@ -41,7 +39,7 @@ struct SessionRecheckTests {
         await core.queriesFinished()
     }
 
-    @Test(arguments: [Provider.claude, .codex, .antigravity])
+    @Test(arguments: [Provider.claude, .codex])
     func aRenewedSessionIsQueriedOnItsOwn(provider: Provider) async {
         await openPanelWithARejectedSession(of: provider)
         #expect(content(of: provider) == .failed(.sessionExpired))
@@ -51,7 +49,6 @@ struct SessionRecheckTests {
         case .claude: .claudeSample
         case .codex: .codexSample
         case .cursor: .cursorSample
-        case .antigravity: .antigravitySample
         }
         await transport.answer(with: sample, for: provider)
         clock.advance(by: Self.recheck)

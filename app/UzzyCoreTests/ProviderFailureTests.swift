@@ -16,7 +16,7 @@ struct ProviderFailureTests {
     let weeklyReset = Date(timeIntervalSince1970: 1_790_326_800)
 
     init() {
-        core = UsageCore(claudeSessionReader: SampleSessionReader(), codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(), transport: transport, clock: clock, log: log)
+        core = UsageCore(claudeSessionReader: SampleSessionReader(), codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), transport: transport, clock: clock, log: log)
     }
 
     func claudeContent() -> CardContent? {
@@ -118,7 +118,7 @@ struct ProviderFailureTests {
 
     @Test func aSessionFailureDoesNotKeepThePreviousReading() async {
         let sessionReader = ControlledSessionReader()
-        let core = UsageCore(claudeSessionReader: sessionReader, codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(), transport: transport, clock: clock, log: log)
+        let core = UsageCore(claudeSessionReader: sessionReader, codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), transport: transport, clock: clock, log: log)
         core.panelOpened()
         await core.queriesFinished()
 
@@ -131,7 +131,7 @@ struct ProviderFailureTests {
 
     @Test func aReadingOfAnotherAccountIsNotKeptAfterAFailure() async {
         let sessionReader = ControlledSessionReader()
-        let core = UsageCore(claudeSessionReader: sessionReader, codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(), transport: transport, clock: clock, log: log)
+        let core = UsageCore(claudeSessionReader: sessionReader, codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), transport: transport, clock: clock, log: log)
         core.panelOpened()
         await core.queriesFinished()
 
@@ -145,7 +145,7 @@ struct ProviderFailureTests {
 
     @Test func aReadingIsNotKeptWhenTheAccountCannotBeVerified() async {
         let sessionReader = ControlledSessionReader()
-        let core = UsageCore(claudeSessionReader: sessionReader, codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), antigravitySessionReader: NoSessionReader(), transport: transport, clock: clock, log: log)
+        let core = UsageCore(claudeSessionReader: sessionReader, codexSessionReader: NoSessionReader(), cursorSessionReader: NoSessionReader(), transport: transport, clock: clock, log: log)
         core.panelOpened()
         await core.queriesFinished()
 

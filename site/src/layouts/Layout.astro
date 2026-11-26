@@ -10,13 +10,13 @@ interface Props {
 }
 // <title> and og:title share this string, so they can't drift apart.
 const {
-  title = "Uzzy: AI usage limits for Claude, Codex, Cursor and Antigravity",
+  title = "Uzzy: AI usage limits for Claude, Codex and Cursor",
   noindex = false,
 } = Astro.props;
 const canonical = new URL("/", Astro.site).href;
 const ogImage = new URL("/og.jpg", Astro.site).href;
 const ogImageAlt =
-  "Uzzy: “Your AI tools have limits. Checking them shouldn’t be a task” next to the panel hanging from the menu bar, showing usage limits for Claude, Codex, Cursor and Antigravity.";
+  "Uzzy: “Your AI tools have limits. Checking them shouldn’t be a task” next to the panel hanging from the menu bar, showing usage limits for Claude, Codex and Cursor.";
 // slate-50, the page background
 const themeColor = "#f8fafc";
 ---
